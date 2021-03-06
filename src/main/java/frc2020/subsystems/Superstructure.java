@@ -22,7 +22,7 @@ public class Superstructure extends Subsystem {
 
     private static Intake mIntake = Intake.getInstance();
     private static Inventory mInventory = Inventory.getInstance();
-    private static AimingDevice mAimingDevice = AimingDevice.getInstance();
+    private static Hood mHood = Hood.getInstance();
     private static Kicker mKicker = Kicker.getInstance();
     private static Shooter mShooter = Shooter.getInstance();
     private static Limelight mLimelight = Limelight.getInstance();
@@ -80,7 +80,7 @@ public class Superstructure extends Subsystem {
                         // Read current state
                         mCurrentState.intakeStalled = mIntake.isStalled();
 
-                        mCurrentState.hood = mAimingDevice.getHoodAngle();
+                        mCurrentState.hood = mHood.getAngle();
                         mCurrentState.shooterRPM = mShooter.getRPM();
                         mCurrentState.shooterVoltage = mShooter.getVoltage();
 
@@ -104,9 +104,9 @@ public class Superstructure extends Subsystem {
                         }
 
                         if(mHoodAngleOverride.isEmpty()) {
-                            mAimingDevice.setHoodSetpoint(newState.hood);
+                            mHood.setAngle(newState.hood);
                         } else {
-                            mAimingDevice.setHoodSetpoint(mHoodAngleOverride.get());
+                            mHood.setAngle(mHoodAngleOverride.get());
                         }
                         
                         mKicker.setDemand(newState.kickerVoltage);

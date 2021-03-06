@@ -21,7 +21,6 @@ import frc2020.subsystems.LED;
 import frc2020.subsystems.Limelight;
 import frc2020.subsystems.Pixy;
 import frc2020.subsystems.RobotStateEstimator;
-import frc2020.subsystems.Turret;
 import frc2020.subsystems.Hood;
 import frc2020.subsystems.Shooter;
 import frc2020.subsystems.Superstructure;
@@ -32,7 +31,6 @@ import frc2020.statemachines.ClimberStateMachine;
 import frc2020.statemachines.SuperstructureStateMachine;
 import frc2020.statemachines.SuperstructureStateMachine.SystemState;
 import frc2020.states.LEDState;
-import frc2020.subsystems.AimingDevice;
 import frc2020.subsystems.Climber;
 
 import java.util.Optional;
@@ -51,13 +49,11 @@ public class Robot extends TimedRobot {
     private final RobotStateEstimator mRobotStateEstimator = RobotStateEstimator.getInstance();
     
     private final Intake mIntake = Intake.getInstance();
-    private final Turret mTurret = Turret.getInstance();
     private final Hood mHood = Hood.getInstance();
     private final Shooter mShooter = Shooter.getInstance();
     private final Kicker mKicker = Kicker.getInstance();
     private final Climber mClimber = Climber.getInstance();
 
-    private final AimingDevice mAimingDevice = AimingDevice.getInstance();
     private final Inventory mInventory = Inventory.getInstance();
     private final Superstructure mSuperstructure = Superstructure.getInstance();
 
@@ -88,12 +84,10 @@ public class Robot extends TimedRobot {
                 mRobotStateEstimator,
                 mDrive,
                 mIntake,
-                mTurret,
                 mHood,
                 mShooter,
                 mKicker,
                 mClimber,
-                mAimingDevice,
                 mInventory,
                 mSuperstructure,
                 mLimelight,
@@ -124,7 +118,6 @@ public class Robot extends TimedRobot {
 
             mCompressor.stop();
             mDrive.setBraked(true);
-            mTurret.setBraked(false);
             mHood.forceDisable();
 
             // Reset all auto mode state.
@@ -177,10 +170,8 @@ public class Robot extends TimedRobot {
         
         mCompressor.start();
         mDrive.setBraked(true);
-        mTurret.setBraked(true);
 
         mSuperstructure.setDisabled(false);
-        mAimingDevice.setDisabled(false);
 
         mCoastDrive = false;
 
@@ -220,7 +211,6 @@ public class Robot extends TimedRobot {
             var robotState = RobotState.getInstance();
             robotState.reset(Timer.getFPGATimestamp(), Pose2d.identity());
             mDrive.resetGryo();
-            mAimingDevice.stop();
 
             mSuperstructure.resetStateMachine();
             mClimber.resetStateMachine();
@@ -430,7 +420,6 @@ public class Robot extends TimedRobot {
     @Override
     public void testPeriodic() {
         mSuperstructure.setDisabled(true);
-        mAimingDevice.setDisabled(true);
         
         //mShooter.setTargetRPM(9000);
         mHood.setPercent(1.0);
