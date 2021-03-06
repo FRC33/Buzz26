@@ -53,7 +53,6 @@ public final class Constants {
 
     // TeleOp drive
     /** Set this to true to drive with one joystick */
-    public static final boolean kDriveOneJoystick = false;
     public static final double kDriveGearReduction = 11.3666;
     public static final double kQuickTurnEnableThrottle = 0.15;
     public static final double kQuickTurnGain = 0.9;

@@ -37,8 +37,6 @@ public class RobotStateEstimator extends Subsystem {
     private class EnabledLoop implements Loop {
         @Override
         public synchronized void onStart(double timestamp) {
-            left_encoder_prev_distance_ = mDrive.getLeftPosition(); //getLeftEncoderDistance
-            right_encoder_prev_distance_ = mDrive.getRightPosition(); //getRightEncoderDistance
             prev_timestamp_ = timestamp;
         }
 
@@ -47,27 +45,6 @@ public class RobotStateEstimator extends Subsystem {
             if (prev_heading_ == null) {
                 prev_heading_ = mRobotState.getLatestFieldToVehicle().getValue().getRotation();
             }
-            final double dt = timestamp - prev_timestamp_;
-            final double left_distance = mDrive.getLeftPosition(); //getLeftEncoderDistance
-            final double right_distance = mDrive.getRightPosition(); //getRightEncoderDistance
-            final double delta_left = left_distance - left_encoder_prev_distance_;
-            final double delta_right = right_distance - right_encoder_prev_distance_;
-            final Rotation2d gyro_angle = mDrive.getHeading();
-            Twist2d odometry_twist;
-            synchronized (mRobotState) {
-                final Pose2d last_measurement = mRobotState.getLatestFieldToVehicle().getValue();
-                odometry_twist = Kinematics.forwardKinematics(last_measurement.getRotation(), delta_left,
-                        delta_right, gyro_angle);
-            }
-            final Twist2d measured_velocity = Kinematics.forwardKinematics(
-                    delta_left, delta_right, prev_heading_.inverse().rotateBy(gyro_angle).getRadians()).scaled(1.0 / dt);
-            final Twist2d predicted_velocity = Kinematics.forwardKinematics(mDrive.getLeftVelocity(), //getLeftLinearVelocity
-                    mDrive.getRightVelocity()).scaled(dt);
-            mRobotState.addObservations(timestamp, odometry_twist, measured_velocity, predicted_velocity);
-            left_encoder_prev_distance_ = left_distance;
-            right_encoder_prev_distance_ = right_distance;
-            prev_heading_ = gyro_angle;
-            prev_timestamp_ = timestamp;
         }
 
         @Override

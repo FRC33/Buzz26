@@ -221,10 +221,6 @@ public class Robot extends TimedRobot {
 
             disableShooter = SmartDashboard.getBoolean("Disable Shooter", false);
 
-            if(mDrive.getAverageDriveVelocityMagnitude() <= 2) {
-                mCoastDrive = true;
-            }
-
             mDrive.setBraked(!mCoastDrive);
 
             mHood.forceDisable();
@@ -291,13 +287,10 @@ public class Robot extends TimedRobot {
         //Drive
         boolean search = mSuperstructure.systemStateIsLimelight() && 
                         (mHood.getAngle() > 45.0 || shootingLocation == ShootingLocation.Location.GREEN);
-        mDrive.setBuzzDrive(
-            mHMI.getThrottle(), 
-            mHMI.getSteer(),
-            mHMI.getSpinLeft(),
-            mHMI.getSpinRight(),
-            mHMI.getAim() && search,
-            mHMI.getShoot());
+        mDrive.setTeleOpInputs(
+            mHMI.getThrottle(),
+            mHMI.getStrafe(),
+            mHMI.getSteer());
 
         if(isShootingLocation) {
             enableFlywheel = true;

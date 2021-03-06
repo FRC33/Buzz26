@@ -29,19 +29,15 @@ public class HMI {
 
     //region Driving
     public double getThrottle() {
-        return Constants.kDriveOneJoystick ? -driver.getRightStickY() : -driver.getLeftStickY();
+        return -driver.getLeftStickY();
     }
+
+    public double getStrafe() {
+        return driver.getLeftStickX();
+    } 
 
     public double getSteer() {
         return driver.getRightStickX();
-    }
-
-    public boolean getSpinLeft() {
-        return driver.getAButton();
-    }
-    
-    public boolean getSpinRight() {
-        return driver.getBButton();
     }
     //endregion
 

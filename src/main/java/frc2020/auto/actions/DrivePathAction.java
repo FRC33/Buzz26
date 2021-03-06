@@ -46,7 +46,7 @@ public class DrivePathAction implements Action {
     @Override
     public void done() {
         if (mStopWhenDone) {
-            mDrive.setBuzzDrive(0, 0, false, false, false);
+            mDrive.setTeleOpInputs(0, 0, 0);
         }
     }
 }

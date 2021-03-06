@@ -35,7 +35,7 @@ public class SeekAndSuckAction implements Action {
             }
         }
 
-        mDrive.setBuzzDrive(0.5, wheel, false, false, false);;
+        mDrive.setTeleOpInputs(0, 0, 0);
     }
 
     @Override
