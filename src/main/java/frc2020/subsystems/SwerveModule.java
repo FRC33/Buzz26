@@ -2,11 +2,16 @@ package frc2020.subsystems;
 
 import java.util.Optional;
 
+import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
+import com.ctre.phoenix.motorcontrol.can.BaseTalon;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 import edu.wpi.first.wpilibj.Counter;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-import frc2020.subsystems.Hood.CommandMode;
-import lib.drivers.BuzzTalonFX;
+import frc2020.Constants;
 import lib.drivers.TalonFXFactory;
+import lib.drivers.TalonSRXFactory;
 import lib.geometry.Rotation2d;
 import lib.subsystems.Subsystem;
 
@@ -15,11 +20,13 @@ import lib.subsystems.Subsystem;
  */
 public class SwerveModule extends Subsystem {
 
-    private BuzzTalonFX mDriveMotor;
-    private BuzzTalonFX mSteerMotor;
+    private BaseTalon mDriveMotor;
+    private BaseTalon mSteerMotor;
     private Counter mSteerEncoder;
 
     private Optional<Double> mTrackedAngleOffset = Optional.empty();
+
+    private SwerveModuleConstants mConstants;
 
     public enum DriveMode {
         DISABLED,
@@ -48,8 +55,9 @@ public class SwerveModule extends Subsystem {
         public double kDriveKiZone = 0;
 
         public double kSteerMotorGearReduction;
-        public double kSteerEncoderGearReduction;
+        //public double kSteerEncoderGearReduction;
         //TODO add current limiting
+        public double kSteerEncoderOffset; /** The raw absolute revolutions [0, 1] when the wheel faces forward */
         public double kSteerKp;
         public double kSteerKi;
         public double kSteerKd;
@@ -59,12 +67,20 @@ public class SwerveModule extends Subsystem {
         public double kSteerKa; /** Feedforward acceleration */
     }
 
-    private SwerveModule(SwerveModuleConstants constants) {
+    public SwerveModule(SwerveModuleConstants constants) {
         mPeriodicIO = new PeriodicIO();
 
+        mConstants = constants;
+
         // Initalize subsystem devices
-        mDriveMotor = TalonFXFactory.createDefaultTalon(constants.kDriveMotorId);
-        mSteerMotor = TalonFXFactory.createDefaultTalon(constants.kSteerMotorId);
+        if(RobotBase.isReal()) {
+            mDriveMotor = TalonFXFactory.createDefaultTalon(constants.kDriveMotorId);
+            mSteerMotor = TalonFXFactory.createDefaultTalon(constants.kSteerMotorId);
+        } else {
+            mDriveMotor = TalonSRXFactory.createDefaultTalon(constants.kDriveMotorId);
+            mSteerMotor = TalonSRXFactory.createDefaultTalon(constants.kSteerMotorId);
+        }
+        
         mSteerEncoder = new Counter(constants.kSteerEncoderId);
 
         //TODO config device properties based on constants
@@ -80,8 +96,10 @@ public class SwerveModule extends Subsystem {
         // Drive
         public double driveSupplyVoltage;
         public double driveVelocity; /** in/s */
+        public double drivePosition; /** in */
         // Steer
         public double steerSupplyVoltage;
+        public double rawAbsoluteRevs; /** Magnetic encoder position from 0 to 1, no offset */
         public double absoluteAngle; /** Degrees from magnetic encoder */
         public double relativeAngle; /** Degrees from steer Falcon integrated sensor. Not wrapped */
         public double trackedAngle; /** Not wrapped */
@@ -98,7 +116,26 @@ public class SwerveModule extends Subsystem {
         mPeriodicIO.timestamp = Timer.getFPGATimestamp();
 
         // Read inputs
+        mPeriodicIO.driveSupplyVoltage = mDriveMotor.getBusVoltage();
+        mPeriodicIO.driveVelocity = (((mDriveMotor.getSelectedSensorVelocity() / Constants.kFalconCPR) / mConstants.kDriveMotorGearReduction) * 10d) // rev/s
+                                     * (mConstants.kDriveWheelDiameter * Math.PI); // Scale revs to inches
+        mPeriodicIO.drivePosition = ((mDriveMotor.getSelectedSensorPosition() / Constants.kFalconCPR) / mConstants.kDriveMotorGearReduction) // rev
+                                     * (mConstants.kDriveWheelDiameter * Math.PI); // Scale revs to inches
         
+        mPeriodicIO.steerSupplyVoltage = mDriveMotor.getBusVoltage();
+
+        mPeriodicIO.rawAbsoluteRevs = (mSteerEncoder.getPeriod() * 1e6) / 4096; // Scale [0, 4096e-6] to [0, 1]
+        var absoluteRevs = mPeriodicIO.rawAbsoluteRevs - mConstants.kSteerEncoderOffset; // Subtract offset so that 0 revs = 0 degrees
+        if(absoluteRevs < 0) absoluteRevs += 1; // Wrap negative values to be back inside range [0, 1]
+        mPeriodicIO.absoluteAngle = (absoluteRevs - 0.5) * 360; // Scale [0, 1] to [-180, 180]
+
+        mPeriodicIO.relativeAngle = ((mSteerMotor.getSelectedSensorPosition() / Constants.kFalconCPR) / mConstants.kSteerEncoderOffset) // rev
+                                    * 360; // Scales revs to degrees
+
+        if(mTrackedAngleOffset.isEmpty()) {
+            mTrackedAngleOffset = Optional.of(mPeriodicIO.absoluteAngle - mPeriodicIO.relativeAngle);
+        }
+        mPeriodicIO.trackedAngle = mPeriodicIO.relativeAngle + mTrackedAngleOffset.get();
     }
 
     @Override
@@ -136,6 +173,14 @@ public class SwerveModule extends Subsystem {
         setAngle(rotation2d.getDegrees());
     }
 
+    public TalonSRXSimCollection getDriveSim() {
+        return ((TalonSRX) mDriveMotor).getSimCollection();
+    }
+
+    public TalonSRXSimCollection getSteerSim() {
+        return ((TalonSRX) mSteerMotor).getSimCollection();
+    }
+
     @Override
     public void stop() {
     }
@@ -147,7 +192,6 @@ public class SwerveModule extends Subsystem {
 
     @Override
     public void outputTelemetry() {
-        
     }
     
 }
