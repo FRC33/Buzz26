@@ -127,7 +127,7 @@ public class SwerveModule extends Subsystem {
         mPeriodicIO.rawAbsoluteRevs = (mSteerEncoder.getPeriod() * 1e6) / 4096; // Scale [0, 4096e-6] to [0, 1]
         var absoluteRevs = mPeriodicIO.rawAbsoluteRevs - mConstants.kSteerEncoderOffset; // Subtract offset so that 0 revs = 0 degrees
         if(absoluteRevs < 0) absoluteRevs += 1; // Wrap negative values to be back inside range [0, 1]
-        mPeriodicIO.absoluteAngle = (absoluteRevs - 0.5) * 180; // Scale [0, 1] to [-180, 180]
+        mPeriodicIO.absoluteAngle = (absoluteRevs - 0.5) * 360; // Scale [0, 1] to [-180, 180]
 
         mPeriodicIO.relativeAngle = ((mSteerMotor.getSelectedSensorPosition() / Constants.kFalconCPR) / mConstants.kSteerEncoderOffset) // rev
                                     * 360; // Scales revs to degrees
