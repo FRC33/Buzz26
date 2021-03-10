@@ -2,14 +2,16 @@ package frc2020.subsystems;
 
 import java.util.Optional;
 
-import com.ctre.phoenix.motorcontrol.VictorSPXSimCollection;
+import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
+import com.ctre.phoenix.motorcontrol.can.BaseTalon;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.Counter;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import frc2020.Constants;
-import frc2020.subsystems.Hood.CommandMode;
-import lib.drivers.BuzzTalonFX;
 import lib.drivers.TalonFXFactory;
+import lib.drivers.TalonSRXFactory;
 import lib.geometry.Rotation2d;
 import lib.subsystems.Subsystem;
 
@@ -18,8 +20,8 @@ import lib.subsystems.Subsystem;
  */
 public class SwerveModule extends Subsystem {
 
-    private BuzzTalonFX mDriveMotor;
-    private BuzzTalonFX mSteerMotor;
+    private BaseTalon mDriveMotor;
+    private BaseTalon mSteerMotor;
     private Counter mSteerEncoder;
 
     private Optional<Double> mTrackedAngleOffset = Optional.empty();
@@ -65,14 +67,20 @@ public class SwerveModule extends Subsystem {
         public double kSteerKa; /** Feedforward acceleration */
     }
 
-    private SwerveModule(SwerveModuleConstants constants) {
+    public SwerveModule(SwerveModuleConstants constants) {
         mPeriodicIO = new PeriodicIO();
 
         mConstants = constants;
 
         // Initalize subsystem devices
-        mDriveMotor = TalonFXFactory.createDefaultTalon(constants.kDriveMotorId);
-        mSteerMotor = TalonFXFactory.createDefaultTalon(constants.kSteerMotorId);
+        if(RobotBase.isReal()) {
+            mDriveMotor = TalonFXFactory.createDefaultTalon(constants.kDriveMotorId);
+            mSteerMotor = TalonFXFactory.createDefaultTalon(constants.kSteerMotorId);
+        } else {
+            mDriveMotor = TalonSRXFactory.createDefaultTalon(constants.kDriveMotorId);
+            mSteerMotor = TalonSRXFactory.createDefaultTalon(constants.kSteerMotorId);
+        }
+        
         mSteerEncoder = new Counter(constants.kSteerEncoderId);
 
         //TODO config device properties based on constants
@@ -163,6 +171,14 @@ public class SwerveModule extends Subsystem {
 
     public void setAngle(Rotation2d rotation2d) {
         setAngle(rotation2d.getDegrees());
+    }
+
+    public TalonSRXSimCollection getDriveSim() {
+        return ((TalonSRX) mDriveMotor).getSimCollection();
+    }
+
+    public TalonSRXSimCollection getSteerSim() {
+        return ((TalonSRX) mSteerMotor).getSimCollection();
     }
 
     @Override
