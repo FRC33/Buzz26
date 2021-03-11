@@ -2,6 +2,7 @@ package frc2020.subsystems;
 
 import java.util.Optional;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -9,7 +10,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.estimator.AngleStatistics;
 import frc2020.Constants;
 import lib.drivers.TalonFXFactory;
 import lib.drivers.TalonSRXFactory;
@@ -155,16 +155,36 @@ public class SwerveModule extends Subsystem {
 
     @Override
     public synchronized void writePeriodicOutputs() {
+        switch(mPeriodicIO.driveMode) {
+            case VELOCITY:
+                // Velocity set doesn't exists yet
+                break;
+            case VOLTAGE:
+                mDriveMotor.set(ControlMode.PercentOutput, mPeriodicIO.driveCommand / mPeriodicIO.driveSupplyVoltage);
+
+                break;
+            case DISABLED:
+            default:
+                break;
+        }
+
         switch(mPeriodicIO.steerMode) {
             case VOLTAGE:
+                mSteerMotor.set(ControlMode.PercentOutput, mPeriodicIO.steerCommand / mPeriodicIO.steerSupplyVoltage);
+
                 break;
             case ANGLE:
                 if (!mTrackedAngleOffset.isEmpty()) {
-
+                    mSteerMotor.set(ControlMode.MotionMagic, mPeriodicIO.steerCommand);
                 }
+                else {
+                    stop();
+                }
+
                 break;
+            case DISABLED:
             default:
-            break;
+                break;
         }
     }
 
