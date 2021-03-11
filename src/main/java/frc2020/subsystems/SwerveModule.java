@@ -188,6 +188,11 @@ public class SwerveModule extends Subsystem {
         mPeriodicIO.driveMode = DriveMode.VOLTAGE;
     }
 
+    public void setSteerVoltage(double voltage) {
+        mPeriodicIO.steerCommand = voltage;
+        mPeriodicIO.steerMode = SteerMode.VOLTAGE;
+    }
+
     public void setAngle(double angle) {
         mPeriodicIO.steerCommand = angle;
         mPeriodicIO.steerMode = SteerMode.ANGLE;
