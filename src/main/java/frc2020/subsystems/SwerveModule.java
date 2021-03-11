@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.estimator.AngleStatistics;
 import frc2020.Constants;
 import lib.drivers.TalonFXFactory;
 import lib.drivers.TalonSRXFactory;
@@ -68,7 +69,7 @@ public class SwerveModule extends Subsystem {
         public double kSteerKd;
         public double kSteerKf;
         public double kSteerKiZone = 0;
-        /** Feedforward velocity */
+        /** Feedforward velocity (aka cruise velocity) */
         public double kSteerKv;
         /** Feedforward acceleration */
         public double kSteerKa;
@@ -154,8 +155,17 @@ public class SwerveModule extends Subsystem {
 
     @Override
     public synchronized void writePeriodicOutputs() {
-        // Set output
-        
+        switch(mPeriodicIO.steerMode) {
+            case VOLTAGE:
+                break;
+            case ANGLE:
+                if (!mTrackedAngleOffset.isEmpty()) {
+
+                }
+                break;
+            default:
+            break;
+        }
     }
 
     public double getVelocity() {
@@ -185,6 +195,10 @@ public class SwerveModule extends Subsystem {
 
     public void setAngle(Rotation2d rotation2d) {
         setAngle(rotation2d.getDegrees());
+    }
+
+    public void resetOffset() {
+        mTrackedAngleOffset = Optional.empty();
     }
 
     public TalonSRXSimCollection getDriveSim() {
