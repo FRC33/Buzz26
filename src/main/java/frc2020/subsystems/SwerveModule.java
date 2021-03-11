@@ -165,6 +165,8 @@ public class SwerveModule extends Subsystem {
                 break;
             case DISABLED:
             default:
+                mDriveMotor.set(ControlMode.PercentOutput, mPeriodicIO.driveCommand);
+                
                 break;
         }
 
@@ -184,6 +186,8 @@ public class SwerveModule extends Subsystem {
                 break;
             case DISABLED:
             default:
+                mSteerMotor.set(ControlMode.PercentOutput, mPeriodicIO.steerCommand);
+
                 break;
         }
     }
