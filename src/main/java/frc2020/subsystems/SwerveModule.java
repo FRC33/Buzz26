@@ -41,12 +41,16 @@ public class SwerveModule extends Subsystem {
     }
 
     public static class SwerveModuleConstants {
-        public int kDriveMotorId = 1; /** Falcon CAN ID */
-        public int kSteerMotorId = 2; /** Falcon CAN ID */
-        public int kSteerEncoderId = 0; /** DIO channel */
+        /** Falcon CAN ID */
+        public int kDriveMotorId = 1;
+        /** Falcon CAN ID */
+        public int kSteerMotorId = 2;
+        /** DIO channel */
+        public int kSteerEncoderId = 0;
 
         public double kDriveMotorGearReduction;
-        public double kDriveWheelDiameter = 6; /** in */
+        /** in */
+        public double kDriveWheelDiameter = 6;
         //TODO add current limiting
         public double kDriveKp;
         public double kDriveKi;
@@ -57,14 +61,17 @@ public class SwerveModule extends Subsystem {
         public double kSteerMotorGearReduction;
         //public double kSteerEncoderGearReduction;
         //TODO add current limiting
-        public double kSteerEncoderOffset; /** The raw absolute revolutions [0, 1] when the wheel faces forward */
+        /** The raw absolute revolutions [0, 1] when the wheel faces forward */
+        public double kSteerEncoderOffset;
         public double kSteerKp;
         public double kSteerKi;
         public double kSteerKd;
         public double kSteerKf;
         public double kSteerKiZone = 0;
-        public double kSteerKv; /** Feedforward velocity */
-        public double kSteerKa; /** Feedforward acceleration */
+        /** Feedforward velocity */
+        public double kSteerKv;
+        /** Feedforward acceleration */
+        public double kSteerKa;
     }
 
     public SwerveModule(SwerveModuleConstants constants) {
@@ -95,18 +102,25 @@ public class SwerveModule extends Subsystem {
         public double timestamp;
         // Drive
         public double driveSupplyVoltage;
-        public double driveVelocity; /** in/s */
-        public double drivePosition; /** in */
+        /** in/s */
+        public double driveVelocity;
+        /** in */
+        public double drivePosition;
         // Steer
         public double steerSupplyVoltage;
-        public double rawAbsoluteRevs; /** Magnetic encoder position from 0 to 1, no offset */
-        public double absoluteAngle; /** Degrees from magnetic encoder */
-        public double relativeAngle; /** Degrees from steer Falcon integrated sensor. Not wrapped */
-        public double trackedAngle; /** Not wrapped */
+        /** Magnetic encoder position from 0 to 1, no offset */
+        public double rawAbsoluteRevs;
+        /** Degrees from magnetic encoder */
+        public double absoluteAngle;
+        /** Degrees from steer Falcon integrated sensor. Not wrapped */
+        public double relativeAngle;
+        /** Not wrapped */
+        public double trackedAngle;
 
         // OUTPUTS
         public double driveCommand;
-        public double steerCommand; /** Wrapped -180 to 180 */
+        /** Wrapped -180 to 180 */
+        public double steerCommand;
         public DriveMode driveMode;
         public SteerMode steerMode;
     }
