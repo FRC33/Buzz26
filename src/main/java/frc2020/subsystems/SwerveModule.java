@@ -144,7 +144,7 @@ public class SwerveModule extends Subsystem {
         if(absoluteRevs < 0) absoluteRevs += 1; // Wrap negative values to be back inside range [0, 1]
         mPeriodicIO.absoluteAngle = (absoluteRevs - 0.5) * 360; // Scale [0, 1] to [-180, 180]
 
-        mPeriodicIO.relativeAngle = ((mSteerMotor.getSelectedSensorPosition() / Constants.kFalconCPR) / mConstants.kSteerEncoderOffset) // rev
+        mPeriodicIO.relativeAngle = ((mSteerMotor.getSelectedSensorPosition() / Constants.kFalconCPR) / mConstants.kSteerMotorGearReduction) // rev
                                     * 360; // Scales revs to degrees
 
         if(mTrackedAngleOffset.isEmpty()) {
