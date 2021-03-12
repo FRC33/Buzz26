@@ -160,7 +160,7 @@ public class SwerveModule extends Subsystem {
                 // Velocity set doesn't exists yet
                 break;
             case VOLTAGE:
-                mDriveMotor.set(ControlMode.PercentOutput, mPeriodicIO.driveCommand / mPeriodicIO.driveSupplyVoltage);
+                mDriveMotor.set(ControlMode.PercentOutput, mPeriodicIO.driveCommand / 12);
 
                 break;
             case DISABLED:
@@ -172,12 +172,12 @@ public class SwerveModule extends Subsystem {
 
         switch(mPeriodicIO.steerMode) {
             case VOLTAGE:
-                mSteerMotor.set(ControlMode.PercentOutput, mPeriodicIO.steerCommand / mPeriodicIO.steerSupplyVoltage);
+                mSteerMotor.set(ControlMode.PercentOutput, mPeriodicIO.steerCommand / 12);
 
                 break;
             case ANGLE:
                 if (!mTrackedAngleOffset.isEmpty()) {
-                    mSteerMotor.set(ControlMode.MotionMagic, mPeriodicIO.steerCommand);
+                    mSteerMotor.set(ControlMode.MotionMagic, mPeriodicIO.steerCommand - mConstants.kSteerEncoderOffset);
                 }
                 else {
                     stop();
