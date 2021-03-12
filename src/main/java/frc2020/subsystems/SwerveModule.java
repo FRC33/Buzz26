@@ -92,6 +92,8 @@ public class SwerveModule extends Subsystem {
         mSteerEncoder = new Counter(constants.kSteerEncoderId);
 
         //TODO config device properties based on constants
+        // Need to config sat voltage before enabling comp
+        // mSteerMotor.enableVoltageCompensation(true);
 
         mSteerEncoder.setSemiPeriodMode(true);
     }
