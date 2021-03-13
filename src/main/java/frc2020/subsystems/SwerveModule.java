@@ -159,7 +159,9 @@ public class SwerveModule extends Subsystem {
     public synchronized void writePeriodicOutputs() {
         switch(mPeriodicIO.driveMode) {
             case VELOCITY:
-                // Velocity set doesn't exists yet
+                var scaledDriveCommand = ((mPeriodicIO.driveCommand / (mConstants.kDriveWheelDiameter * Math.PI)) * Constants.kFalconCPR * mConstants.kDriveMotorGearReduction) / 10d;
+                mDriveMotor.set(ControlMode.Velocity, scaledDriveCommand);
+
                 break;
             case VOLTAGE:
                 mDriveMotor.set(ControlMode.PercentOutput, mPeriodicIO.driveCommand / 12);
@@ -179,7 +181,7 @@ public class SwerveModule extends Subsystem {
                 break;
             case ANGLE:
                 if (!mTrackedAngleOffset.isEmpty()) {
-                    var steerCommandEncoderUnits = (mPeriodicIO.steerCommand - mConstants.kSteerEncoderOffset) * (4096 / 360); // Scales steer cmd in degs to ticks
+                    var steerCommandEncoderUnits = ((mPeriodicIO.steerCommand - mConstants.kSteerEncoderOffset) / (mConstants.kDriveWheelDiameter * Math.PI)) * Constants.kFalconCPR * mConstants.kDriveMotorGearReduction; // Scales steer cmd in degs to ticks
                     mSteerMotor.set(ControlMode.MotionMagic, steerCommandEncoderUnits);
                 }
                 else {
@@ -213,6 +215,11 @@ public class SwerveModule extends Subsystem {
     public void setVoltage(double voltage) {
         mPeriodicIO.driveCommand = voltage;
         mPeriodicIO.driveMode = DriveMode.VOLTAGE;
+    }
+
+    public void setVelocity(double velocity) {
+        mPeriodicIO.driveCommand = velocity;
+        mPeriodicIO.driveMode = DriveMode.VELOCITY;
     }
 
     public void setSteerVoltage(double voltage) {
