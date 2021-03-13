@@ -159,7 +159,8 @@ public class SwerveModule extends Subsystem {
     public synchronized void writePeriodicOutputs() {
         switch(mPeriodicIO.driveMode) {
             case VELOCITY:
-                var scaledDriveCommand = ((mPeriodicIO.driveCommand / (mConstants.kDriveWheelDiameter * Math.PI)) * Constants.kFalconCPR * mConstants.kDriveMotorGearReduction) / 10d;
+                var scaledDriveCommand = ((mPeriodicIO.driveCommand / (mConstants.kDriveWheelDiameter * Math.PI)) 
+                * Constants.kFalconCPR * mConstants.kDriveMotorGearReduction) / 10d;
                 mDriveMotor.set(ControlMode.Velocity, scaledDriveCommand);
 
                 break;
