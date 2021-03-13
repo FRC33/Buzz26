@@ -2,6 +2,7 @@ package frc2020.subsystems;
 
 import java.util.Optional;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -68,7 +69,7 @@ public class SwerveModule extends Subsystem {
         public double kSteerKd;
         public double kSteerKf;
         public double kSteerKiZone = 0;
-        /** Feedforward velocity */
+        /** Feedforward velocity (aka cruise velocity) */
         public double kSteerKv;
         /** Feedforward acceleration */
         public double kSteerKa;
@@ -91,6 +92,8 @@ public class SwerveModule extends Subsystem {
         mSteerEncoder = new Counter(constants.kSteerEncoderId);
 
         //TODO config device properties based on constants
+        // Need to config sat voltage before enabling comp
+        // mSteerMotor.enableVoltageCompensation(true);
 
         mSteerEncoder.setSemiPeriodMode(true);
     }
@@ -143,7 +146,7 @@ public class SwerveModule extends Subsystem {
         if(absoluteRevs < 0) absoluteRevs += 1; // Wrap negative values to be back inside range [0, 1]
         mPeriodicIO.absoluteAngle = (absoluteRevs - 0.5) * 360; // Scale [0, 1] to [-180, 180]
 
-        mPeriodicIO.relativeAngle = ((mSteerMotor.getSelectedSensorPosition() / Constants.kFalconCPR) / mConstants.kSteerEncoderOffset) // rev
+        mPeriodicIO.relativeAngle = ((mSteerMotor.getSelectedSensorPosition() / Constants.kFalconCPR) / mConstants.kSteerMotorGearReduction) // rev
                                     * 360; // Scales revs to degrees
 
         if(mTrackedAngleOffset.isEmpty()) {
@@ -154,8 +157,46 @@ public class SwerveModule extends Subsystem {
 
     @Override
     public synchronized void writePeriodicOutputs() {
-        // Set output
-        
+        switch(mPeriodicIO.driveMode) {
+            case VELOCITY:
+                var scaledDriveCommand = ((mPeriodicIO.driveCommand / (mConstants.kDriveWheelDiameter * Math.PI)) 
+                * Constants.kFalconCPR * mConstants.kDriveMotorGearReduction) / 10d;
+                mDriveMotor.set(ControlMode.Velocity, scaledDriveCommand);
+
+                break;
+            case VOLTAGE:
+                mDriveMotor.set(ControlMode.PercentOutput, mPeriodicIO.driveCommand / 12);
+
+                break;
+            case DISABLED:
+            default:
+                mDriveMotor.set(ControlMode.PercentOutput, mPeriodicIO.driveCommand);
+                
+                break;
+        }
+
+        switch(mPeriodicIO.steerMode) {
+            case VOLTAGE:
+                mSteerMotor.set(ControlMode.PercentOutput, mPeriodicIO.steerCommand / 12);
+
+                break;
+            case ANGLE:
+                if (!mTrackedAngleOffset.isEmpty()) {
+                    var steerCommandEncoderUnits = ((mPeriodicIO.steerCommand - mConstants.kSteerEncoderOffset) / 360) 
+                    * Constants.kFalconCPR * mConstants.kSteerMotorGearReduction; // Scales steer cmd in degs to ticks
+                    mSteerMotor.set(ControlMode.MotionMagic, steerCommandEncoderUnits);
+                }
+                else {
+                    stop();
+                }
+
+                break;
+            case DISABLED:
+            default:
+                mSteerMotor.set(ControlMode.PercentOutput, mPeriodicIO.steerCommand);
+
+                break;
+        }
     }
 
     public double getVelocity() {
@@ -178,6 +219,16 @@ public class SwerveModule extends Subsystem {
         mPeriodicIO.driveMode = DriveMode.VOLTAGE;
     }
 
+    public void setVelocity(double velocity) {
+        mPeriodicIO.driveCommand = velocity;
+        mPeriodicIO.driveMode = DriveMode.VELOCITY;
+    }
+
+    public void setSteerVoltage(double voltage) {
+        mPeriodicIO.steerCommand = voltage;
+        mPeriodicIO.steerMode = SteerMode.VOLTAGE;
+    }
+
     public void setAngle(double angle) {
         mPeriodicIO.steerCommand = angle;
         mPeriodicIO.steerMode = SteerMode.ANGLE;
@@ -185,6 +236,10 @@ public class SwerveModule extends Subsystem {
 
     public void setAngle(Rotation2d rotation2d) {
         setAngle(rotation2d.getDegrees());
+    }
+
+    public void resetOffset() {
+        mTrackedAngleOffset = Optional.empty();
     }
 
     public TalonSRXSimCollection getDriveSim() {
