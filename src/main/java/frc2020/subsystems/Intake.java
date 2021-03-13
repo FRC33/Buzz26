@@ -54,9 +54,8 @@ public class Intake extends Subsystem {
 
         // OUTPUTS
         public double intakeDemand;
-        public double infeederDemand;
-        public double brushDemand;
         public boolean intakeDeploy;
+        public double indexerDemand;
     }
 
     @Override
@@ -89,12 +88,8 @@ public class Intake extends Subsystem {
         mPeriodicIO.intakeDemand = voltage;
     }
 
-    public void setInfeeder(double voltage) {
-        mPeriodicIO.infeederDemand = voltage;
-    }
-
-    public void setBrush(double voltage) {
-        mPeriodicIO.brushDemand = voltage;
+    public void setIndexer(double voltage) {
+        mPeriodicIO.indexerDemand = voltage;
     }
 
     public void setIntakeDeploy(boolean deploy) {
