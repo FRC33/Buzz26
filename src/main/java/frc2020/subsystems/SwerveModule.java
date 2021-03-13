@@ -179,7 +179,8 @@ public class SwerveModule extends Subsystem {
                 break;
             case ANGLE:
                 if (!mTrackedAngleOffset.isEmpty()) {
-                    mSteerMotor.set(ControlMode.MotionMagic, mPeriodicIO.steerCommand - mConstants.kSteerEncoderOffset);
+                    var steerCommandEncoderUnits = (mPeriodicIO.steerCommand - mConstants.kSteerEncoderOffset) * (4096 / 360); // Scales steer cmd in degs to ticks
+                    mSteerMotor.set(ControlMode.MotionMagic, steerCommandEncoderUnits);
                 }
                 else {
                     stop();
