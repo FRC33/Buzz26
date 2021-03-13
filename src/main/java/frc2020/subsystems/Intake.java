@@ -20,7 +20,7 @@ public class Intake extends Subsystem {
     private static Intake mInstance;
 
     private BuzzTalonFX mIntake1;
-    private BuzzTalonFX mIntake2;
+    //private BuzzTalonFX mIntake2;
     private BuzzTalonSRX mInfeeder;
     private BuzzTalonSRX mBrush;
     private DoubleSolenoid mIntakeSolenoid;
