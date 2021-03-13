@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.wpi.first.hal.HAL;
@@ -15,19 +16,21 @@ import lib.loops.Looper;
 
 public class SwerveModuleTest {
 
-    SwerveModule swerveModule;
+    private static SwerveModule swerveModule;
     
-    SubsystemManager subsystemManager = SubsystemManager.getInstance();
-    private final Looper enabledLooper = new Looper();
-    private final Looper disabledLooper = new Looper();
+    private static SubsystemManager subsystemManager = SubsystemManager.getInstance();
+    private static final Looper enabledLooper = new Looper();
+    private static final Looper disabledLooper = new Looper();
 
-    @Before
-    public void before() {
+    @BeforeClass
+    public static void beforeClass() {
         assert HAL.initialize(500, 0);
 
         SwerveModuleConstants constants = new SwerveModule.SwerveModuleConstants();
         constants.kDriveWheelDiameter = 6;
         constants.kDriveMotorGearReduction = 6.666;
+        constants.kSteerEncoderOffset = 0;
+        constants.kSteerMotorGearReduction = 12.333;
         swerveModule = new SwerveModule(constants);
 
         subsystemManager.setSubsystems(swerveModule);
@@ -44,5 +47,19 @@ public class SwerveModuleTest {
         swerveModule.getDriveSim().setQuadratureVelocity((int)vel);
         Thread.sleep(500);
         assertEquals(swerveModule.getVelocity(), 12, 0.5);
+
+        var period = 4096e-6 * 0.5;
+        swerveModule.getCounterWrapper().setSimPeriod(period);
+        var pos = ((30.0 * 12.333) / 360) * 2048;
+        swerveModule.getSteerSim().setQuadratureRawPosition((int)pos);
+        Thread.sleep(500);
+        swerveModule.resetOffset();
+        Thread.sleep(500);
+
+        var pos2 = ((270.0 * 12.333) / 360) * 2048;
+        swerveModule.getSteerSim().setQuadratureRawPosition((int)pos2);
+        Thread.sleep(500);
+
+        assertEquals(swerveModule.getAngle().getDegrees(), -120.0, 0.1);
     }
 }

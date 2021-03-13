@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import frc2020.Constants;
+import lib.drivers.CounterWrapper;
 import lib.drivers.TalonFXFactory;
 import lib.drivers.TalonSRXFactory;
 import lib.geometry.Rotation2d;
@@ -23,7 +24,7 @@ public class SwerveModule extends Subsystem {
 
     private BaseTalon mDriveMotor;
     private BaseTalon mSteerMotor;
-    private Counter mSteerEncoder;
+    private CounterWrapper mSteerEncoder;
 
     private Optional<Double> mTrackedAngleOffset = Optional.empty();
 
@@ -89,13 +90,13 @@ public class SwerveModule extends Subsystem {
             mSteerMotor = TalonSRXFactory.createDefaultTalon(constants.kSteerMotorId);
         }
         
-        mSteerEncoder = new Counter(constants.kSteerEncoderId);
+        mSteerEncoder = new CounterWrapper(new Counter(constants.kSteerEncoderId));
 
         //TODO config device properties based on constants
         // Need to config sat voltage before enabling comp
         // mSteerMotor.enableVoltageCompensation(true);
 
-        mSteerEncoder.setSemiPeriodMode(true);
+        mSteerEncoder.get().setSemiPeriodMode(true);
     }
 
     private final PeriodicIO mPeriodicIO;
@@ -242,6 +243,7 @@ public class SwerveModule extends Subsystem {
         mTrackedAngleOffset = Optional.empty();
     }
 
+    // region Simulation
     public TalonSRXSimCollection getDriveSim() {
         return ((TalonSRX) mDriveMotor).getSimCollection();
     }
@@ -249,6 +251,11 @@ public class SwerveModule extends Subsystem {
     public TalonSRXSimCollection getSteerSim() {
         return ((TalonSRX) mSteerMotor).getSimCollection();
     }
+
+    public CounterWrapper getCounterWrapper() {
+        return mSteerEncoder;
+    }
+    // endregion
 
     @Override
     public void stop() {

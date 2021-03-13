@@ -3,6 +3,9 @@ package lib.util;
 import lib.util.TimeBooleanFilter;
 
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Ignore;
+
 import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
@@ -10,6 +13,7 @@ import org.junit.Test;
 public class TimedBooleanFilterTest {
     TimeBooleanFilter filter = new TimeBooleanFilter();
 
+    @Ignore
     @Test
     public void test() throws InterruptedException {
         //Starts out false
