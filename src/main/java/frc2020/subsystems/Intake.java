@@ -19,12 +19,14 @@ import lib.util.DelayedBoolean;
 public class Intake extends Subsystem {
     private static Intake mInstance;
 
-    private BuzzTalonFX mIntake;
-    private BuzzTalonFX mIndexer;
+    private BuzzTalonFX mIntake1;
+    private BuzzTalonFX mIntake2;
+    private BuzzTalonSRX mInfeeder;
+    private BuzzTalonSRX mBrush;
     private DoubleSolenoid mIntakeSolenoid;
 
-    private DelayedBoolean mIntakeStalledDelayedBoolean = new DelayedBoolean(Timer.getFPGATimestamp(), kIntakeStallTime);
-    private DelayedBoolean mIndexerStalledDelayedBoolean = new DelayedBoolean(Timer.getFPGATimestamp(), kIntakeStallTime);
+    private DelayedBoolean mIntake1StalledDelayedBoolean = new DelayedBoolean(Timer.getFPGATimestamp(), kIntakeStallTime);
+    private DelayedBoolean mIntake2StalledDelayedBoolean = new DelayedBoolean(Timer.getFPGATimestamp(), kIntakeStallTime);
 
     public synchronized static Intake getInstance() {
         if (mInstance == null) {
@@ -38,8 +40,20 @@ public class Intake extends Subsystem {
         mPeriodicIO = new PeriodicIO();
 
         // Initalize subsystem devices
-        mIntake = TalonFXFactory.createDefaultTalon(kIntakeId);
-        mIndexer = TalonFXFactory.createDefaultTalon(kIndexerId);
+        mIntake1 = TalonFXFactory.createDefaultTalon(kIntake1Id);
+        mIntake1.setInverted(true);
+        mIntake1.configOpenloopRamp(0.1);
+
+        mIntake2 = TalonFXFactory.createDefaultTalon(kIntake2Id);
+        mIntake2.setInverted(true);
+        mIntake2.configOpenloopRamp(0.1);
+
+        mInfeeder = TalonSRXFactory.createDefaultTalon(kInfeederId);
+        
+        mBrush = TalonSRXFactory.createDefaultTalon(kBrushId);
+        mBrush.setInverted(true);
+        mBrush.setNeutralMode(NeutralMode.Brake);
+
         mIntakeSolenoid = new DoubleSolenoid(kIntakeForwardId, kIntakeReverseId);
     }
 
@@ -65,15 +79,17 @@ public class Intake extends Subsystem {
 
         // Read inputs
         mPeriodicIO.intakeStalled =
-            mIntakeStalledDelayedBoolean.update(getTimestamp(), mIntake.getStatorCurrent() > Constants.kIntakeStallCurrent) ||
-            mIndexerStalledDelayedBoolean.update(getTimestamp(), mIndexer.getStatorCurrent() > Constants.kIntakeStallCurrent);
+            mIntake1StalledDelayedBoolean.update(getTimestamp(), mIntake1.getStatorCurrent() > Constants.kIntakeStallCurrent) ||
+            mIntake2StalledDelayedBoolean.update(getTimestamp(), mIntake2.getStatorCurrent() > Constants.kIntakeStallCurrent);
     }
 
     @Override
     public synchronized void writePeriodicOutputs() {
         // Set output
-        mIntake.setDemandVoltage(mPeriodicIO.intakeDemand);
-        mIndexer.setDemandVoltage(mPeriodicIO.intakeDemand);
+        mIntake1.setDemandVoltage(mPeriodicIO.intakeDemand);
+        mIntake2.setDemandVoltage(mPeriodicIO.intakeDemand);
+        mInfeeder.setDemandVoltage(mPeriodicIO.infeederDemand);
+        mBrush.setDemandVoltage(mPeriodicIO.brushDemand);
         mIntakeSolenoid.set(mPeriodicIO.intakeDeploy ? Value.kReverse : Value.kForward);
     }
 
