@@ -38,8 +38,8 @@ public class Intake extends Subsystem {
         mPeriodicIO = new PeriodicIO();
 
         // Initalize subsystem devices
-        mIntake = TalonFXFactory.createDefaultTalon(kIntake1Id);
-        mIndexer = TalonFXFactory.createDefaultTalon(kIntake2Id);
+        mIntake = TalonFXFactory.createDefaultTalon(kIntakeId);
+        mIndexer = TalonFXFactory.createDefaultTalon(kIndexerId);
         mIntakeSolenoid = new DoubleSolenoid(kIntakeForwardId, kIntakeReverseId);
     }
 
