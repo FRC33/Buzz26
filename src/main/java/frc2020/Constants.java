@@ -124,7 +124,7 @@ public final class Constants {
     public static final int kShooterAId = 12;
     public static final int kShooterBId = 13;
     
-    public static final int kKickerId = 14;
+    public static final int kFeederId = 14;
 
     public static final int kWinchId = 15;
     public static final int kMastId = 16;

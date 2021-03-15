@@ -23,7 +23,7 @@ public class Superstructure extends Subsystem {
     private static Intake mIntake = Intake.getInstance();
     private static Inventory mInventory = Inventory.getInstance();
     private static Hood mHood = Hood.getInstance();
-    private static Kicker mKicker = Kicker.getInstance();
+    private static Feeder mFeeder = Feeder.getInstance();
     private static Shooter mShooter = Shooter.getInstance();
     private static Limelight mLimelight = Limelight.getInstance();
 
@@ -109,7 +109,7 @@ public class Superstructure extends Subsystem {
                             mHood.setAngle(mHoodAngleOverride.get());
                         }
                         
-                        mKicker.setDemand(newState.kickerVoltage);
+                        mFeeder.setDemand(newState.FeederVoltage);
 
                         boolean isShooterVoltage = !Double.isNaN(newState.shooterVoltage);
                         boolean isShooterRPM = !Double.isNaN(newState.shooterRPM);

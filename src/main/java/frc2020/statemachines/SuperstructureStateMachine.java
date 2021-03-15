@@ -16,7 +16,7 @@ public class SuperstructureStateMachine {
     // Intake
     private static final double kIntakeVoltage = 11;
     private static final double kInfeederVoltage = 5;
-    private static final double kKickerIntakeVoltage = -3;
+    private static final double kFeederIntakeVoltage = -3;
     
     // Index
     private static final double kBrushIndexVoltage = 5;
@@ -24,18 +24,18 @@ public class SuperstructureStateMachine {
     // Blow
     private static final double kBlowVoltage = -11;
     private static final double kBrushBlowVoltage = -13;
-    private static final double kKickerBlowVoltage = -5;
+    private static final double kFeederBlowVoltage = -5;
 
     // Aim
     private static final double kBrushBallPrepVoltage = -7;
-    private static final double kKickerAimBackVoltage = -5;
-    private static final double kKickerAimForwardVoltage = 12;
+    private static final double kFeederAimBackVoltage = -5;
+    private static final double kFeederAimForwardVoltage = 12;
     /** Seconds */
-    private static final double kKickerAimBallsBackTime = 0.2;
+    private static final double kFeederAimBallsBackTime = 0.2;
 
     // Shoot
     private static final double kBrushShootVoltage = 7.5;
-    private static final double kKickerShootVoltage = 12;
+    private static final double kFeederShootVoltage = 12;
     private static final double kShooterRecoveryVoltage = 12;
 
     private SystemState mSystemState = SystemState.IDLE;
@@ -72,7 +72,7 @@ public class SuperstructureStateMachine {
         public double brushVoltage;
         public boolean intakeDeploy;
 
-        public double kickerVoltage;
+        public double FeederVoltage;
 
         //Current and desired
         public double hood = kHoodStowAngle;
@@ -347,7 +347,7 @@ public class SuperstructureStateMachine {
         mDesiredState.brushVoltage = 0;
         mDesiredState.intakeDeploy = false;
 
-        mDesiredState.kickerVoltage = 0;
+        mDesiredState.FeederVoltage = 0;
 
         mDesiredState.shooterVoltage = kShooterIdleVoltage;
         mDesiredState.shooterRPM = Double.NaN;
@@ -366,7 +366,7 @@ public class SuperstructureStateMachine {
         mDesiredState.intakeDeploy = true;
         mDesiredState.intakeVoltage = kIntakeVoltage;
         mDesiredState.infeederVoltage = kInfeederVoltage;
-        mDesiredState.kickerVoltage = kKickerIntakeVoltage;
+        mDesiredState.FeederVoltage = kFeederIntakeVoltage;
     }
 
     private void getIndexDesiredState(SuperstructureState currentState) {
@@ -378,7 +378,7 @@ public class SuperstructureStateMachine {
         mDesiredState.infeederVoltage = kInfeederVoltage;
         // Increase index speed with more balls. TODO Remove?
         mDesiredState.brushVoltage = kBrushIndexVoltage + (currentState.ballCount * 2.0);
-        mDesiredState.kickerVoltage = kKickerIntakeVoltage;
+        mDesiredState.FeederVoltage = kFeederIntakeVoltage;
     }
 
     private void getIntakeFinishDesiredState(SuperstructureState currentState) {
@@ -393,7 +393,7 @@ public class SuperstructureStateMachine {
         mDesiredState.intakeVoltage = kBlowVoltage;
         mDesiredState.infeederVoltage = kBlowVoltage;
         mDesiredState.brushVoltage = kBrushBlowVoltage;
-        mDesiredState.kickerVoltage = kKickerBlowVoltage;
+        mDesiredState.FeederVoltage = kFeederBlowVoltage;
     }
 
     private void getUnjamIntakeDesiredState(SuperstructureState currentState) {
@@ -403,7 +403,7 @@ public class SuperstructureStateMachine {
         mDesiredState.intakeDeploy = true;
         mDesiredState.intakeVoltage = kBlowVoltage;
         mDesiredState.infeederVoltage = kInfeederVoltage;
-        mDesiredState.kickerVoltage = kKickerIntakeVoltage;
+        mDesiredState.FeederVoltage = kFeederIntakeVoltage;
     }
 
     private void getEnableFlywheelDesiredState(SuperstructureState currentState, ShootingLocation.Location wantedShootingLocation) {
@@ -415,16 +415,16 @@ public class SuperstructureStateMachine {
         mDesiredState.shooterRPM = wantedShootingLocation.getShooterRPM();
         mDesiredState.hood = wantedShootingLocation.getHoodAngle();
 
-        mDesiredState.kickerVoltage = kKickerAimBackVoltage;
+        mDesiredState.FeederVoltage = kFeederAimBackVoltage;
     }
 
     private void getAimLimelightDesiredState(SuperstructureState currentState, ShootingLocation.Location wantedShootingLocation, double timeInState) {
         getDefaultDesiredState(currentState);
         getAimManualDesiredState(currentState, wantedShootingLocation);
 
-        mDesiredState.brushVoltage = timeInState >= kKickerAimBallsBackTime ? 
+        mDesiredState.brushVoltage = timeInState >= kFeederAimBallsBackTime ? 
             0 : kBrushBallPrepVoltage;
-        mDesiredState.kickerVoltage = kKickerAimForwardVoltage;
+        mDesiredState.FeederVoltage = kFeederAimForwardVoltage;
     }
 
     private void getAimNoLimelightDesiredState(SuperstructureState currentState, ShootingLocation.Location wantedShootingLocation) {
@@ -443,7 +443,7 @@ public class SuperstructureStateMachine {
         getDefaultDesiredState(currentState);
 
         mDesiredState.brushVoltage = kBrushShootVoltage;
-        mDesiredState.kickerVoltage = kKickerShootVoltage;
+        mDesiredState.FeederVoltage = kFeederShootVoltage;
         
         if(wantedShootingLocation.getShooterRPM() - currentState.shooterRPM >= 50) {
             // If the target shooting RPM is 50 RPM greater than the current, set shooter to full power to recover faster
