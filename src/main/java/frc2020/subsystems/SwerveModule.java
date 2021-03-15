@@ -7,9 +7,11 @@ import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.wpilibj.Counter;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.simulation.DutyCycleSim;
 import frc2020.Constants;
 import lib.drivers.CounterWrapper;
 import lib.drivers.TalonFXFactory;
@@ -24,7 +26,7 @@ public class SwerveModule extends Subsystem {
 
     private BaseTalon mDriveMotor;
     private BaseTalon mSteerMotor;
-    private CounterWrapper mSteerEncoder;
+    private DutyCycle mSteerEncoder;
 
     private Optional<Double> mTrackedAngleOffset = Optional.empty();
 
@@ -90,13 +92,11 @@ public class SwerveModule extends Subsystem {
             mSteerMotor = TalonSRXFactory.createDefaultTalon(constants.kSteerMotorId);
         }
         
-        mSteerEncoder = new CounterWrapper(new Counter(constants.kSteerEncoderId));
+        mSteerEncoder = new DutyCycle(new DigitalInput(constants.kSteerEncoderId));
 
         //TODO config device properties based on constants
         // Need to config sat voltage before enabling comp
         // mSteerMotor.enableVoltageCompensation(true);
-
-        mSteerEncoder.get().setSemiPeriodMode(true);
     }
 
     private final PeriodicIO mPeriodicIO;
@@ -142,7 +142,7 @@ public class SwerveModule extends Subsystem {
         
         mPeriodicIO.steerSupplyVoltage = mDriveMotor.getBusVoltage();
 
-        mPeriodicIO.rawAbsoluteRevs = (mSteerEncoder.getPeriod() * 1e6) / 4096; // Scale [0, 4096e-6] to [0, 1]
+        mPeriodicIO.rawAbsoluteRevs = mSteerEncoder.getOutput();
         var absoluteRevs = mPeriodicIO.rawAbsoluteRevs - mConstants.kSteerEncoderOffset; // Subtract offset so that 0 revs = 0 degrees
         if(absoluteRevs < 0) absoluteRevs += 1; // Wrap negative values to be back inside range [0, 1]
         mPeriodicIO.absoluteAngle = (absoluteRevs - 0.5) * 360; // Scale [0, 1] to [-180, 180]
@@ -262,8 +262,8 @@ public class SwerveModule extends Subsystem {
         return ((TalonSRX) mSteerMotor).getSimCollection();
     }
 
-    public CounterWrapper getCounterWrapper() {
-        return mSteerEncoder;
+    public DutyCycleSim getEncoderSim() {
+        return new DutyCycleSim(mSteerEncoder);
     }
     // endregion
 
