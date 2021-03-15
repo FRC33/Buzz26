@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DutyCycleSim;
 import frc2020.Constants;
-import lib.drivers.CounterWrapper;
 import lib.drivers.TalonFXFactory;
 import lib.drivers.TalonSRXFactory;
 import lib.geometry.Rotation2d;
