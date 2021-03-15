@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.wpilibj.simulation.DutyCycleSim;
 import frc2020.subsystems.SwerveModule.SwerveModuleConstants;
 import lib.SubsystemManager;
 import lib.loops.Looper;
@@ -17,6 +18,7 @@ import lib.loops.Looper;
 public class SwerveModuleTest {
 
     private static SwerveModule swerveModule;
+    private static DutyCycleSim encoderSim;
     
     private static SubsystemManager subsystemManager = SubsystemManager.getInstance();
     private static final Looper enabledLooper = new Looper();
@@ -33,9 +35,13 @@ public class SwerveModuleTest {
         constants.kSteerMotorGearReduction = 12.333;
         swerveModule = new SwerveModule(constants);
 
+        encoderSim = swerveModule.getEncoderSim();
+
         subsystemManager.setSubsystems(swerveModule);
         subsystemManager.registerEnabledLoops(enabledLooper);
         subsystemManager.registerDisabledLoops(disabledLooper);
+
+        
     }
 
     @Test
@@ -48,8 +54,8 @@ public class SwerveModuleTest {
         Thread.sleep(500);
         assertEquals(swerveModule.getVelocity(), 12, 0.5);
 
-        var period = 4096e-6 * 0.5;
-        swerveModule.getCounterWrapper().setSimPeriod(period);
+        var period = 0.5;
+        swerveModule.getEncoderSim().setOutput(period);
         var pos = ((30.0 * 12.333) / 360) * 2048;
         swerveModule.getSteerSim().setQuadratureRawPosition((int)pos);
         Thread.sleep(500);
