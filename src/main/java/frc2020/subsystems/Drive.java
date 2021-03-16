@@ -38,6 +38,8 @@ public class Drive extends Subsystem {
     private RobotState mRobotState = RobotState.getInstance();
     private Limelight mLimelight = Limelight.getInstance();
 
+    private SwerveModule[] mModules = new SwerveModule[4];
+
     // Devices
     private BuzzPigeon mGyro;
 
@@ -62,6 +64,11 @@ public class Drive extends Subsystem {
 
     private Drive() {
         mPeriodicIO = new PeriodicIO();
+
+        mModules[0] = new SwerveModule(Constants.kFrontRightModuleConstants);
+        mModules[1] = new SwerveModule(Constants.kFrontLeftModuleConstants);
+        mModules[2] = new SwerveModule(Constants.kBackLeftModuleConstants);
+        mModules[3] = new SwerveModule(Constants.kBackRightModuleConstants);
 
         // Initalize subsystem devices
         mGyro = new BuzzPigeon();

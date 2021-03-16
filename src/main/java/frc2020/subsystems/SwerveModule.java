@@ -50,9 +50,9 @@ public class SwerveModule extends Subsystem {
         /** DIO channel */
         public int kSteerEncoderId = 0;
 
-        public double kDriveMotorGearReduction;
+        public double kDriveMotorGearReduction = 4.67;
         /** in */
-        public double kDriveWheelDiameter = 6;
+        public double kDriveWheelDiameter = 3;
         //TODO add current limiting
         public double kDriveKp;
         public double kDriveKi;

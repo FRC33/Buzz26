@@ -31,7 +31,6 @@ import frc2020.statemachines.ClimberStateMachine;
 import frc2020.statemachines.SuperstructureStateMachine;
 import frc2020.statemachines.SuperstructureStateMachine.SystemState;
 import frc2020.states.LEDState;
-import frc2020.subsystems.Climber;
 
 import java.util.Optional;
 
@@ -52,7 +51,6 @@ public class Robot extends TimedRobot {
     private final Hood mHood = Hood.getInstance();
     private final Shooter mShooter = Shooter.getInstance();
     private final Feeder mFeeder = Feeder.getInstance();
-    private final Climber mClimber = Climber.getInstance();
 
     private final Inventory mInventory = Inventory.getInstance();
     private final Superstructure mSuperstructure = Superstructure.getInstance();
@@ -87,7 +85,6 @@ public class Robot extends TimedRobot {
                 mHood,
                 mShooter,
                 mFeeder,
-                mClimber,
                 mInventory,
                 mSuperstructure,
                 mLimelight,
@@ -213,7 +210,6 @@ public class Robot extends TimedRobot {
             mDrive.resetGryo();
 
             mSuperstructure.resetStateMachine();
-            mClimber.resetStateMachine();
 
             intakeOn = false;
             aimManual = false;
@@ -369,6 +365,7 @@ public class Robot extends TimedRobot {
             mSuperstructure.stopBrushOverride();
         }
 
+        /*
         //Climber
         ClimberStateMachine.WantedAction climberWantedAction = ClimberStateMachine.WantedAction.STOP;
         if(mHMI.getMastUp()) {
@@ -381,6 +378,7 @@ public class Robot extends TimedRobot {
             climberWantedAction = ClimberStateMachine.WantedAction.WINCH_OUT;
         }
         mClimber.setWantedAction(climberWantedAction);
+        */
 
         // LEDs
         

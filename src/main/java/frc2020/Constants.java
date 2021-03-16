@@ -7,6 +7,8 @@
 
 package frc2020;
 
+import frc2020.subsystems.SwerveModule.SwerveModuleConstants;
+
 public final class Constants {
 
     // ------- CHANGE THIS VALUE DEPENDING ON WHICH ROBOT THIS IS -------
@@ -72,6 +74,34 @@ public final class Constants {
     public static final double kAutoSteerKd = 0.35;
     public static final double kAutoSteerKiZone = 3;
     public static final double kAutoSteerMaxOutput = 8;
+
+    public static final SwerveModuleConstants kFrontRightModuleConstants = new SwerveModuleConstants();
+    static {
+        kFrontRightModuleConstants.kDriveMotorId = 1;
+        kFrontRightModuleConstants.kSteerMotorId = 2;
+        kFrontRightModuleConstants.kSteerEncoderId = 6;
+    }
+
+    public static final SwerveModuleConstants kFrontLeftModuleConstants = new SwerveModuleConstants();
+    static {
+        kFrontLeftModuleConstants.kDriveMotorId = 3;
+        kFrontLeftModuleConstants.kSteerMotorId = 4;
+        kFrontLeftModuleConstants.kSteerEncoderId = 7;
+    }
+
+    public static final SwerveModuleConstants kBackLeftModuleConstants = new SwerveModuleConstants();
+    static {
+        kFrontLeftModuleConstants.kDriveMotorId = 5;
+        kFrontLeftModuleConstants.kSteerMotorId = 6;
+        kFrontLeftModuleConstants.kSteerEncoderId = 8;
+    }
+
+    public static final SwerveModuleConstants kBackRightModuleConstants = new SwerveModuleConstants();
+    static {
+        kFrontLeftModuleConstants.kDriveMotorId = 7;
+        kFrontLeftModuleConstants.kSteerMotorId = 8;
+        kFrontLeftModuleConstants.kSteerEncoderId = 9;
+    }
     
     // Intake
     public static final double kIntakeStallCurrent = 90;
@@ -119,15 +149,10 @@ public final class Constants {
     public static final int kIntakeId = 9;
     public static final int kIndexerId = 10;
 
-    public static final int kAzimuthId = 11;
+    public static final int kFeederId = 11;
 
     public static final int kShooterAId = 12;
     public static final int kShooterBId = 13;
-    
-    public static final int kFeederId = 14;
-
-    public static final int kWinchId = 15;
-    public static final int kMastId = 16;
 
     // CANCoders
     public static final int kTurretEncoderAId = 31;
