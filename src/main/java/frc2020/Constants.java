@@ -77,30 +77,42 @@ public final class Constants {
 
     public static final SwerveModuleConstants kFrontRightModuleConstants = new SwerveModuleConstants();
     static {
+        kFrontRightModuleConstants.kName = "Front Right";
         kFrontRightModuleConstants.kDriveMotorId = 1;
         kFrontRightModuleConstants.kSteerMotorId = 2;
-        kFrontRightModuleConstants.kSteerEncoderId = 6;
+        kFrontRightModuleConstants.kSteerEncoderId = 9;
+
+        kFrontRightModuleConstants.kSteerMotorGearReduction = 15.33;
     }
 
     public static final SwerveModuleConstants kFrontLeftModuleConstants = new SwerveModuleConstants();
     static {
+        kFrontLeftModuleConstants.kName = "Front Left";
         kFrontLeftModuleConstants.kDriveMotorId = 3;
         kFrontLeftModuleConstants.kSteerMotorId = 4;
         kFrontLeftModuleConstants.kSteerEncoderId = 7;
+
+        kFrontLeftModuleConstants.kSteerMotorGearReduction = 11;
     }
 
     public static final SwerveModuleConstants kBackLeftModuleConstants = new SwerveModuleConstants();
     static {
-        kFrontLeftModuleConstants.kDriveMotorId = 5;
-        kFrontLeftModuleConstants.kSteerMotorId = 6;
-        kFrontLeftModuleConstants.kSteerEncoderId = 8;
+        kBackLeftModuleConstants.kName = "Back Left";
+        kBackLeftModuleConstants.kDriveMotorId = 5;
+        kBackLeftModuleConstants.kSteerMotorId = 6;
+        kBackLeftModuleConstants.kSteerEncoderId = 8;
+        
+        kBackLeftModuleConstants.kSteerMotorGearReduction = 11;
     }
 
     public static final SwerveModuleConstants kBackRightModuleConstants = new SwerveModuleConstants();
     static {
-        kFrontLeftModuleConstants.kDriveMotorId = 7;
-        kFrontLeftModuleConstants.kSteerMotorId = 8;
-        kFrontLeftModuleConstants.kSteerEncoderId = 9;
+        kBackRightModuleConstants.kName = "Back Right";
+        kBackRightModuleConstants.kDriveMotorId = 7;
+        kBackRightModuleConstants.kSteerMotorId = 8;
+        kBackRightModuleConstants.kSteerEncoderId = 6;
+
+        kBackRightModuleConstants.kSteerMotorGearReduction = 15.33;
     }
     
     // Intake
@@ -108,19 +120,9 @@ public final class Constants {
     /** Seconds intake motor(s) have to be at stall current to be considered stalled */
     public static final double kIntakeStallTime = 0.15;
 
-    // Turret
-    public static final int kTurretTeethA = 12;
-    public static final int kTurretTeethB = 13;
-    public static final int kTurretTeethRing = 120;
-    public static final double kTurretSensorScale = ((double) (kTurretTeethA * kTurretTeethB) / kTurretTeethRing) * 360d;
-    public static final RobotConstant<Double> kTurretSensorOffset = new RobotConstant<>(0.1924, 0.0);
-    public static final double kTurretAngleMin = -38;
-    public static final double kTurretAngleMax = 180;
-    public static final double kTurretPeakOutput = 0.35;
-
     // Hood
     public static final double kHoodEncoderReduction = 2;
-    public static final RobotConstant<Double> kHoodSensorOffset = new RobotConstant<>(0.72, 0.0);
+    public static final RobotConstant<Double> kHoodSensorOffset = new RobotConstant<>(0.12, 0.0);
     public static final double kHoodAngleOffset = 25;
     public static final double kHoodAngleMin = 27;
     public static final double kHoodAngleMax = 70;
@@ -141,11 +143,6 @@ public final class Constants {
     
     // region ------ Device IDs ------
     // Talons
-    public static final int kLeftDriveLeaderId = 2;
-    public static final int kLeftDriveFollowerId = 3;
-    public static final int kRightDriveLeaderId = 4;
-    public static final int kRightDriveFollowerId = 5;
-
     public static final int kIntakeId = 9;
     public static final int kIndexerId = 10;
 
@@ -155,19 +152,18 @@ public final class Constants {
     public static final int kShooterBId = 13;
 
     // CANCoders
-    public static final int kTurretEncoderAId = 31;
-    public static final int kTurretEncoderBId = 32;
     public static final int kHoodEncoderId = 33;
 
     // PWM
     public static final int kLEDId = 0;
-    public static final int kHoodAId = 1;
-    public static final int kHoodBId = 2;
+    public static final int kHoodAId = 8;
+    public static final int kHoodBId = 9;
 
     // DIO
     public static final int kBallSensorIds[] = {0,1,2,3,4};
-    public static final int kMastSwitch = 7;
     public static final int kPixyDigitalInputId = 5;
+
+    // Analog
     public static final int kPixyAnalogInputId = 0;
     
     // Solins

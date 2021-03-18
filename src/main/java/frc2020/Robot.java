@@ -81,6 +81,10 @@ public class Robot extends TimedRobot {
             mSubsystemManager.setSubsystems(
                 mRobotStateEstimator,
                 mDrive,
+                mDrive.getSwerveModules()[0],
+                mDrive.getSwerveModules()[1],
+                mDrive.getSwerveModules()[2],
+                mDrive.getSwerveModules()[3],
                 mIntake,
                 mHood,
                 mShooter,
@@ -378,7 +382,6 @@ public class Robot extends TimedRobot {
             climberWantedAction = ClimberStateMachine.WantedAction.WINCH_OUT;
         }
         mClimber.setWantedAction(climberWantedAction);
-        */
 
         // LEDs
         
