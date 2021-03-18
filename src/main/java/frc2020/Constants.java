@@ -116,17 +116,15 @@ public final class Constants {
     public static final int kRightDriveLeaderId = 4;
     public static final int kRightDriveFollowerId = 5;
 
-    public static final int kIntake1Id = 7;
-    public static final int kIntake2Id = 8;
-    public static final int kInfeederId = 9;
-    public static final int kBrushId = 10;
+    public static final int kIntakeId = 9;
+    public static final int kIndexerId = 10;
 
     public static final int kAzimuthId = 11;
 
     public static final int kShooterAId = 12;
     public static final int kShooterBId = 13;
     
-    public static final int kKickerId = 14;
+    public static final int kFeederId = 14;
 
     public static final int kWinchId = 15;
     public static final int kMastId = 16;

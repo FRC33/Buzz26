@@ -9,29 +9,29 @@ import lib.drivers.BuzzTalonSRX;
 import lib.drivers.TalonSRXFactory;
 import lib.subsystems.Subsystem;
 
-public class Kicker extends Subsystem {
-    private static Kicker mInstance;
+public class Feeder extends Subsystem {
+    private static Feeder mInstance;
 
-    private BuzzTalonSRX mKickerMotor;
+    private BuzzTalonSRX mFeederMotor;
 
     public enum CommandMode {
         DISABLED,
         VOLTAGE
     }
 
-    public synchronized static Kicker getInstance() {
+    public synchronized static Feeder getInstance() {
         if (mInstance == null) {
-            mInstance = new Kicker();
+            mInstance = new Feeder();
         }
 
         return mInstance;
     }
 
-    private Kicker() {
+    private Feeder() {
         mPeriodicIO = new PeriodicIO();
 
         // Initalize subsystem devices
-        mKickerMotor = TalonSRXFactory.createDefaultTalon(kKickerId);
+        mFeederMotor = TalonSRXFactory.createDefaultTalon(kFeederId);
     }
 
     private final PeriodicIO mPeriodicIO;
@@ -58,10 +58,10 @@ public class Kicker extends Subsystem {
 
         switch(mPeriodicIO.commandMode) {
             case DISABLED:
-                mKickerMotor.set(ControlMode.Disabled, 0);
+                mFeederMotor.set(ControlMode.Disabled, 0);
                 break;
             case VOLTAGE:
-                mKickerMotor.setDemandVoltage(mPeriodicIO.command);
+                mFeederMotor.setDemandVoltage(mPeriodicIO.command);
                 break;
         }
     }

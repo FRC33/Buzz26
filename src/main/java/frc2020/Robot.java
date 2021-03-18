@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc2020.subsystems.Drive;
 import frc2020.subsystems.Intake;
 import frc2020.subsystems.Inventory;
-import frc2020.subsystems.Kicker;
+import frc2020.subsystems.Feeder;
 import frc2020.subsystems.LED;
 import frc2020.subsystems.Limelight;
 import frc2020.subsystems.Pixy;
@@ -51,7 +51,7 @@ public class Robot extends TimedRobot {
     private final Intake mIntake = Intake.getInstance();
     private final Hood mHood = Hood.getInstance();
     private final Shooter mShooter = Shooter.getInstance();
-    private final Kicker mKicker = Kicker.getInstance();
+    private final Feeder mFeeder = Feeder.getInstance();
     private final Climber mClimber = Climber.getInstance();
 
     private final Inventory mInventory = Inventory.getInstance();
@@ -86,7 +86,7 @@ public class Robot extends TimedRobot {
                 mIntake,
                 mHood,
                 mShooter,
-                mKicker,
+                mFeeder,
                 mClimber,
                 mInventory,
                 mSuperstructure,
@@ -416,6 +416,6 @@ public class Robot extends TimedRobot {
         
         //mShooter.setTargetRPM(9000);
         mHood.setPercent(1.0);
-        //mKicker.setDemand(12);
+        //mFeeder.setDemand(12);
     }
 }
