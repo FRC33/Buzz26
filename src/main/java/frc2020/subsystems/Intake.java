@@ -111,7 +111,7 @@ public class Intake extends Subsystem {
 
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putNumber("Brush Demand", mPeriodicIO.brushDemand);
+        SmartDashboard.putNumber("Brush Demand", mPeriodicIO.indexerDemand);
     }
 
     public synchronized double getTimestamp() {

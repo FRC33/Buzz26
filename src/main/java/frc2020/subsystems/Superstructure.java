@@ -96,11 +96,10 @@ public class Superstructure extends Subsystem {
                         // Write subsystem outputs based on new state
                         mIntake.setIntakeDeploy(newState.intakeDeploy);
                         mIntake.setIntake(newState.intakeVoltage);
-                        mIntake.setInfeeder(newState.infeederVoltage);
                         if (mBrushOverride == 0) {
-                            mIntake.setBrush(newState.brushVoltage);
+                            mIntake.setIndexer(newState.brushVoltage);
                         } else {
-                            mIntake.setBrush(mBrushOverride);
+                            mIntake.setIndexer(mBrushOverride);
                         }
 
                         if(mHoodAngleOverride.isEmpty()) {

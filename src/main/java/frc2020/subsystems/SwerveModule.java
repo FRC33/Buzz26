@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DutyCycleSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc2020.Constants;
 import lib.drivers.TalonFXFactory;
 import lib.drivers.TalonSRXFactory;
@@ -27,6 +28,8 @@ public class SwerveModule extends Subsystem {
     private BaseTalon mSteerMotor;
     private DutyCycle mSteerEncoder;
 
+    private String mName;
+    
     private Optional<Double> mTrackedAngleOffset = Optional.empty();
 
     private SwerveModuleConstants mConstants;
@@ -44,6 +47,8 @@ public class SwerveModule extends Subsystem {
     }
 
     public static class SwerveModuleConstants {
+        public String kName = "";
+
         /** Falcon CAN ID */
         public int kDriveMotorId = 1;
         /** Falcon CAN ID */
@@ -51,9 +56,9 @@ public class SwerveModule extends Subsystem {
         /** DIO channel */
         public int kSteerEncoderId = 0;
 
-        public double kDriveMotorGearReduction;
+        public double kDriveMotorGearReduction = 4.67;
         /** in */
-        public double kDriveWheelDiameter = 6;
+        public double kDriveWheelDiameter = 3;
         //TODO add current limiting
         public double kDriveKp;
         public double kDriveKi;
@@ -61,11 +66,10 @@ public class SwerveModule extends Subsystem {
         public double kDriveKf;
         public double kDriveKiZone = 0;
 
-        public double kSteerMotorGearReduction;
-        //public double kSteerEncoderGearReduction;
+        public double kSteerMotorGearReduction = 1;
         //TODO add current limiting
         /** The raw absolute revolutions [0, 1] when the wheel faces forward */
-        public double kSteerEncoderOffset;
+        public double kSteerEncoderOffset = 0;
         public double kSteerKp;
         public double kSteerKi;
         public double kSteerKd;
@@ -81,6 +85,8 @@ public class SwerveModule extends Subsystem {
         mPeriodicIO = new PeriodicIO();
 
         mConstants = constants;
+
+        mName = constants.kName;
 
         // Initalize subsystem devices
         if(RobotBase.isReal()) {
@@ -124,8 +130,8 @@ public class SwerveModule extends Subsystem {
         public double driveCommand;
         /** Wrapped -180 to 180 */
         public double steerCommand;
-        public DriveMode driveMode;
-        public SteerMode steerMode;
+        public DriveMode driveMode = DriveMode.DISABLED;
+        public SteerMode steerMode = SteerMode.DISABLED;
     }
 
     @Override
@@ -277,6 +283,9 @@ public class SwerveModule extends Subsystem {
 
     @Override
     public void outputTelemetry() {
+        SmartDashboard.putNumber(mName + " Raw Revs", mPeriodicIO.rawAbsoluteRevs);
+        SmartDashboard.putNumber(mName + " Abs Angle", mPeriodicIO.absoluteAngle);
+        SmartDashboard.putNumber(mName + " Tracked Angle", mPeriodicIO.relativeAngle);
     }
     
 }

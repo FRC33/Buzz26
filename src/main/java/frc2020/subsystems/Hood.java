@@ -72,7 +72,8 @@ public class Hood extends Subsystem {
 
         // Read inputs
         double absRevs = mEncoder.getAbsoluteRevs();
-        mPeriodicIO.rawAbsPosition = absRevs <= 0.5 ? 1 + absRevs : absRevs;
+        //mPeriodicIO.rawAbsPosition = absRevs <= 0.5 ? 1 + absRevs : absRevs;
+        mPeriodicIO.rawAbsPosition = absRevs;
         mPeriodicIO.absPosition = (((mPeriodicIO.rawAbsPosition - kHoodSensorOffset.get()) / kHoodEncoderReduction) * 360) + kHoodAngleOffset;
         mPeriodicIO.relPosition = (mEncoder.getRevs() / kHoodEncoderReduction) * 360;
         if(mTrackedPositionOffset.isEmpty()) {

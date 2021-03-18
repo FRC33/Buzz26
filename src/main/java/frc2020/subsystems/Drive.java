@@ -35,8 +35,9 @@ import lib.util.Util;
 public class Drive extends Subsystem {
     private static Drive mInstance;
 
-    private RobotState mRobotState = RobotState.getInstance();
     private Limelight mLimelight = Limelight.getInstance();
+
+    private SwerveModule[] mModules = new SwerveModule[4];
 
     // Devices
     private BuzzPigeon mGyro;
@@ -63,6 +64,11 @@ public class Drive extends Subsystem {
     private Drive() {
         mPeriodicIO = new PeriodicIO();
 
+        mModules[0] = new SwerveModule(Constants.kFrontRightModuleConstants);
+        mModules[1] = new SwerveModule(Constants.kFrontLeftModuleConstants);
+        mModules[2] = new SwerveModule(Constants.kBackLeftModuleConstants);
+        mModules[3] = new SwerveModule(Constants.kBackRightModuleConstants);
+
         // Initalize subsystem devices
         mGyro = new BuzzPigeon();
         mGyro.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10);
@@ -85,7 +91,7 @@ public class Drive extends Subsystem {
     @Override
     public synchronized void readPeriodicInputs() {
         mPeriodicIO.timestamp = Timer.getFPGATimestamp();
-        
+
         double lastYaw = mPeriodicIO.yaw;
 
         mPeriodicIO.yaw = mGyro.getRawYawZeroed();
@@ -141,6 +147,10 @@ public class Drive extends Subsystem {
 
     public void setTeleOpInputs(double throttle, double strafe, double wheel) {
 
+    }
+
+    public SwerveModule[] getSwerveModules() {
+        return mModules;
     }
 
     // region Getters
