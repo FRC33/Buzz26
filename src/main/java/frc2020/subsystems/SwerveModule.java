@@ -3,6 +3,7 @@ package frc2020.subsystems;
 import java.util.Optional;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -13,6 +14,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.DutyCycleSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Units;
 import frc2020.Constants;
 import lib.drivers.TalonFXFactory;
 import lib.drivers.TalonSRXFactory;
@@ -56,30 +58,34 @@ public class SwerveModule extends Subsystem {
         /** DIO channel */
         public int kSteerEncoderId = 0;
 
+        public boolean kDriveInverted = true;
         public double kDriveMotorGearReduction = 4.67;
         /** in */
         public double kDriveWheelDiameter = 3;
         //TODO add current limiting
-        public double kDriveKp;
-        public double kDriveKi;
-        public double kDriveKd;
-        public double kDriveKf;
+        public double kDriveKp = 0;
+        public double kDriveKi = 0;
+        public double kDriveKd = 0;
+        public double kDriveKf = (1023 * 0.8376) / 18424;
         public double kDriveKiZone = 0;
 
+        public boolean kSteerInverted = false;
         public double kSteerMotorGearReduction = 1;
         //TODO add current limiting
         /** The raw absolute revolutions [0, 1] when the wheel faces forward */
         public double kSteerEncoderOffset = 0;
-        public double kSteerKp;
-        public double kSteerKi;
-        public double kSteerKd;
-        public double kSteerKf;
+        public double kSteerKp = 0.1;
+        public double kSteerKi = 0;
+        public double kSteerKd = 0;
+        public double kSteerKf = (1023 * 0.4350) / 8841;
         public double kSteerKiZone = 0;
         /** Feedforward velocity (aka cruise velocity) */
-        public double kSteerKv;
+        public double kSteerKv = 6000;
         /** Feedforward acceleration */
-        public double kSteerKa;
+        public double kSteerKa = 6000 * 4;
+        public int kSteerSCurveStrength = 1;
     }
+
 
     public SwerveModule(SwerveModuleConstants constants) {
         mPeriodicIO = new PeriodicIO();
@@ -101,7 +107,28 @@ public class SwerveModule extends Subsystem {
 
         //TODO config device properties based on constants
         // Need to config sat voltage before enabling comp
-        // mSteerMotor.enableVoltageCompensation(true);
+        mDriveMotor.setInverted(constants.kDriveInverted);
+        mDriveMotor.setNeutralMode(NeutralMode.Brake);
+        mDriveMotor.enableVoltageCompensation(true);
+        mDriveMotor.configVoltageCompSaturation(12.0);
+        mDriveMotor.config_kP(0, constants.kDriveKp);
+        mDriveMotor.config_kI(0, constants.kDriveKi);
+        mDriveMotor.config_kD(0, constants.kDriveKd);
+        mDriveMotor.config_kF(0, constants.kDriveKf);
+        mDriveMotor.config_IntegralZone(0, constants.kDriveKiZone);
+
+        mSteerMotor.setInverted(constants.kSteerInverted);
+        mSteerMotor.setNeutralMode(NeutralMode.Brake);
+        mSteerMotor.enableVoltageCompensation(true);
+        mSteerMotor.configVoltageCompSaturation(12.0);
+        mSteerMotor.configMotionCruiseVelocity(constants.kSteerKv);
+        mSteerMotor.configMotionAcceleration(constants.kSteerKa);
+        mSteerMotor.configMotionSCurveStrength(constants.kSteerSCurveStrength);
+        mSteerMotor.config_kP(0, constants.kSteerKp);
+        mSteerMotor.config_kI(0, constants.kSteerKi);
+        mSteerMotor.config_kD(0, constants.kSteerKd);
+        mSteerMotor.config_kF(0, constants.kSteerKf);
+        mSteerMotor.config_IntegralZone(0, constants.kSteerKiZone);
     }
 
     private final PeriodicIO mPeriodicIO;
@@ -150,7 +177,8 @@ public class SwerveModule extends Subsystem {
         mPeriodicIO.rawAbsoluteRevs = mSteerEncoder.getOutput();
         var absoluteRevs = mPeriodicIO.rawAbsoluteRevs - mConstants.kSteerEncoderOffset; // Subtract offset so that 0 revs = 0 degrees
         if(absoluteRevs < 0) absoluteRevs += 1; // Wrap negative values to be back inside range [0, 1]
-        mPeriodicIO.absoluteAngle = (absoluteRevs - 0.5) * 360; // Scale [0, 1] to [-180, 180]
+        mPeriodicIO.absoluteAngle = absoluteRevs * -360; // Scale [0, 1] to [0, -360]
+        mPeriodicIO.absoluteAngle = Rotation2d.fromDegrees(mPeriodicIO.absoluteAngle).getDegrees();
 
         mPeriodicIO.relativeAngle = ((mSteerMotor.getSelectedSensorPosition() / Constants.kFalconCPR) / mConstants.kSteerMotorGearReduction) // rev
                                     * 360; // Scales revs to degrees
@@ -163,6 +191,24 @@ public class SwerveModule extends Subsystem {
 
     @Override
     public synchronized void writePeriodicOutputs() {
+        double raw_error = 0;
+        if(mPeriodicIO.steerMode == SteerMode.ANGLE) {
+            Rotation2d current = Rotation2d.fromDegrees(mPeriodicIO.trackedAngle);
+
+            raw_error = current.distance(Rotation2d.fromDegrees(mPeriodicIO.steerCommand));
+            if(Math.abs(raw_error) > Math.PI) {
+                raw_error -= (Math.PI * 2 * Math.signum(raw_error));
+            }
+        }
+        if(mPeriodicIO.driveMode == DriveMode.VELOCITY && mPeriodicIO.steerMode == SteerMode.ANGLE) {
+            if(mPeriodicIO.driveVelocity <= 30) {
+                if(Math.abs(raw_error) > Math.PI / 2) {
+                    mPeriodicIO.driveCommand *= -1;
+                    raw_error -= Math.PI * Math.signum(raw_error);
+                }
+            }
+        }
+
         switch(mPeriodicIO.driveMode) {
             case VELOCITY:
                 var scaledDriveCommand = ((mPeriodicIO.driveCommand / (mConstants.kDriveWheelDiameter * Math.PI)) 
@@ -188,17 +234,11 @@ public class SwerveModule extends Subsystem {
                 break;
             case ANGLE:
                 if (!mTrackedAngleOffset.isEmpty()) {
-                    var wrappedCurrentAngle = mPeriodicIO.trackedAngle % 360;
-                    if(wrappedCurrentAngle < 0) wrappedCurrentAngle += 360;
-                    var adjust = mPeriodicIO.steerCommand - wrappedCurrentAngle;
+                    
 
-                    if(Math.abs(adjust) >= 180) {
-                        adjust = adjust > 0 ? 360 - adjust : 360 + adjust;
-                    }
+                    double final_setpoint = mPeriodicIO.trackedAngle + Units.radiansToDegrees(raw_error);                  
 
-                    var newSteerCommand = wrappedCurrentAngle + adjust;
-
-                    var steerCommandEncoderUnits = ((newSteerCommand - mTrackedAngleOffset.get()) / 360) 
+                    var steerCommandEncoderUnits = ((final_setpoint - mTrackedAngleOffset.get()) / 360) 
                     * Constants.kFalconCPR * mConstants.kSteerMotorGearReduction; // Scales steer cmd in degs to ticks
                     mSteerMotor.set(ControlMode.MotionMagic, steerCommandEncoderUnits);
                 }
@@ -283,9 +323,12 @@ public class SwerveModule extends Subsystem {
 
     @Override
     public void outputTelemetry() {
+        SmartDashboard.putNumber(mName + " Velocity", mPeriodicIO.driveVelocity);
         SmartDashboard.putNumber(mName + " Raw Revs", mPeriodicIO.rawAbsoluteRevs);
         SmartDashboard.putNumber(mName + " Abs Angle", mPeriodicIO.absoluteAngle);
-        SmartDashboard.putNumber(mName + " Tracked Angle", mPeriodicIO.relativeAngle);
+        SmartDashboard.putNumber(mName + " Rel Angle", mPeriodicIO.relativeAngle);
+        SmartDashboard.putNumber(mName + " Tracked Angle", mPeriodicIO.trackedAngle);
+        SmartDashboard.putNumber(mName + " Rot2d Angle", getAngle().getDegrees());
     }
     
 }

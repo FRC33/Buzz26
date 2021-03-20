@@ -108,7 +108,7 @@ public class Superstructure extends Subsystem {
                             mHood.setAngle(mHoodAngleOverride.get());
                         }
                         
-                        mFeeder.setDemand(newState.FeederVoltage);
+                        mFeeder.setDemand(newState.feederVoltage);
 
                         boolean isShooterVoltage = !Double.isNaN(newState.shooterVoltage);
                         boolean isShooterRPM = !Double.isNaN(newState.shooterRPM);

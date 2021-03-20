@@ -3,6 +3,7 @@ package frc2020.subsystems;
 import static frc2020.Constants.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.Timer;
 import lib.drivers.BuzzTalonSRX;
@@ -32,6 +33,11 @@ public class Feeder extends Subsystem {
 
         // Initalize subsystem devices
         mFeederMotor = TalonSRXFactory.createDefaultTalon(kFeederId);
+
+        mFeederMotor.setInverted(true);
+        mFeederMotor.setNeutralMode(NeutralMode.Brake);
+        mFeederMotor.enableVoltageCompensation(true);
+        mFeederMotor.configVoltageCompSaturation(11.5);
     }
 
     private final PeriodicIO mPeriodicIO;

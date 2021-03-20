@@ -24,6 +24,7 @@ import frc2020.subsystems.RobotStateEstimator;
 import frc2020.subsystems.Hood;
 import frc2020.subsystems.Shooter;
 import frc2020.subsystems.Superstructure;
+import frc2020.subsystems.SwerveModule;
 import frc2020.auto.AutoModeExecutor;
 import frc2020.auto.modes.AutoModeBase;
 import frc2020.hmi.HMI;
@@ -173,6 +174,7 @@ public class Robot extends TimedRobot {
         mDrive.setBraked(true);
 
         mSuperstructure.setDisabled(false);
+        mDrive.setDisabled(false);
 
         mCoastDrive = false;
 
@@ -222,6 +224,9 @@ public class Robot extends TimedRobot {
             disableShooter = SmartDashboard.getBoolean("Disable Shooter", false);
 
             mDrive.setBraked(!mCoastDrive);
+            for(SwerveModule swerveModule : mDrive.getSwerveModules()) {
+                swerveModule.resetOffset();
+            }
 
             mHood.forceDisable();
 
@@ -414,9 +419,52 @@ public class Robot extends TimedRobot {
     @Override
     public void testPeriodic() {
         mSuperstructure.setDisabled(true);
-        
+        mDrive.setDisabled(false);
+
+        mDrive.setTeleOpInputs(
+            mHMI.getThrottle(),
+            mHMI.getStrafe(),
+            mHMI.getSteer());
+
         //mShooter.setTargetRPM(9000);
-        mHood.setPercent(1.0);
         //mFeeder.setDemand(12);
+        //mIntake.setIntake(8);
+        //mIntake.setIntakeDeploy(false);
+
+        mIntake.setIntakeDeploy(true);
+        mIntake.setIntake(10);
+        mIntake.setIndexer(5);
+        mFeeder.setDemand(12);
+        mShooter.setDemand(11);
+
+        var g = mHMI.getDriver();
+
+        /*
+        int index = 0;
+        if(g.getXButton()) {
+            index = 3;
+        } else if(g.getYButton()) {
+            index = 0;
+        } else if(g.getAButton()) {
+            index = 2;
+        } else if(g.getBButton()) {
+            index = 1;
+        }
+
+        for(int i = 0; i < 4; i++) {
+            if(i == index) {
+                mDrive.getSwerveModules()[i].setSteerVoltage(g.getLeftStickX() * 4);
+            } else {
+                mDrive.getSwerveModules()[i].setSteerVoltage(0);
+            }
+        }
+        */
+
+        //mDrive.getSwerveModules()[0].setVoltage(12);
+        //mDrive.getSwerveModules()[0].setVelocity(80);
+
+        //mDrive.getSwerveModules()[1].setSteerVoltage(5);
+        //mDrive.getSwerveModules()[3].setSteerVoltage(5);
+        //mDrive.getSwerveModules()[3].setAngle(g.getLeftStickX() * 180);
     }
 }

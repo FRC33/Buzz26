@@ -41,6 +41,17 @@ public class Intake extends Subsystem {
         mIntake = TalonFXFactory.createDefaultTalon(kIntakeId);
         mIndexer = TalonFXFactory.createDefaultTalon(kIndexerId);
         mIntakeSolenoid = new DoubleSolenoid(kIntakeForwardId, kIntakeReverseId);
+
+        mIntake.setInverted(true);
+        mIntake.setNeutralMode(NeutralMode.Coast);
+        mIntake.enableVoltageCompensation(true);
+        mIntake.configVoltageCompSaturation(11.5);
+        mIntake.configOpenloopRamp(0.25);
+        
+        mIndexer.setInverted(true);
+        mIndexer.setNeutralMode(NeutralMode.Brake);
+        mIndexer.enableVoltageCompensation(true);
+        mIndexer.configVoltageCompSaturation(11.5);
     }
 
     private final PeriodicIO mPeriodicIO;
@@ -72,7 +83,7 @@ public class Intake extends Subsystem {
     public synchronized void writePeriodicOutputs() {
         // Set output
         mIntake.setDemandVoltage(mPeriodicIO.intakeDemand);
-        mIndexer.setDemandVoltage(mPeriodicIO.intakeDemand);
+        mIndexer.setDemandVoltage(mPeriodicIO.indexerDemand);
         mIntakeSolenoid.set(mPeriodicIO.intakeDeploy ? Value.kReverse : Value.kForward);
     }
 

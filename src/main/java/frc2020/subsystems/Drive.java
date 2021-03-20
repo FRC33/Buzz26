@@ -49,7 +49,8 @@ public class Drive extends Subsystem {
 
     private DriveControlState mDriveControlState = DriveControlState.OPEN_LOOP;
 
-    private boolean fieldCentric = true;
+    private boolean mDisabled = true;
+    private boolean mFieldCentric = true;
 
     public enum DriveControlState {
         OPEN_LOOP, // open loop voltage control
@@ -109,14 +110,16 @@ public class Drive extends Subsystem {
     @Override
     public synchronized void writePeriodicOutputs() {
         // Set output
-        if(mPeriodicIO.swerveModuleStates == null) {
-            for(SwerveModule module : mModules) {
-                module.disable();
-            }
-        } else {
-            for(int i = 0; i < 3; i++) {
-                mModules[i].setVelocity(mPeriodicIO.swerveModuleStates[i].speedMetersPerSecond);
-                mModules[i].setAngle(mPeriodicIO.swerveModuleStates[i].angle.getDegrees());
+        if(!mDisabled) {
+            if(mPeriodicIO.swerveModuleStates == null) {
+                for(SwerveModule module : mModules) {
+                    module.disable();
+                }
+            } else {
+                for(int i = 0; i < 4; i++) {
+                    mModules[i].setVelocity(mPeriodicIO.swerveModuleStates[i].speedMetersPerSecond);
+                    mModules[i].setAngle(mPeriodicIO.swerveModuleStates[i].angle.getDegrees());
+                }
             }
         }
     }
@@ -160,12 +163,12 @@ public class Drive extends Subsystem {
     }
 
     public void setTeleOpInputs(double throttle, double strafe, double wheel) {
-        double vx = throttle * 100; // Max 100 in/s
-        double vy = -strafe * 100; // Max 100 in/s
-        double omega = wheel * 4.5; // Max 4.5 rad/s (100 in/s tangential)
+        double vx = -throttle * 100; // Max 100 in/s
+        double vy = strafe * 100; // Max 100 in/s
+        double omega = wheel * 6.25; // Max 4.5 rad/s (100 in/s tangential)
 
         ChassisSpeeds speeds;
-        if(fieldCentric) {
+        if(mFieldCentric) {
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, omega, getHeadingWPI());
         } else {
             speeds = new ChassisSpeeds(vx, vy, omega);
@@ -192,6 +195,10 @@ public class Drive extends Subsystem {
 
     public void resetGyro() {
         mGyro.reset();
+    }
+
+    public synchronized void setDisabled(boolean disabled) {
+        mDisabled = disabled;
     }
 
     public synchronized void setBraked(boolean braked) {

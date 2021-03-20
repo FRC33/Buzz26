@@ -37,20 +37,21 @@ public class Shooter extends Subsystem {
         // Initalize subsystem devices
         mShooterA = TalonFXFactory.createDefaultTalon(kShooterAId);
         mShooterB = TalonFXFactory.createDefaultTalon(kShooterBId);
-        configShooterMotor(mShooterA);
-        configShooterMotor(mShooterB);
+        boolean invert = true;
+        configShooterMotor(mShooterA, !invert);
+        configShooterMotor(mShooterB, invert);
     }
 
-    private void configShooterMotor(BuzzTalonFX motor) {
+    private void configShooterMotor(BuzzTalonFX motor, boolean invert) {
+        motor.setInverted(invert);
         motor.setNeutralMode(NeutralMode.Coast);
         motor.setBuzzTalonScalars(kShooterGearReduction, kShooterDiameter, kFalconCPR);
         motor.configOpenloopRamp(0);
         motor.configClosedloopRamp(kShooterRampRate);
         motor.configPIDF(kShooterSlotIdx, kShooterKp, kShooterKi, kShooterKd, kShooterKf);
 
-        motor.enableVoltageCompensation(false);
-        // TODO Renable?
-        //motor.configVoltageCompSaturation(11.5);
+        motor.enableVoltageCompensation(true);
+        motor.configVoltageCompSaturation(11.5);
     }
 
     private final PeriodicIO mPeriodicIO;

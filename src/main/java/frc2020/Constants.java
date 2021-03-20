@@ -77,18 +77,8 @@ public final class Constants {
     public static final double kAutoSteerKiZone = 3;
     public static final double kAutoSteerMaxOutput = 8;
 
-    public static final SwerveModuleConstants kFrontRightModuleConstants = new SwerveModuleConstants();
-    static {
-        kFrontRightModuleConstants.kName = "Front Right";
-        kFrontRightModuleConstants.kDriveMotorId = 1;
-        kFrontRightModuleConstants.kSteerMotorId = 2;
-        kFrontRightModuleConstants.kSteerEncoderId = 9;
-
-        kFrontRightModuleConstants.kSteerMotorGearReduction = 15.33;
-    }
-
-    public static final double kDriveLength = 22;
-    public static final double kDriveWidth = 22;
+    public static final double kDriveLength = 16;
+    public static final double kDriveWidth = 16;
     public static final SwerveDriveKinematics kSwerveKinematics;
     static {
         Translation2d frontRightLocation = new Translation2d(kDriveLength, -kDriveWidth);
@@ -100,26 +90,23 @@ public final class Constants {
             frontRightLocation, frontLeftLocation, backLeftLocation, backRightLocation
         );
     }
-    
 
-    public static final SwerveModuleConstants kFrontLeftModuleConstants = new SwerveModuleConstants();
+    public static final SwerveModuleConstants kFrontRightModuleConstants = new SwerveModuleConstants();
     static {
-        kFrontLeftModuleConstants.kName = "Front Left";
-        kFrontLeftModuleConstants.kDriveMotorId = 3;
-        kFrontLeftModuleConstants.kSteerMotorId = 4;
-        kFrontLeftModuleConstants.kSteerEncoderId = 7;
+        kFrontRightModuleConstants.kName = "Front Right";
+        kFrontRightModuleConstants.kDriveMotorId = 1;
+        kFrontRightModuleConstants.kSteerMotorId = 2;
+        kFrontRightModuleConstants.kSteerEncoderId = 7;
 
-        kFrontLeftModuleConstants.kSteerMotorGearReduction = 11;
-    }
+        kFrontRightModuleConstants.kSteerInverted = true;
 
-    public static final SwerveModuleConstants kBackLeftModuleConstants = new SwerveModuleConstants();
-    static {
-        kBackLeftModuleConstants.kName = "Back Left";
-        kBackLeftModuleConstants.kDriveMotorId = 5;
-        kBackLeftModuleConstants.kSteerMotorId = 6;
-        kBackLeftModuleConstants.kSteerEncoderId = 8;
-        
-        kBackLeftModuleConstants.kSteerMotorGearReduction = 11;
+        kFrontRightModuleConstants.kSteerMotorGearReduction = 13.2;
+        kFrontRightModuleConstants.kSteerEncoderOffset = 0.764946069123652;
+
+        kFrontRightModuleConstants.kSteerKf = (1023 * 0.4370) / 9057;
+        kFrontRightModuleConstants.kSteerKp = 0.1;
+        kFrontRightModuleConstants.kSteerKv *= (13.2 / 15.33);
+        kFrontRightModuleConstants.kSteerKa *= (13.2 / 15.33);
     }
 
     public static final SwerveModuleConstants kBackRightModuleConstants = new SwerveModuleConstants();
@@ -129,7 +116,41 @@ public final class Constants {
         kBackRightModuleConstants.kSteerMotorId = 8;
         kBackRightModuleConstants.kSteerEncoderId = 6;
 
-        kBackRightModuleConstants.kSteerMotorGearReduction = 15.33;
+        kBackRightModuleConstants.kSteerInverted = true;
+
+        kBackRightModuleConstants.kSteerMotorGearReduction = 13.2;
+        kBackRightModuleConstants.kSteerEncoderOffset = 0.565444764136119;
+
+        kBackRightModuleConstants.kSteerKf = (1023 * 0.4370) / 9057;
+        kBackRightModuleConstants.kSteerKp = 0.1;
+        kBackRightModuleConstants.kSteerKv *= (13.2 / 15.33);
+        kBackRightModuleConstants.kSteerKa *= (13.2 / 15.33);
+    }
+
+    public static final SwerveModuleConstants kFrontLeftModuleConstants = new SwerveModuleConstants();
+    static {
+        kFrontLeftModuleConstants.kName = "Front Left";
+        kFrontLeftModuleConstants.kDriveMotorId = 3;
+        kFrontLeftModuleConstants.kSteerMotorId = 4;
+        kFrontLeftModuleConstants.kSteerEncoderId = 9;
+
+        kFrontLeftModuleConstants.kSteerInverted = false;
+
+        kFrontLeftModuleConstants.kSteerMotorGearReduction = 15.33;
+        kFrontLeftModuleConstants.kSteerEncoderOffset = 0.016080725402018;
+    }
+
+    public static final SwerveModuleConstants kBackLeftModuleConstants = new SwerveModuleConstants();
+    static {
+        kBackLeftModuleConstants.kName = "Back Left";
+        kBackLeftModuleConstants.kDriveMotorId = 5;
+        kBackLeftModuleConstants.kSteerMotorId = 6;
+        kBackLeftModuleConstants.kSteerEncoderId = 8;
+
+        kBackLeftModuleConstants.kSteerInverted = false;
+        
+        kBackLeftModuleConstants.kSteerMotorGearReduction = 15.33;
+        kBackLeftModuleConstants.kSteerEncoderOffset = 0.922648673066217;
     }
     
     // Intake
@@ -149,7 +170,7 @@ public final class Constants {
     public static final double kHoodKiZone = 1;
 
     // Shooter
-    public static final double kShooterGearReduction = 1 / 1.5;
+    public static final double kShooterGearReduction = 1;
     public static final double kShooterDiameter = 4.0;
     public static final double kShooterRampRate = 0;
     public static final int kShooterSlotIdx = 0;
@@ -177,15 +198,15 @@ public final class Constants {
     public static final int kHoodBId = 9;
 
     // DIO
-    public static final int kBallSensorIds[] = {0,1,2,3,4};
-    public static final int kPixyDigitalInputId = 5;
+    public static final int kBallSensorIds[] = {5};
+    public static final int kPixyDigitalInputId = 4;
 
     // Analog
     public static final int kPixyAnalogInputId = 0;
     
     // Solins
-    public static final int kIntakeForwardId = 0;
-    public static final int kIntakeReverseId = 1;
+    public static final int kIntakeForwardId = 1;
+    public static final int kIntakeReverseId = 0;
     // endregion ------------------------ -
 
     public static enum WhichRobot {

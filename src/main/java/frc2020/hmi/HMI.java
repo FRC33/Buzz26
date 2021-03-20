@@ -27,6 +27,14 @@ public class HMI {
         operator = new BuzzXboxController(1);
     }
 
+    public BuzzXboxController getDriver() {
+        return driver;
+    }
+
+    public BuzzXboxController getOperator() {
+        return operator;
+    }
+
     //region Driving
     public double getThrottle() {
         return -driver.getLeftStickY();
