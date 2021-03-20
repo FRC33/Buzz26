@@ -211,7 +211,7 @@ public class Robot extends TimedRobot {
             //Reset Field to Vehicle
             var robotState = RobotState.getInstance();
             robotState.reset(Timer.getFPGATimestamp(), Pose2d.identity());
-            mDrive.resetGryo();
+            mDrive.resetGyro();
 
             mSuperstructure.resetStateMachine();
 

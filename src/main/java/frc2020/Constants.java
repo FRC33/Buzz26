@@ -7,6 +7,8 @@
 
 package frc2020;
 
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import frc2020.subsystems.SwerveModule.SwerveModuleConstants;
 
 public final class Constants {
@@ -84,6 +86,21 @@ public final class Constants {
 
         kFrontRightModuleConstants.kSteerMotorGearReduction = 15.33;
     }
+
+    public static final double kDriveLength = 22;
+    public static final double kDriveWidth = 22;
+    public static final SwerveDriveKinematics kSwerveKinematics;
+    static {
+        Translation2d frontRightLocation = new Translation2d(kDriveLength, -kDriveWidth);
+        Translation2d frontLeftLocation = new Translation2d(kDriveLength, kDriveWidth);
+        Translation2d backLeftLocation = new Translation2d(-kDriveLength, kDriveWidth);
+        Translation2d backRightLocation = new Translation2d(-kDriveLength, -kDriveWidth);
+    
+        kSwerveKinematics = new SwerveDriveKinematics(
+            frontRightLocation, frontLeftLocation, backLeftLocation, backRightLocation
+        );
+    }
+    
 
     public static final SwerveModuleConstants kFrontLeftModuleConstants = new SwerveModuleConstants();
     static {
