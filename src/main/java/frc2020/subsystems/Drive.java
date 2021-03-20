@@ -8,6 +8,8 @@ import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Units;
 import frc2020.Constants;
@@ -37,9 +39,8 @@ public class Drive extends Subsystem {
 
     private Limelight mLimelight = Limelight.getInstance();
 
-    private SwerveModule[] mModules = new SwerveModule[4];
-
     // Devices
+    private SwerveModule[] mModules = new SwerveModule[4];
     private BuzzPigeon mGyro;
 
     // Controllers
@@ -47,6 +48,8 @@ public class Drive extends Subsystem {
     private Path mCurrentPath = null;
 
     private DriveControlState mDriveControlState = DriveControlState.OPEN_LOOP;
+
+    private boolean fieldCentric = true;
 
     public enum DriveControlState {
         OPEN_LOOP, // open loop voltage control
@@ -85,6 +88,7 @@ public class Drive extends Subsystem {
         public double yawRate;
 
         // OUTPUTS
+        public SwerveModuleState[] swerveModuleStates;
     }
 
     double lastTimestamp = 0;
@@ -105,6 +109,16 @@ public class Drive extends Subsystem {
     @Override
     public synchronized void writePeriodicOutputs() {
         // Set output
+        if(mPeriodicIO.swerveModuleStates == null) {
+            for(SwerveModule module : mModules) {
+                module.disable();
+            }
+        } else {
+            for(int i = 0; i < 3; i++) {
+                mModules[i].setVelocity(mPeriodicIO.swerveModuleStates[i].speedMetersPerSecond);
+                mModules[i].setAngle(mPeriodicIO.swerveModuleStates[i].angle.getRadians());
+            }
+        }
     }
 
     @Override
@@ -146,7 +160,20 @@ public class Drive extends Subsystem {
     }
 
     public void setTeleOpInputs(double throttle, double strafe, double wheel) {
+        double vx = throttle * 100; // Max 100 in/s
+        double vy = strafe * 100; // Max 100 in/s
+        double omega = wheel * 4.5; // Max 4.5 rad/s (100 in/s tangential)
 
+        ChassisSpeeds speeds;
+        if(fieldCentric) {
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, omega, getHeadingWPI());
+        } else {
+            speeds = new ChassisSpeeds(vx, vy, omega);
+        }
+
+        SwerveModuleState[] moduleStates = kSwerveKinematics.toSwerveModuleStates(speeds);
+
+        mPeriodicIO.swerveModuleStates = moduleStates;
     }
 
     public SwerveModule[] getSwerveModules() {
@@ -156,6 +183,10 @@ public class Drive extends Subsystem {
     // region Getters
     public Rotation2d getHeading() {
         return mPeriodicIO.heading;
+    }
+
+    public edu.wpi.first.wpilibj.geometry.Rotation2d getHeadingWPI() {
+        return new edu.wpi.first.wpilibj.geometry.Rotation2d(mPeriodicIO.heading.getRadians());
     }
     // endregion
 
