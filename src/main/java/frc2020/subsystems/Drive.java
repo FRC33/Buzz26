@@ -116,7 +116,7 @@ public class Drive extends Subsystem {
         } else {
             for(int i = 0; i < 3; i++) {
                 mModules[i].setVelocity(mPeriodicIO.swerveModuleStates[i].speedMetersPerSecond);
-                mModules[i].setAngle(mPeriodicIO.swerveModuleStates[i].angle.getRadians());
+                mModules[i].setAngle(mPeriodicIO.swerveModuleStates[i].angle.getDegrees());
             }
         }
     }
