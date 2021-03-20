@@ -38,7 +38,7 @@ public class Inventory extends Subsystem {
             mBallSensors[i] = new BuzzDigitalInput(kBallSensorIds[i]);
         }
         
-        mBallSensors[0].invert(true);
+        mBallSensors[0].invert(false);
     }
 
     private final PeriodicIO mPeriodicIO;
