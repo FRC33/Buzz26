@@ -161,7 +161,7 @@ public class Drive extends Subsystem {
 
     public void setTeleOpInputs(double throttle, double strafe, double wheel) {
         double vx = throttle * 100; // Max 100 in/s
-        double vy = strafe * 100; // Max 100 in/s
+        double vy = -strafe * 100; // Max 100 in/s
         double omega = wheel * 4.5; // Max 4.5 rad/s (100 in/s tangential)
 
         ChassisSpeeds speeds;
