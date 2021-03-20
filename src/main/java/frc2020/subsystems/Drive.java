@@ -190,7 +190,7 @@ public class Drive extends Subsystem {
     }
     // endregion
 
-    public void resetGryo() {
+    public void resetGyro() {
         mGyro.reset();
     }
 
