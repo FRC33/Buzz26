@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory.State;
 import edu.wpi.first.wpilibj.util.Units;
 import frc2020.Constants;
 import frc2020.RobotState;
@@ -48,6 +49,8 @@ public class Drive extends Subsystem {
 
     private boolean mDisabled = true;
     private boolean mFieldCentric = true;
+
+    private State mState = new State();
 
     public enum DriveControlState {
         OPEN_LOOP, // open loop voltage control
@@ -220,6 +223,10 @@ public class Drive extends Subsystem {
         );
     }
 
+    public void setTrajectoryState(State state) {
+        mState = state;
+    }
+
     public synchronized void setDisabled(boolean disabled) {
         mDisabled = disabled;
     }
@@ -259,9 +266,14 @@ public class Drive extends Subsystem {
 
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putNumber("Swerve x", Units.metersToInches(getPoseWPI().getX()));
-        SmartDashboard.putNumber("Swerve y", Units.metersToInches(getPoseWPI().getY()));
-        SmartDashboard.putNumber("Swerve deg", getPoseWPI().getRotation().getDegrees());
+        SmartDashboard.putNumber("x", Units.metersToInches(getPoseWPI().getX()));
+        SmartDashboard.putNumber("y", Units.metersToInches(getPoseWPI().getY()));
+        SmartDashboard.putNumber("theta", getPoseWPI().getRotation().getDegrees());
+
+        var pose = mState.poseMeters;
+        SmartDashboard.putNumber("lx", Units.metersToInches(pose.getX()));
+        SmartDashboard.putNumber("ly", Units.metersToInches(pose.getY()));
+        SmartDashboard.putNumber("lv", pose.getRotation().getDegrees());
     }
 
     public synchronized double getTimestamp() {

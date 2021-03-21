@@ -8,10 +8,12 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -25,6 +27,8 @@ public class SwervePathAction implements Action {
     private SwerveControllerCommand mSwerveControllerCommand;
     private Trajectory mTrajectory;
     private boolean mResetOdometry;
+
+    private Timer mTimer = new Timer();
 
     public SwervePathAction(String trajectoryName, boolean resetOdometry) {
         this(loadTrajectory(trajectoryName), resetOdometry);
@@ -90,11 +94,17 @@ public class SwervePathAction implements Action {
         }
 
         mSwerveControllerCommand.initialize();
+
+        mTimer.reset();
+        mTimer.start();
     }
 
     @Override
     public void update() {
         mSwerveControllerCommand.execute();
+
+        // Set trajectory state in drive to display on dashboard
+        mDrive.setTrajectoryState(mTrajectory.sample(mTimer.get()));
     }
 
     @Override
@@ -105,5 +115,6 @@ public class SwervePathAction implements Action {
     @Override
     public void done() {
         mSwerveControllerCommand.end(false);
+        mTimer.stop();
     }
 }
