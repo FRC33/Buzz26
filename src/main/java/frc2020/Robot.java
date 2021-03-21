@@ -185,6 +185,8 @@ public class Robot extends TimedRobot {
     public void testInit() {
         try {
             CrashTracker.logTestInit();
+            testTimer.reset();
+            testTimer.start();
             enabledInit();
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
@@ -416,6 +418,11 @@ public class Robot extends TimedRobot {
         */
     }
 
+    Timer testTimer = new Timer();
+    LatchedBoolean testLatch1 = new LatchedBoolean();
+    LatchedBoolean testLatch2 = new LatchedBoolean();
+    boolean indexing = false;
+    int count = 0;
     @Override
     public void testPeriodic() {
         mSuperstructure.setDisabled(true);
@@ -433,9 +440,33 @@ public class Robot extends TimedRobot {
 
         mIntake.setIntakeDeploy(true);
         mIntake.setIntake(10);
-        mIntake.setIndexer(5);
-        mFeeder.setDemand(12);
-        mShooter.setDemand(11);
+
+        var a = testLatch1.update(mInventory.getSensorValues()[0]);
+        var b = testLatch2.update(!mInventory.getSensorValues()[0]);
+        if(a) {
+            count++;
+            if(count < 3) indexing = true;
+        }
+        if(b) {
+            testTimer.reset();
+        }
+        if((!mInventory.getSensorValues()[0] && testTimer.get() >= 0.100) || count >= 3) {
+            indexing = false;
+        }
+
+        if(mHMI.getDriver().getBButton()) {
+            mIntake.setIndexer(-3);
+        } else if(indexing && mHMI.getDriver().getXButton()) {
+            mIntake.setIndexer(3);
+        } else {
+            mIntake.setIndexer(0);
+        }
+
+        //mIntake.setIntakeDeploy(false);
+        //mIntake.setIntake(10);
+        //mIntake.setIndexer(5);
+        //mFeeder.setDemand(12);
+        //mShooter.setDemand(11);
 
         var g = mHMI.getDriver();
 
