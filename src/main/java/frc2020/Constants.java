@@ -50,6 +50,20 @@ public final class Constants {
     public static final double kAutoSteerKiZone = 3;
     public static final double kAutoSteerMaxOutput = 8;
 
+    public static final double kPathXKp = 0.5;
+    public static final double kPathXKi = 0;
+    public static final double kPathXKd = 0;
+
+    public static final double kPathYKp = kPathXKp;
+    public static final double kPathYKi = kPathXKi;
+    public static final double kPathYKd = kPathXKd;
+
+    public static final double kPathThetaKp = 0.5;
+    public static final double kPathThetaKi = 0;
+    public static final double kPathThetaKd = 0;
+    public static final double kPathThetaMaxVelocity = 100 / 16;
+    public static final double kPathThetaMaxAcceleration = 400 / 16;
+
     public static final double kDriveMaxLinearVelocity = Units.inchesToMeters(100);
     public static final double kDriveMaxAngularVelocity = 100 / 16; // Units do not matter
 

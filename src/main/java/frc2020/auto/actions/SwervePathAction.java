@@ -29,10 +29,12 @@ public class SwervePathAction implements Action {
     }
 
     public SwervePathAction(Trajectory trajectory, Supplier<Rotation2d> desiredRotation) {
-        var xPid = new PIDController(0, 0, 0);
-        var yPid = new PIDController(0, 0, 0);
-        var thetaConstraints = new TrapezoidProfile.Constraints(0, 0);
-        var thetaPid = new ProfiledPIDController(0, 0, 0, thetaConstraints);
+        var xPid = new PIDController(kPathXKp, kPathXKi, kPathXKd);
+        var yPid = new PIDController(kPathYKp, kPathYKi, kPathYKd);
+        var thetaConstraints = new TrapezoidProfile.Constraints(kPathThetaMaxVelocity, kPathThetaMaxAcceleration);
+        var thetaPid = new ProfiledPIDController(
+            kPathThetaKp, kPathThetaKi, kPathThetaKd, thetaConstraints
+        );
         
         mTrajectory = trajectory;
         mSwerveControllerCommand = new SwerveControllerCommand(
