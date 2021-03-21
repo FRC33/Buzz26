@@ -24,28 +24,29 @@ public class SwervePathAction implements Action {
 
     private SwerveControllerCommand mSwerveControllerCommand;
     private Trajectory mTrajectory;
+    private boolean mResetOdometry;
 
-    public SwervePathAction(String trajectoryName) {
-        this(loadTrajectory(trajectoryName));
+    public SwervePathAction(String trajectoryName, boolean resetOdometry) {
+        this(loadTrajectory(trajectoryName), resetOdometry);
     }
 
-    public SwervePathAction(String trajectoryName, Rotation2d desiredRotation) {
-        this(loadTrajectory(trajectoryName), desiredRotation);
+    public SwervePathAction(String trajectoryName, Rotation2d desiredRotation, boolean resetOdometry) {
+        this(loadTrajectory(trajectoryName), desiredRotation, resetOdometry);
     }
 
-    public SwervePathAction(String trajectoryName, Supplier<Rotation2d> desiredRotation) {
-        this(loadTrajectory(trajectoryName), desiredRotation);
+    public SwervePathAction(String trajectoryName, Supplier<Rotation2d> desiredRotation, boolean resetOdometry) {
+        this(loadTrajectory(trajectoryName), desiredRotation, resetOdometry);
     }
 
-    public SwervePathAction(Trajectory trajectory) {
-        this(trajectory, Rotation2d.fromDegrees(0));
+    public SwervePathAction(Trajectory trajectory, boolean resetOdometry) {
+        this(trajectory, Rotation2d.fromDegrees(0), resetOdometry);
     }
 
-    public SwervePathAction(Trajectory trajectory, Rotation2d desiredRotation) {
-        this(trajectory, () -> desiredRotation);
+    public SwervePathAction(Trajectory trajectory, Rotation2d desiredRotation, boolean resetOdometry) {
+        this(trajectory, () -> desiredRotation, resetOdometry);
     }
 
-    public SwervePathAction(Trajectory trajectory, Supplier<Rotation2d> desiredRotation) {
+    public SwervePathAction(Trajectory trajectory, Supplier<Rotation2d> desiredRotation, boolean resetOdometry) {
         var xPid = new PIDController(kPathXKp, kPathXKi, kPathXKd);
         var yPid = new PIDController(kPathYKp, kPathYKi, kPathYKd);
         var thetaConstraints = new TrapezoidProfile.Constraints(kPathThetaMaxVelocity, kPathThetaMaxAcceleration);
@@ -78,8 +79,16 @@ public class SwervePathAction implements Action {
         return trajectory;
     }
 
+    public Trajectory getTrajectory() {
+        return mTrajectory;
+    }
+
     @Override
     public void start() {
+        if(mResetOdometry) {
+            mDrive.resetOdometry(mTrajectory.getInitialPose());
+        }
+
         mSwerveControllerCommand.initialize();
     }
 
