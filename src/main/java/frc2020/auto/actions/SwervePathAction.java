@@ -20,6 +20,14 @@ public class SwervePathAction implements Action {
     private SwerveControllerCommand mSwerveControllerCommand;
     private Trajectory mTrajectory;
 
+    public SwervePathAction(Trajectory trajectory) {
+        this(trajectory, Rotation2d.fromDegrees(0));
+    }
+
+    public SwervePathAction(Trajectory trajectory, Rotation2d desiredRotation) {
+        this(trajectory, () -> desiredRotation);
+    }
+
     public SwervePathAction(Trajectory trajectory, Supplier<Rotation2d> desiredRotation) {
         var xPid = new PIDController(0, 0, 0);
         var yPid = new PIDController(0, 0, 0);
