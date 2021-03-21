@@ -28,34 +28,6 @@ public final class Constants {
     public static final int kCANCoderCPR = 4096;
     // endregion -----------------------------
 
-    // region ------ Drive constants and path following ------
-    public static final double kDriveWheelTrackWidthInches = 26.6;
-    public static final double kDriveWheelDiameterInches = 6;
-    public static final double kTrackScrubFactor = 1.0; //Priorly 1.0469745223
-
-    public static final double kMinLookAhead = 12.0; // inches
-    public static final double kMinLookAheadSpeed = 12.0; // inches per second
-    public static final double kMaxLookAhead = 48.0; // inches
-    public static final double kMaxLookAheadSpeed = 150.0; // inches per second
-
-    public static final double kInertiaSteeringGain = 0.0012; // angular velocity command is multiplied by this gain *
-                                                     // our speed
-                                                     // in inches per sec
-    public static final double kPathFollowingMaxAccel = 100.0;  // inches per second ^ 2
-    public static final double kPathFollowingMaxVel = 150.0; // inches per second
-
-    public static final double kPathFollowingProfileKp = 0.327 / 12.0;  // % throttle per inch of error
-    public static final double kPathFollowingProfileKi = 0.0;
-    public static final double kPathFollowingProfileKv = 0.01 / 12.0;  // % throttle per inch/s of error
-    public static final double kPathFollowingProfileKffv = 0.0631 / 12.0;  // % throttle per inch/s
-    public static final double kPathFollowingProfileKffa = 0.0072 / 12;  // % throttle per inch/s^2
-    public static final double kPathFollowingProfileKs = 0.714 / 12.0;  // % throttle
-
-    public static final double kPathFollowingGoalPosTolerance = 3.0; //3.0
-    public static final double kPathFollowingGoalVelTolerance = 12.0;
-    public static final double kPathStopSteeringDistance = 12.0;
-    // endregion ---------------------------------------------
-
     // TeleOp drive
     /** Set this to true to drive with one joystick */
     public static final double kDriveGearReduction = 11.3666;

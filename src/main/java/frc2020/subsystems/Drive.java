@@ -16,9 +16,6 @@ import edu.wpi.first.wpilibj.util.Units;
 import frc2020.Constants;
 import frc2020.RobotState;
 import lib.Kinematics;
-import lib.control.Lookahead;
-import lib.control.Path;
-import lib.control.PathFollower;
 import lib.drivers.BuzzPigeon;
 import lib.drivers.BuzzTalonFX;
 import lib.drivers.TalonFXFactory;
@@ -45,9 +42,6 @@ public class Drive extends Subsystem {
     private BuzzPigeon mGyro;
 
     // Controllers
-    private PathFollower mPathFollower;
-    private Path mCurrentPath = null;
-
     private SwerveDriveOdometry mSwerveDriveOdometry;
 
     private DriveControlState mDriveControlState = DriveControlState.OPEN_LOOP;
@@ -154,9 +148,6 @@ public class Drive extends Subsystem {
                         case OPEN_LOOP:
                             break;
                         case PATH_FOLLOWING:
-                            if (mPathFollower != null) {
-                                updatePathFollower(timestamp);
-                            }
                             break;
                         default:
                             System.out.println("unexpected drive control state: " + mDriveControlState);
@@ -187,6 +178,10 @@ public class Drive extends Subsystem {
 
         SwerveModuleState[] moduleStates = kSwerveKinematics.toSwerveModuleStates(speeds);
 
+        mPeriodicIO.swerveModuleStates = moduleStates;
+    }
+
+    public void setModuleStates(SwerveModuleState[] moduleStates) {
         mPeriodicIO.swerveModuleStates = moduleStates;
     }
 
@@ -241,84 +236,6 @@ public class Drive extends Subsystem {
             mDriveControlState = DriveControlState.OPEN_LOOP;
         }
     }
-
-    public synchronized void setVelocity(DriveSignal signal) {
-        if (mDriveControlState != DriveControlState.PATH_FOLLOWING) {
-            System.out.println("switching to path following");
-            mDriveControlState = DriveControlState.PATH_FOLLOWING;
-        }
-    }
-
-    /**
-     * Configures the drivebase to drive a path. Used for autonomous driving
-     *
-     * @see Path
-     */
-    public synchronized void setWantDrivePath(Path path, boolean reversed) {
-        if (mCurrentPath != path || mDriveControlState != DriveControlState.PATH_FOLLOWING) {
-            RobotState.getInstance().resetDistanceDriven();
-            mPathFollower = new PathFollower(path, reversed, new PathFollower.Parameters(
-                    new Lookahead(Constants.kMinLookAhead, Constants.kMaxLookAhead, Constants.kMinLookAheadSpeed,
-                            Constants.kMaxLookAheadSpeed),
-                    Constants.kInertiaSteeringGain, Constants.kPathFollowingProfileKp,
-                    Constants.kPathFollowingProfileKi, Constants.kPathFollowingProfileKv,
-                    Constants.kPathFollowingProfileKffv, Constants.kPathFollowingProfileKffa,
-                    Constants.kPathFollowingProfileKs, Constants.kPathFollowingMaxVel,
-                    Constants.kPathFollowingMaxAccel, Constants.kPathFollowingGoalPosTolerance,
-                    Constants.kPathFollowingGoalVelTolerance, Constants.kPathStopSteeringDistance));
-            mDriveControlState = DriveControlState.PATH_FOLLOWING;
-            mCurrentPath = path;
-        } else {
-            setTeleOpInputs(0, 0, 0);
-        }
-    }
-
-    public synchronized boolean isDoneWithPath() {
-        if (mDriveControlState == DriveControlState.PATH_FOLLOWING && mPathFollower != null) {
-            return mPathFollower.isFinished();
-        } else {
-            System.out.println("Robot is not in path following mode");
-            return true;
-        }
-    }
-
-    public synchronized void forceDoneWithPath() {
-        if (mDriveControlState == DriveControlState.PATH_FOLLOWING && mPathFollower != null) {
-            mPathFollower.forceFinish();
-        } else {
-            System.out.println("Robot is not in path following mode");
-        }
-    }
-
-    private void updatePathFollower(double timestamp) {
-        if (mDriveControlState == DriveControlState.PATH_FOLLOWING) {
-            RobotState robot_state = RobotState.getInstance();
-            Pose2d field_to_vehicle = robot_state.getLatestFieldToVehicle().getValue();
-            Twist2d command = mPathFollower.update(timestamp, field_to_vehicle, robot_state.getDistanceDriven(),
-                    robot_state.getPredictedVelocity().dx);
-            if (!mPathFollower.isFinished()) {
-                DriveSignal setpoint = Kinematics.inverseKinematics(command);
-                //setVelocity(setpoint, new DriveSignal(0, 0));
-                setVelocity(setpoint);
-            } else {
-                if (!mPathFollower.isForceFinished()) {
-                    //setVelocity(new DriveSignal(0, 0), new DriveSignal(0, 0));
-                    setOpenLoop(new DriveSignal(0, 0));
-                }
-            }
-        } else {
-            DriverStation.reportError("drive is not in path following state", false);
-        }
-    }
-
-    public synchronized boolean hasPassedMarker(String marker) {
-        if (mDriveControlState == DriveControlState.PATH_FOLLOWING && mPathFollower != null) {
-            return mPathFollower.hasPassedMarker(marker);
-        } else {
-            System.out.println("Robot is not in path following mode");
-            return false;
-        }
-    }
     // endregion
 
     @Override
@@ -339,14 +256,6 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("Swerve x", Units.metersToInches(getPoseWPI().getX()));
         SmartDashboard.putNumber("Swerve y", Units.metersToInches(getPoseWPI().getY()));
         SmartDashboard.putNumber("Swerve deg", getPoseWPI().getRotation().getDegrees());
-
-        if(mDriveControlState == DriveControlState.PATH_FOLLOWING) {
-            var debug = mPathFollower.getDebug();
-            SmartDashboard.putNumber("lx", debug.lookahead_point_x);
-            SmartDashboard.putNumber("ly", debug.lookahead_point_y);
-            SmartDashboard.putNumber("lv", debug.lookahead_point_velocity);
-            SmartDashboard.putNumber("along track error", debug.along_track_error);
-        }
     }
 
     public synchronized double getTimestamp() {

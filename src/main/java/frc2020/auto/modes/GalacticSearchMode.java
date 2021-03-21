@@ -2,7 +2,6 @@ package frc2020.auto.modes;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc2020.auto.AutoModeEndedException;
-import frc2020.auto.actions.DrivePathAction;
 import frc2020.auto.actions.LambdaAction;
 import frc2020.auto.actions.ParallelAction;
 import frc2020.auto.actions.SeekAndSuckAction;
@@ -20,6 +19,8 @@ public class GalacticSearchMode extends AutoModeBase {
     
     @Override
     protected void routine() throws AutoModeEndedException {
+        /*
+
         runAction(new HoodAngleAction(58, 0.5));
         runAction(new SelectAction(this::isBallSeen, 
             // If ball seen, run red paths
@@ -52,6 +53,8 @@ public class GalacticSearchMode extends AutoModeBase {
                 )
             )
         ));
+
+        */
     }
 
     private boolean isBallSeen() {
