@@ -9,6 +9,7 @@ package frc2020;
 
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.util.Units;
 import frc2020.subsystems.SwerveModule.SwerveModuleConstants;
 
 public final class Constants {
@@ -77,8 +78,11 @@ public final class Constants {
     public static final double kAutoSteerKiZone = 3;
     public static final double kAutoSteerMaxOutput = 8;
 
-    public static final double kDriveLength = 16;
-    public static final double kDriveWidth = 16;
+    public static final double kDriveMaxLinearVelocity = Units.inchesToMeters(100);
+    public static final double kDriveMaxAngularVelocity = 100 / 16; // Units do not matter
+
+    public static final double kDriveLength = Units.inchesToMeters(16);
+    public static final double kDriveWidth = Units.inchesToMeters(16);
     public static final SwerveDriveKinematics kSwerveKinematics;
     static {
         Translation2d frontRightLocation = new Translation2d(kDriveLength, -kDriveWidth);
