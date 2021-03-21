@@ -213,6 +213,12 @@ public class Drive extends Subsystem {
             getHeadingWPI()
         );
     }
+    public void resetOdometry(edu.wpi.first.wpilibj.geometry.Pose2d pose) {
+        mSwerveDriveOdometry.resetPosition(
+            pose, 
+            getHeadingWPI()
+        );
+    }
 
     public synchronized void setDisabled(boolean disabled) {
         mDisabled = disabled;
