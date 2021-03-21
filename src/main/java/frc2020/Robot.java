@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
 
     private final Drive mDrive = Drive.getInstance();
     
-    private final RobotStateEstimator mRobotStateEstimator = RobotStateEstimator.getInstance();
+    //private final RobotStateEstimator mRobotStateEstimator = RobotStateEstimator.getInstance();
     
     private final Intake mIntake = Intake.getInstance();
     private final Hood mHood = Hood.getInstance();
@@ -80,7 +80,7 @@ public class Robot extends TimedRobot {
             CrashTracker.logRobotInit();
 
             mSubsystemManager.setSubsystems(
-                mRobotStateEstimator,
+                //mRobotStateEstimator,
                 mDrive,
                 mDrive.getSwerveModules()[0],
                 mDrive.getSwerveModules()[1],
@@ -216,6 +216,7 @@ public class Robot extends TimedRobot {
             var robotState = RobotState.getInstance();
             robotState.reset(Timer.getFPGATimestamp(), Pose2d.identity());
             mDrive.resetGyro();
+            mDrive.resetOdometry();
 
             mSuperstructure.resetStateMachine();
 

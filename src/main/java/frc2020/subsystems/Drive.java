@@ -9,6 +9,7 @@ import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Units;
@@ -47,6 +48,8 @@ public class Drive extends Subsystem {
     private PathFollower mPathFollower;
     private Path mCurrentPath = null;
 
+    private SwerveDriveOdometry mSwerveDriveOdometry;
+
     private DriveControlState mDriveControlState = DriveControlState.OPEN_LOOP;
 
     private boolean mDisabled = true;
@@ -76,6 +79,8 @@ public class Drive extends Subsystem {
         // Initalize subsystem devices
         mGyro = new BuzzPigeon();
         mGyro.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10);
+
+        mSwerveDriveOdometry = new SwerveDriveOdometry(kSwerveKinematics, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(0));
     }
 
     private final PeriodicIO mPeriodicIO;
@@ -139,6 +144,12 @@ public class Drive extends Subsystem {
             public void onLoop(double timestamp) {
                 synchronized (Drive.this) {
                     //handleFaults();
+                    mSwerveDriveOdometry.update(getHeadingWPI(),
+                        mModules[0].getModuleState(),
+                        mModules[1].getModuleState(),
+                        mModules[2].getModuleState(),
+                        mModules[3].getModuleState());
+
                     switch (mDriveControlState) {
                         case OPEN_LOOP:
                             break;
@@ -191,10 +202,21 @@ public class Drive extends Subsystem {
     public edu.wpi.first.wpilibj.geometry.Rotation2d getHeadingWPI() {
         return new edu.wpi.first.wpilibj.geometry.Rotation2d(mPeriodicIO.heading.getRadians());
     }
+
+    public edu.wpi.first.wpilibj.geometry.Pose2d getPoseWPI() {
+        return mSwerveDriveOdometry.getPoseMeters();
+    }
     // endregion
 
     public void resetGyro() {
         mGyro.reset();
+    }
+
+    public void resetOdometry() {
+        mSwerveDriveOdometry.resetPosition(
+            new edu.wpi.first.wpilibj.geometry.Pose2d(0, 0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(0)), 
+            getHeadingWPI()
+        );
     }
 
     public synchronized void setDisabled(boolean disabled) {
@@ -314,6 +336,10 @@ public class Drive extends Subsystem {
 
     @Override
     public void outputTelemetry() {
+        SmartDashboard.putNumber("Swerve x", Units.metersToInches(getPoseWPI().getX()));
+        SmartDashboard.putNumber("Swerve y", Units.metersToInches(getPoseWPI().getY()));
+        SmartDashboard.putNumber("Swerve deg", getPoseWPI().getRotation().getDegrees());
+
         if(mDriveControlState == DriveControlState.PATH_FOLLOWING) {
             var debug = mPathFollower.getDebug();
             SmartDashboard.putNumber("lx", debug.lookahead_point_x);

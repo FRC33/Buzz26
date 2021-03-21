@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.simulation.DutyCycleSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Units;
@@ -263,6 +264,10 @@ public class SwerveModule extends Subsystem {
         return Rotation2d.fromDegrees(mPeriodicIO.trackedAngle);
     }
 
+    public edu.wpi.first.wpilibj.geometry.Rotation2d getAngleWPI() {
+        return edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(mPeriodicIO.trackedAngle);
+    }
+
     public void disable() {
         mPeriodicIO.driveCommand = 0;
         mPeriodicIO.driveMode = DriveMode.DISABLED;
@@ -292,6 +297,10 @@ public class SwerveModule extends Subsystem {
 
     public void setAngle(Rotation2d rotation2d) {
         setAngle(rotation2d.getDegrees());
+    }
+
+    public SwerveModuleState getModuleState() {
+        return new SwerveModuleState(getVelocity(), getAngleWPI());
     }
 
     public void resetOffset() {
