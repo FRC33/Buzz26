@@ -58,7 +58,7 @@ public class SwerveModule extends Subsystem {
         /** DIO channel */
         public int kSteerEncoderId = 0;
 
-        public boolean kDriveInverted = true;
+        public boolean kDriveInverted = false;
         public double kDriveMotorGearReduction = 4.67;
         /** in */
         public double kDriveWheelDiameter = 3;
