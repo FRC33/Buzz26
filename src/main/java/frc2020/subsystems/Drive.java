@@ -170,7 +170,7 @@ public class Drive extends Subsystem {
     public void setTeleOpInputs(double throttle, double strafe, double wheel) {
         double vx = throttle * kDriveMaxLinearVelocity;
         double vy = -strafe * kDriveMaxLinearVelocity;
-        double omega = wheel * kDriveMaxAngularVelocity;
+        double omega = -wheel * kDriveMaxAngularVelocity;
 
         ChassisSpeeds speeds;
         if(mFieldCentric) {
