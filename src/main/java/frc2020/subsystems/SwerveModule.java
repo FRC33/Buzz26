@@ -64,6 +64,7 @@ public class SwerveModule extends Subsystem {
         /** in */
         public double kDriveWheelDiameter = Units.inchesToMeters(3);
         //TODO add current limiting
+        public double kDriveRamp = 0.33;
         public double kDriveKp = 0;
         public double kDriveKi = 0;
         public double kDriveKd = 0;
@@ -112,6 +113,8 @@ public class SwerveModule extends Subsystem {
         mDriveMotor.setNeutralMode(NeutralMode.Brake);
         mDriveMotor.enableVoltageCompensation(true);
         mDriveMotor.configVoltageCompSaturation(12.0);
+        mDriveMotor.configOpenloopRamp(constants.kDriveRamp);
+        mDriveMotor.configClosedloopRamp(constants.kDriveRamp);
         mDriveMotor.config_kP(0, constants.kDriveKp);
         mDriveMotor.config_kI(0, constants.kDriveKi);
         mDriveMotor.config_kD(0, constants.kDriveKd);
