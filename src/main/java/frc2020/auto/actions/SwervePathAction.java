@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import frc2020.paths.TrajectoryRegistry;
 import frc2020.subsystems.Drive;
 
 public class SwervePathAction implements Action {
@@ -38,19 +39,10 @@ public class SwervePathAction implements Action {
         this(loadTrajectory(trajectoryName), desiredRotation, resetOdometry);
     }
 
+
     public SwervePathAction(String trajectoryName, Supplier<Rotation2d> desiredRotation, boolean resetOdometry) {
-        this(loadTrajectory(trajectoryName), desiredRotation, resetOdometry);
-    }
-
-    public SwervePathAction(Trajectory trajectory, boolean resetOdometry) {
-        this(trajectory, Rotation2d.fromDegrees(0), resetOdometry);
-    }
-
-    public SwervePathAction(Trajectory trajectory, Rotation2d desiredRotation, boolean resetOdometry) {
-        this(trajectory, () -> desiredRotation, resetOdometry);
-    }
-
-    public SwervePathAction(Trajectory trajectory, Supplier<Rotation2d> desiredRotation, boolean resetOdometry) {
+        mTrajectory = TrajectoryRegistry.getInstance().get(trajectoryName);
+        
         var xPid = new PIDController(kPathXKp, kPathXKi, kPathXKd);
         var yPid = new PIDController(kPathYKp, kPathYKi, kPathYKd);
         var thetaConstraints = new TrapezoidProfile.Constraints(kPathThetaMaxVelocity, kPathThetaMaxAcceleration);
@@ -58,9 +50,8 @@ public class SwervePathAction implements Action {
             kPathThetaKp, kPathThetaKi, kPathThetaKd, thetaConstraints
         );
         
-        mTrajectory = trajectory;
         mSwerveControllerCommand = new SwerveControllerCommand(
-            trajectory,
+            mTrajectory,
             mDrive::getPoseWPI,
             kSwerveKinematics,
             xPid,
@@ -69,18 +60,6 @@ public class SwervePathAction implements Action {
             desiredRotation,
             mDrive::setModuleStates
         );
-    }
-
-    public static Trajectory loadTrajectory(String name) {
-        String trajectoryJSON = "paths/" + name + ".wpilib.json";
-        Trajectory trajectory = new Trajectory();
-        try {
-            Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
-            trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
-        } catch (IOException ex) {
-            DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
-        }
-        return trajectory;
     }
 
     public Trajectory getTrajectory() {
