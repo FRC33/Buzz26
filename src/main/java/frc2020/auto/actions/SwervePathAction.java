@@ -32,11 +32,11 @@ public class SwervePathAction implements Action {
     private Timer mTimer = new Timer();
 
     public SwervePathAction(String trajectoryName, boolean resetOdometry) {
-        this(loadTrajectory(trajectoryName), resetOdometry);
+        this(trajectoryName, Rotation2d.fromDegrees(0), resetOdometry);
     }
 
     public SwervePathAction(String trajectoryName, Rotation2d desiredRotation, boolean resetOdometry) {
-        this(loadTrajectory(trajectoryName), desiredRotation, resetOdometry);
+        this(trajectoryName, () -> desiredRotation, resetOdometry);
     }
 
 
