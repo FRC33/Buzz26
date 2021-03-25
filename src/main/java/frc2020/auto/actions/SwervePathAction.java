@@ -39,7 +39,6 @@ public class SwervePathAction implements Action {
         this(trajectoryName, () -> desiredRotation, resetOdometry);
     }
 
-
     public SwervePathAction(String trajectoryName, Supplier<Rotation2d> desiredRotation, boolean resetOdometry) {
         mTrajectory = TrajectoryRegistry.getInstance().get(trajectoryName);
         
