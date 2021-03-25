@@ -58,6 +58,7 @@ public class SwervePathAction implements Action {
             kPathThetaKp, kPathThetaKi, kPathThetaKd, thetaConstraints
         );
         
+        mResetOdometry = resetOdometry;
         mTrajectory = trajectory;
         mSwerveControllerCommand = new SwerveControllerCommand(
             trajectory,
@@ -72,7 +73,7 @@ public class SwervePathAction implements Action {
     }
 
     public static Trajectory loadTrajectory(String name) {
-        String trajectoryJSON = "paths/" + name + ".wpilib.json";
+        String trajectoryJSON = "paths/output/" + name + ".wpilib.json";
         Trajectory trajectory = new Trajectory();
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
