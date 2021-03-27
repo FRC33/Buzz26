@@ -82,9 +82,9 @@ public class SwerveModule extends Subsystem {
         public double kSteerKf = (1023 * 0.4350) / 8841;
         public double kSteerKiZone = 0;
         /** Feedforward velocity (aka cruise velocity) */
-        public double kSteerKv = 6000;
+        public double kSteerKv = 12000;
         /** Feedforward acceleration */
-        public double kSteerKa = 6000 * 4;
+        public double kSteerKa = 12000 * 4;
         public int kSteerSCurveStrength = 1;
     }
 
@@ -205,7 +205,7 @@ public class SwerveModule extends Subsystem {
             }
         }
         if(mPeriodicIO.driveMode == DriveMode.VELOCITY && mPeriodicIO.steerMode == SteerMode.ANGLE) {
-            if(mPeriodicIO.driveVelocity <= 30) {
+            if(mPeriodicIO.driveVelocity <= Units.inchesToMeters(30)) {
                 if(Math.abs(raw_error) > Math.PI / 2) {
                     mPeriodicIO.driveCommand *= -1;
                     raw_error -= Math.PI * Math.signum(raw_error);
@@ -306,7 +306,7 @@ public class SwerveModule extends Subsystem {
         return new SwerveModuleState(getVelocity(), getAngleWPI());
     }
 
-    public void resetOffset() {
+    public synchronized void resetOffset() {
         mTrackedAngleOffset = Optional.empty();
     }
 

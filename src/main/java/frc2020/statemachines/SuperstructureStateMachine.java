@@ -213,7 +213,7 @@ public class SuperstructureStateMachine {
 
     private SystemState handleIndexTransitions(WantedAction wantedAction, SuperstructureState currentState) {
         if(wantedAction == WantedAction.INTAKE_ON) {
-            if(!currentState.sensorValues[0]) {
+            if(!currentState.sensorValues[0] && currentState.sensorValues[1]) {
                 if(currentState.ballCount >= 3) {
                     return SystemState.INTAKE_FINISH;
                 } else {

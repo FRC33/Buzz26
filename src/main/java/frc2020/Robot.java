@@ -298,7 +298,8 @@ public class Robot extends TimedRobot {
         mDrive.setTeleOpInputs(
             mHMI.getThrottle(),
             mHMI.getStrafe(),
-            mHMI.getSteer());
+            mHMI.getSteer(),
+            mHMI.getDriver().getBButton());
 
         if(isShootingLocation) {
             enableFlywheel = true;
@@ -432,7 +433,9 @@ public class Robot extends TimedRobot {
         mDrive.setTeleOpInputs(
             mHMI.getThrottle(),
             mHMI.getStrafe(),
-            mHMI.getSteer());
+            mHMI.getSteer(),
+            mHMI.getDriver().getBButton(),
+            mHMI.getDriver().getRightTriggerBoolean());
 
         //mShooter.setTargetRPM(9000);
         //mFeeder.setDemand(12);
@@ -440,6 +443,9 @@ public class Robot extends TimedRobot {
         //mIntake.setIntakeDeploy(false);
 
         mIntake.setIntakeDeploy(true);
+        mIntake.setIntake(10);
+
+        /*
         mIntake.setIntake(10);
 
         var a = testLatch1.update(mInventory.getSensorValues()[0]);
@@ -462,12 +468,18 @@ public class Robot extends TimedRobot {
         } else {
             mIntake.setIndexer(0);
         }
+        */
 
-        //mIntake.setIntakeDeploy(false);
-        //mIntake.setIntake(10);
-        //mIntake.setIndexer(5);
-        //mFeeder.setDemand(12);
-        //mShooter.setDemand(11);
+
+        mIntake.setIntakeDeploy(true);
+        mIntake.setIntake(10);
+        if(mHMI.getDriver().getAButton()) {
+            mIntake.setIndexer(8);
+        } else {
+            mIntake.setIndexer(0);
+        }
+        mFeeder.setDemand(12);
+        mShooter.setDemand(9.4);
 
         var g = mHMI.getDriver();
 

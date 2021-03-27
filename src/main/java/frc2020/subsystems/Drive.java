@@ -8,11 +8,13 @@ import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory.State;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.util.Units;
 import frc2020.Constants;
 import frc2020.RobotState;
@@ -22,6 +24,7 @@ import lib.drivers.BuzzTalonFX;
 import lib.drivers.TalonFXFactory;
 import lib.geometry.Pose2d;
 import lib.geometry.Rotation2d;
+import lib.geometry.Translation2d;
 import lib.geometry.Twist2d;
 import lib.loops.ILooper;
 import lib.loops.Loop;
@@ -44,6 +47,10 @@ public class Drive extends Subsystem {
 
     // Controllers
     private SwerveDriveOdometry mSwerveDriveOdometry;
+    private ProfiledPIDController mSteerController =
+        //new ProfiledPIDController(0.02, 0, 0, new Constraints(75 / 6, (75 / 6)));
+        new ProfiledPIDController(0.01, 0, 0, new Constraints(75 / 6, (75 / 6)));
+    private LeadLagFilter mYawControlFilter;
 
     private DriveControlState mDriveControlState = DriveControlState.OPEN_LOOP;
 
@@ -77,6 +84,7 @@ public class Drive extends Subsystem {
         mGyro = new BuzzPigeon();
         mGyro.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10);
 
+        mYawControlFilter = new LeadLagFilter(Timer.getFPGATimestamp(), kYawLead, kYawLag);
         mSwerveDriveOdometry = new SwerveDriveOdometry(kSwerveKinematics, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(0));
     }
 
@@ -85,6 +93,10 @@ public class Drive extends Subsystem {
     public static class PeriodicIO {
         // INPUTS
         public double timestamp;
+
+        public double vx;
+        public double vy;
+        public double omega;
 
         public Rotation2d heading = Rotation2d.identity();
         public double yaw;
@@ -100,6 +112,16 @@ public class Drive extends Subsystem {
         mPeriodicIO.timestamp = Timer.getFPGATimestamp();
 
         double lastYaw = mPeriodicIO.yaw;
+
+        var speeds = kSwerveKinematics.toChassisSpeeds(
+            mModules[0].getModuleState(),
+            mModules[1].getModuleState(),
+            mModules[2].getModuleState(),
+            mModules[3].getModuleState());
+        
+        mPeriodicIO.vx = speeds.vxMetersPerSecond;
+        mPeriodicIO.vy = speeds.vyMetersPerSecond;
+        mPeriodicIO.omega = speeds.omegaRadiansPerSecond;
 
         mPeriodicIO.yaw = mGyro.getRawYawZeroed();
         mPeriodicIO.heading = Rotation2d.fromDegrees(mPeriodicIO.yaw);
@@ -167,10 +189,36 @@ public class Drive extends Subsystem {
         });
     }
 
-    public void setTeleOpInputs(double throttle, double strafe, double wheel) {
+    public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry) {
+        setTeleOpInputs(throttle, strafe, wheel, resetOdometry, false);
+    }
+
+    public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry, boolean lockTranslation) {
         double vx = throttle * kDriveMaxLinearVelocity;
         double vy = -strafe * kDriveMaxLinearVelocity;
         double omega = -wheel * kDriveMaxAngularVelocity;
+
+        if(lockTranslation) {
+            var velocity = new Translation2d(vx, vy);
+            var oldDirection = velocity.direction();
+            var newDirection = Rotation2d.fromDegrees(Math.round(velocity.direction().getDegrees() / 45.0) * 45);
+            var changeDirection = newDirection.rotateBy(oldDirection.inverse());
+            var newVelocity = velocity.rotateBy(changeDirection);
+
+            vx = newVelocity.x();
+            vy = newVelocity.y();
+        }
+
+        if(resetOdometry) {
+            resetGyro();
+            resetOdometry();
+        }
+        
+        double filteredYawRate = mYawControlFilter.update(mPeriodicIO.timestamp, mPeriodicIO.yawRate);
+
+        mSteerController.setGoal(omega);
+        var correction = mSteerController.calculate(filteredYawRate);
+        omega += correction;
 
         ChassisSpeeds speeds;
         if(mFieldCentric) {
@@ -269,6 +317,7 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("x", Units.metersToInches(getPoseWPI().getX()));
         SmartDashboard.putNumber("y", Units.metersToInches(getPoseWPI().getY()));
         SmartDashboard.putNumber("theta", getPoseWPI().getRotation().getDegrees());
+        SmartDashboard.putNumber("VELOCITY", Math.sqrt(Math.pow(mPeriodicIO.vx, 2) * Math.pow(mPeriodicIO.vy, 2)));
 
         var pose = mState.poseMeters;
         SmartDashboard.putNumber("lx", Units.metersToInches(pose.getX()));
