@@ -64,11 +64,12 @@ public class SwerveModule extends Subsystem {
         /** in */
         public double kDriveWheelDiameter = Units.inchesToMeters(3);
         //TODO add current limiting
-        public double kDriveRamp = 0.33;
-        public double kDriveKp = 0;
+        /** Seconds */
+        public double kDriveRamp = 0.3;
+        public double kDriveKp = 0.1;
         public double kDriveKi = 0;
         public double kDriveKd = 0;
-        public double kDriveKf = (1023 * 0.8376) / 18424;
+        public double kDriveKf = (1023 * 1.0) / 14253;
         public double kDriveKiZone = 0;
 
         public boolean kSteerInverted = false;
@@ -142,12 +143,16 @@ public class SwerveModule extends Subsystem {
         public double timestamp;
         // Drive
         public double driveSupplyVoltage;
+        public double driveCommandVoltage;
+        public double driveRawVelocity;
         /** in/s */
         public double driveVelocity;
         /** in */
         public double drivePosition;
         // Steer
         public double steerSupplyVoltage;
+        public double steerCommandVoltage;
+        public double steerRawVelocity;
         /** Magnetic encoder position from 0 to 1, no offset */
         public double rawAbsoluteRevs;
         /** Degrees from magnetic encoder */
@@ -171,12 +176,16 @@ public class SwerveModule extends Subsystem {
 
         // Read inputs
         mPeriodicIO.driveSupplyVoltage = mDriveMotor.getBusVoltage();
-        mPeriodicIO.driveVelocity = (((mDriveMotor.getSelectedSensorVelocity() / Constants.kFalconCPR) / mConstants.kDriveMotorGearReduction) * 10d) // rev/s
+        mPeriodicIO.driveCommandVoltage = mDriveMotor.getMotorOutputVoltage();
+        mPeriodicIO.driveRawVelocity = mDriveMotor.getSelectedSensorVelocity();
+        mPeriodicIO.driveVelocity = (((mPeriodicIO.driveRawVelocity / Constants.kFalconCPR) / mConstants.kDriveMotorGearReduction) * 10d) // rev/s
                                      * (mConstants.kDriveWheelDiameter * Math.PI); // Scale revs to inches
         mPeriodicIO.drivePosition = ((mDriveMotor.getSelectedSensorPosition() / Constants.kFalconCPR) / mConstants.kDriveMotorGearReduction) // rev
                                      * (mConstants.kDriveWheelDiameter * Math.PI); // Scale revs to inches
         
-        mPeriodicIO.steerSupplyVoltage = mDriveMotor.getBusVoltage();
+        mPeriodicIO.steerSupplyVoltage = mSteerMotor.getBusVoltage();
+        mPeriodicIO.steerCommandVoltage = mSteerMotor.getMotorOutputVoltage();
+        mPeriodicIO.steerRawVelocity = mSteerMotor.getSelectedSensorVelocity();
 
         mPeriodicIO.rawAbsoluteRevs = mSteerEncoder.getOutput();
         var absoluteRevs = mPeriodicIO.rawAbsoluteRevs - mConstants.kSteerEncoderOffset; // Subtract offset so that 0 revs = 0 degrees
@@ -259,6 +268,10 @@ public class SwerveModule extends Subsystem {
         }
     }
 
+    public PeriodicIO getPeriodicIO() {
+        return mPeriodicIO;
+    }
+
     public double getVelocity() {
         return mPeriodicIO.driveVelocity;
     }
@@ -335,11 +348,16 @@ public class SwerveModule extends Subsystem {
 
     @Override
     public void outputTelemetry() {
+        SmartDashboard.putNumber(mName + " Drive Kf", (1023 * (mPeriodicIO.driveCommandVoltage / 12)) / mPeriodicIO.driveRawVelocity);
         SmartDashboard.putNumber(mName + " Velocity", mPeriodicIO.driveVelocity);
+        SmartDashboard.putNumber(mName + " Target Velocity", mPeriodicIO.driveCommand);
+
+        SmartDashboard.putNumber(mName + " Steer Kf", (1023 * (mPeriodicIO.steerCommandVoltage / 12)) / mPeriodicIO.steerRawVelocity);
         SmartDashboard.putNumber(mName + " Raw Revs", mPeriodicIO.rawAbsoluteRevs);
         SmartDashboard.putNumber(mName + " Abs Angle", mPeriodicIO.absoluteAngle);
         SmartDashboard.putNumber(mName + " Rel Angle", mPeriodicIO.relativeAngle);
         SmartDashboard.putNumber(mName + " Tracked Angle", mPeriodicIO.trackedAngle);
+        SmartDashboard.putNumber(mName + " Target Angle", mPeriodicIO.steerCommand);
         SmartDashboard.putNumber(mName + " Rot2d Angle", getAngle().getDegrees());
     }
     

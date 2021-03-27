@@ -32,6 +32,7 @@ import lib.subsystems.Subsystem;
 import lib.util.DriveSignal;
 import lib.util.LatchedBoolean;
 import lib.util.LeadLagFilter;
+import lib.util.ReflectingCSVWriter;
 import lib.util.SynchronousPIDF;
 import lib.util.TorqueLimit;
 import lib.util.Util;
@@ -49,7 +50,7 @@ public class Drive extends Subsystem {
     private SwerveDriveOdometry mSwerveDriveOdometry;
     private ProfiledPIDController mSteerController =
         //new ProfiledPIDController(0.02, 0, 0, new Constraints(75 / 6, (75 / 6)));
-        new ProfiledPIDController(0.01, 0, 0, new Constraints(75 / 6, (75 / 6)));
+        new ProfiledPIDController(0.0, 0, 0, new Constraints(75 / 6, (75 / 6)));
     private LeadLagFilter mYawControlFilter;
 
     private DriveControlState mDriveControlState = DriveControlState.OPEN_LOOP;
@@ -168,7 +169,7 @@ public class Drive extends Subsystem {
                         mModules[1].getModuleState(),
                         mModules[2].getModuleState(),
                         mModules[3].getModuleState());
-
+                    
                     switch (mDriveControlState) {
                         case OPEN_LOOP:
                             break;
@@ -194,9 +195,29 @@ public class Drive extends Subsystem {
     }
 
     public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry, boolean lockTranslation) {
-        double vx = throttle * kDriveMaxLinearVelocity;
-        double vy = -strafe * kDriveMaxLinearVelocity;
+        double vx = throttle;
+        double vy = -strafe;
         double omega = -wheel * kDriveMaxAngularVelocity;
+
+        if(resetOdometry) {
+            resetGyro();
+            resetOdometry();
+        }
+
+        if(vx == 0 && vy == 0 && omega == 0 && mPeriodicIO.swerveModuleStates != null) {
+            for(int i = 0; i < mPeriodicIO.swerveModuleStates.length; i++) {
+                var oldState = mPeriodicIO.swerveModuleStates[i];
+                var newState = new SwerveModuleState(0, oldState.angle);
+                mPeriodicIO.swerveModuleStates[i] = newState; 
+            }
+
+            return;
+        }
+
+        // Scale speeds
+        double norm = new Translation2d(vx, vy).norm();
+        vx = norm == 0 ? 0 : (vx / norm) * kDriveMaxLinearVelocity;
+        vy = norm == 0 ? 0 : (vy / norm) * kDriveMaxLinearVelocity;
 
         if(lockTranslation) {
             var velocity = new Translation2d(vx, vy);
@@ -207,11 +228,6 @@ public class Drive extends Subsystem {
 
             vx = newVelocity.x();
             vy = newVelocity.y();
-        }
-
-        if(resetOdometry) {
-            resetGyro();
-            resetOdometry();
         }
         
         double filteredYawRate = mYawControlFilter.update(mPeriodicIO.timestamp, mPeriodicIO.yawRate);
@@ -317,12 +333,13 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("x", Units.metersToInches(getPoseWPI().getX()));
         SmartDashboard.putNumber("y", Units.metersToInches(getPoseWPI().getY()));
         SmartDashboard.putNumber("theta", getPoseWPI().getRotation().getDegrees());
-        SmartDashboard.putNumber("VELOCITY", Math.sqrt(Math.pow(mPeriodicIO.vx, 2) * Math.pow(mPeriodicIO.vy, 2)));
+        SmartDashboard.putNumber("v", Math.sqrt(Math.pow(mPeriodicIO.vx, 2) * Math.pow(mPeriodicIO.vy, 2)));
+        SmartDashboard.putNumber("omega", mPeriodicIO.omega);
 
         var pose = mState.poseMeters;
         SmartDashboard.putNumber("lx", Units.metersToInches(pose.getX()));
         SmartDashboard.putNumber("ly", Units.metersToInches(pose.getY()));
-        SmartDashboard.putNumber("lv", pose.getRotation().getDegrees());
+        SmartDashboard.putNumber("lv", mState.velocityMetersPerSecond);
     }
 
     public synchronized double getTimestamp() {

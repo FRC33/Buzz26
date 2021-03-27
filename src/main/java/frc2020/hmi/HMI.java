@@ -37,15 +37,15 @@ public class HMI {
 
     //region Driving
     public double getThrottle() {
-        return -driver.getLeftStickY();
+        return -driver.getRightStickY();
     }
 
     public double getStrafe() {
-        return driver.getLeftStickX();
+        return driver.getRightStickX();
     } 
 
     public double getSteer() {
-        return driver.getRightStickX();
+        return driver.getLeftStickX();
     }
     //endregion
 
