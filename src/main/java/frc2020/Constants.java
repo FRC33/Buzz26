@@ -64,7 +64,7 @@ public final class Constants {
     public static final double kPathThetaMaxVelocity = 100 / 16;
     public static final double kPathThetaMaxAcceleration = 400 / 16;
 
-    public static final double kDriveMaxLinearVelocity = Units.inchesToMeters(100);
+    public static final double kDriveMaxLinearVelocity = Units.inchesToMeters(110);
     public static final double kDriveMaxAngularVelocity = 75 / 16; // Units do not matter
 
     public static final double kDriveLength = Units.inchesToMeters(16);
