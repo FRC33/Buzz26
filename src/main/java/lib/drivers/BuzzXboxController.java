@@ -8,19 +8,19 @@ public class BuzzXboxController extends XboxController {
     }
 
     public double getLeftStickX() {
-        return joystickCubicScaledDeadband(getX(Hand.kLeft));
+        return getX(Hand.kLeft);
     }
     
     public double getLeftStickY() {
-        return joystickCubicScaledDeadband(getY(Hand.kLeft));
+        return getY(Hand.kLeft);
     }
 
     public double getRightStickX() {
-        return joystickCubicScaledDeadband(getX(Hand.kRight));
+        return getX(Hand.kRight);
     }
     
     public double getRightStickY() {
-        return joystickCubicScaledDeadband(getY(Hand.kRight));
+        return getY(Hand.kRight);
     }
 
     public boolean getLeftTriggerBoolean() {
@@ -102,7 +102,7 @@ public class BuzzXboxController extends XboxController {
      
     private static double joystickCubicScaledDeadband(double x) {
         double deadbandCutoff = 0.08;
-        double weight = 1.0;
+        double weight = 1;
          
         if(Math.abs(x) < deadbandCutoff) {
             return 0;
