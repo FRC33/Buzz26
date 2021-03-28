@@ -2,6 +2,7 @@ package frc2020;
 
 import lib.geometry.Pose2d;
 import lib.geometry.Rotation2d;
+import lib.geometry.Translation2d;
 import lib.wpilib.TimedRobot;
 import lib.util.*;
 //import lib.vision.AimingParameters;
@@ -449,6 +450,9 @@ public class Robot extends TimedRobot {
 
         mIntake.setIntakeDeploy(true);
         mIntake.setIntake(10);
+
+        var trans = new Translation2d(mHMI.getThrottle(), mHMI.getStrafe());
+        SmartDashboard.putNumber("Joystick Norm", trans.norm());
 
         /*
         mIntake.setIntake(10);
