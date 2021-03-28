@@ -28,6 +28,7 @@ import frc2020.subsystems.SwerveModule;
 import frc2020.auto.AutoModeExecutor;
 import frc2020.auto.modes.AutoModeBase;
 import frc2020.hmi.HMI;
+import frc2020.paths.TrajectoryRegistry;
 import frc2020.statemachines.ClimberStateMachine;
 import frc2020.statemachines.SuperstructureStateMachine;
 import frc2020.statemachines.SuperstructureStateMachine.SystemState;
@@ -67,6 +68,8 @@ public class Robot extends TimedRobot {
     private AutoModeSelector mAutoModeSelector = new AutoModeSelector();
     private AutoModeExecutor mAutoModeExecutor;
 
+    private TrajectoryRegistry mTrajectoryRegistry = TrajectoryRegistry.getInstance();
+
     private boolean mCoastDrive = true;
     
     Robot() {
@@ -101,6 +104,8 @@ public class Robot extends TimedRobot {
             mSubsystemManager.registerDisabledLoops(mDisabledLooper);
 
             mAutoModeSelector.updateModeCreator();
+
+            mTrajectoryRegistry.load("Slalom");
 
             if(!SmartDashboard.containsKey("Disable Shooter")) {
                 SmartDashboard.putBoolean("Disable Shooter", false);
