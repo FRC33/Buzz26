@@ -50,7 +50,6 @@ public class SwervePathAction implements Action {
         );
         
         mResetOdometry = resetOdometry;
-        mTrajectory = trajectory;
         mSwerveControllerCommand = new SwerveControllerCommand(
             mTrajectory,
             mDrive::getPoseWPI,
