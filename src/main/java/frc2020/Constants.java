@@ -50,7 +50,7 @@ public final class Constants {
     public static final double kAutoSteerKiZone = 3;
     public static final double kAutoSteerMaxOutput = 8;
 
-    public static final double kPathXKp = 0.5;
+    public static final double kPathXKp = 1.7;
     public static final double kPathXKi = 0;
     public static final double kPathXKd = 0;
 
@@ -64,8 +64,8 @@ public final class Constants {
     public static final double kPathThetaMaxVelocity = 100 / 16;
     public static final double kPathThetaMaxAcceleration = 400 / 16;
 
-    public static final double kDriveMaxLinearVelocity = Units.inchesToMeters(100);
-    public static final double kDriveMaxAngularVelocity = 100 / 16; // Units do not matter
+    public static final double kDriveMaxLinearVelocity = Units.inchesToMeters(110);
+    public static final double kDriveMaxAngularVelocity = 75 / 16; // Units do not matter
 
     public static final double kDriveLength = Units.inchesToMeters(16);
     public static final double kDriveWidth = Units.inchesToMeters(16);
@@ -127,7 +127,7 @@ public final class Constants {
         kFrontLeftModuleConstants.kSteerInverted = false;
 
         kFrontLeftModuleConstants.kSteerMotorGearReduction = 15.33;
-        kFrontLeftModuleConstants.kSteerEncoderOffset = 0.016080725402018;
+        kFrontLeftModuleConstants.kSteerEncoderOffset = 0.828;
     }
 
     public static final SwerveModuleConstants kBackLeftModuleConstants = new SwerveModuleConstants();
@@ -149,13 +149,13 @@ public final class Constants {
     public static final double kIntakeStallTime = 0.15;
 
     // Hood
-    public static final double kHoodEncoderReduction = 2;
-    public static final RobotConstant<Double> kHoodSensorOffset = new RobotConstant<>(0.12, 0.0);
+    public static final double kHoodEncoderReduction = 2.66;
+    public static final RobotConstant<Double> kHoodSensorOffset = new RobotConstant<>(0.95, 0.0);
     public static final double kHoodAngleOffset = 25;
     public static final double kHoodAngleMin = 27;
     public static final double kHoodAngleMax = 70;
     public static final double kHoodKp = 0.5;
-    public static final double kHoodKi = 0.03;
+    public static final double kHoodKi = 0.0;
     public static final double kHoodKd = 0;
     public static final double kHoodKiZone = 1;
 
@@ -188,8 +188,8 @@ public final class Constants {
     public static final int kHoodBId = 9;
 
     // DIO
-    public static final int kBallSensorIds[] = {5};
-    public static final int kPixyDigitalInputId = 4;
+    public static final int kBallSensorIds[] = {5, 4};
+    public static final int kPixyDigitalInputId = 3;
 
     // Analog
     public static final int kPixyAnalogInputId = 0;

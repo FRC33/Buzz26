@@ -49,6 +49,8 @@ public class SwervePathAction implements Action {
             kPathThetaKp, kPathThetaKi, kPathThetaKd, thetaConstraints
         );
         
+        mResetOdometry = resetOdometry;
+        mTrajectory = trajectory;
         mSwerveControllerCommand = new SwerveControllerCommand(
             mTrajectory,
             mDrive::getPoseWPI,

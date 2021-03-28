@@ -21,9 +21,9 @@ public class SuperstructureStateMachine {
     private static final double kBrushIndexVoltage = 5;
 
     // Blow
-    private static final double kBlowVoltage = -11;
+    private static final double kBlowVoltage = 0;
     private static final double kBrushBlowVoltage = -5; // TODO
-    private static final double kFeederBlowVoltage = -5;
+    private static final double kFeederBlowVoltage = 0;
 
     // Aim
     private static final double kBrushBallPrepVoltage = 0; // TODO
@@ -213,7 +213,7 @@ public class SuperstructureStateMachine {
 
     private SystemState handleIndexTransitions(WantedAction wantedAction, SuperstructureState currentState) {
         if(wantedAction == WantedAction.INTAKE_ON) {
-            if(!currentState.sensorValues[0]) {
+            if(!currentState.sensorValues[0] && currentState.sensorValues[1]) {
                 if(currentState.ballCount >= 3) {
                     return SystemState.INTAKE_FINISH;
                 } else {

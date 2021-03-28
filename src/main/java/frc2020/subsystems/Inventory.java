@@ -13,7 +13,7 @@ import lib.util.LatchedBoolean;
 public class Inventory extends Subsystem {
     private static Inventory mInstance;
 
-    private BuzzDigitalInput mBallSensors[] = new BuzzDigitalInput[1];
+    private BuzzDigitalInput mBallSensors[] = new BuzzDigitalInput[2];
 
     private LatchedBoolean mBallEnteredLatch = new LatchedBoolean();
 
@@ -39,6 +39,7 @@ public class Inventory extends Subsystem {
         }
         
         mBallSensors[0].invert(false);
+        mBallSensors[1].invert(false);
     }
 
     private final PeriodicIO mPeriodicIO;
@@ -46,7 +47,7 @@ public class Inventory extends Subsystem {
     public static class PeriodicIO {
         // INPUTS
         public double timestamp;
-        public boolean[] sensorValues = new boolean[1];
+        public boolean[] sensorValues = new boolean[2];
     }
 
     @Override

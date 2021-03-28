@@ -72,8 +72,7 @@ public class Hood extends Subsystem {
 
         // Read inputs
         double absRevs = mEncoder.getAbsoluteRevs();
-        //mPeriodicIO.rawAbsPosition = absRevs <= 0.5 ? 1 + absRevs : absRevs;
-        mPeriodicIO.rawAbsPosition = absRevs;
+        mPeriodicIO.rawAbsPosition = absRevs <= 0.5 ? 1 + absRevs : absRevs;
         mPeriodicIO.absPosition = (((mPeriodicIO.rawAbsPosition - kHoodSensorOffset.get()) / kHoodEncoderReduction) * 360) + kHoodAngleOffset;
         mPeriodicIO.relPosition = (mEncoder.getRevs() / kHoodEncoderReduction) * 360;
         if(mTrackedPositionOffset.isEmpty()) {
@@ -115,36 +114,44 @@ public class Hood extends Subsystem {
 
     private double mLastSetpoint = 0;
     private double calculateDesiredPercent() {
+        return 0.0;
+
+        /*
         switch(mPeriodicIO.commandMode) {
             case DISABLED:
                 return 0.0;
             case PERCENT:
                 return mPeriodicIO.command;
             case ANGLE:
-                // Reset I if target angle changed
-                if(mLastSetpoint != mPeriodicIO.command) pidf.resetIntegrator();
-                mLastSetpoint = mPeriodicIO.command;
+                if(!mTrackedPositionOffset.isEmpty()) {
+                    // Reset I if target angle changed
+                    if(mLastSetpoint != mPeriodicIO.command) pidf.resetIntegrator();
+                    mLastSetpoint = mPeriodicIO.command;
 
-                // Set setpoint
-                pidf.setSetpoint(mPeriodicIO.command);
+                    // Set setpoint
+                    pidf.setSetpoint(mPeriodicIO.command);
 
-                // Calculate output from PID controller
-                double demand = (pidf.calculate(mPeriodicIO.trackedPosition) / RobotController.getVoltage6V());
+                    // Calculate output from PID controller
+                    double demand = (pidf.calculate(mPeriodicIO.trackedPosition) / RobotController.getVoltage6V());
+                    
+                    // 0.05 is hold percent
+                    //demand += 0.07 * Math.sin((mPeriodicIO.trackedPosition / 180.0) * Math.PI);
+                    
+                    // Reset I if not within certain error
+                    if(Math.abs(pidf.getError()) > kHoodKiZone) pidf.resetIntegrator();
+
+                    // Soft limits
+                    if(mPeriodicIO.trackedPosition < kHoodAngleMin && demand < 0) demand = 0;
+                    if(mPeriodicIO.trackedPosition > kHoodAngleMax && demand > 0) demand = 0;
                 
-                // 0.05 is hold percent
-                //demand += 0.07 * Math.sin((mPeriodicIO.trackedPosition / 180.0) * Math.PI);
-                
-                // Reset I if not within certain error
-                if(Math.abs(pidf.getError()) > kHoodKiZone) pidf.resetIntegrator();
-
-                // Soft limits
-                if(mPeriodicIO.trackedPosition < kHoodAngleMin && demand < 0) demand = 0;
-                if(mPeriodicIO.trackedPosition > kHoodAngleMax && demand > 0) demand = 0;
-
-                return demand;
+                    return demand;
+                } else {
+                    return 0.0;
+                }
             default:
                 return 0.0;
         }
+        */
     }
 
     @Override
