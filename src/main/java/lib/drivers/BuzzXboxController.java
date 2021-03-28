@@ -88,22 +88,29 @@ public class BuzzXboxController extends XboxController {
     }
     //endregion
 
-    private static double deadband(double input) {
+    /**
+     * Uses default deadband cutoff of 0.08
+     */
+    public static double deadband(double input) {
         return deadband(input, 0.08);
     }
 
-    private static double deadband(double input, double deadbandValue) {
-        return (input > -deadbandValue && input < deadbandValue) ? 0 : input;
+    public static double deadband(double input, double deadbandCutoff) {
+        return (input > -deadbandCutoff && input < deadbandCutoff) ? 0 : input;
     }
 
-    private static double cubic(double x, double weight) {
+    public static double cubic(double x, double weight) {
         return weight * x * x * x  + (1.0 - weight) * x;
     }
-     
-    private static double joystickCubicScaledDeadband(double x) {
-        double deadbandCutoff = 0.08;
-        double weight = 1;
-         
+    
+    /**
+     * Uses default deadband cutoff of 0.08
+     */
+    public static double joystickCubicScaledDeadband(double x, double weight) {
+        return joystickCubicScaledDeadband(x, 0.08, weight);
+    }
+
+    public static double joystickCubicScaledDeadband(double x, double deadbandCutoff, double weight) {
         if(Math.abs(x) < deadbandCutoff) {
             return 0;
         } else {
