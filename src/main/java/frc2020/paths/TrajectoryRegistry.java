@@ -44,11 +44,11 @@ public class TrajectoryRegistry {
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
             trajectory = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+
+            mTrajectories.put(name, trajectory);
         } catch (IOException ex) {
             DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
         }
-
-        mTrajectories.put(name, trajectory);
     }
 
     public Trajectory get(String name) {
