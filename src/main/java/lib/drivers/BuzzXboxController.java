@@ -98,10 +98,6 @@ public class BuzzXboxController extends XboxController {
     public static double deadband(double input, double deadbandCutoff) {
         return (input > -deadbandCutoff && input < deadbandCutoff) ? 0 : input;
     }
-
-    public static double cubic(double x, double weight) {
-        return weight * x * x * x  + (1.0 - weight) * x;
-    }
     
     /**
      * Uses default deadband cutoff of 0.08
@@ -116,5 +112,9 @@ public class BuzzXboxController extends XboxController {
         } else {
             return (cubic(x, weight)- (Math.abs(x)/x)* cubic(deadbandCutoff, weight)) / (1.0 - cubic(deadbandCutoff, weight));
         }
-    } 
+    }
+
+    private static double cubic(double x, double weight) {
+        return weight * x * x * x  + (1.0 - weight) * x;
+    }
 }
