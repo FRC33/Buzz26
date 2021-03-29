@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Units;
 import frc2020.subsystems.Drive;
 import frc2020.subsystems.Intake;
 import frc2020.subsystems.Inventory;
@@ -232,6 +233,9 @@ public class Robot extends TimedRobot {
 
             disableShooter = SmartDashboard.getBoolean("Disable Shooter", false);
 
+            if(mDrive.getLinearVelocity() < Units.inchesToMeters(5)) {
+                mCoastDrive = true;
+            }
             mDrive.setBraked(!mCoastDrive);
             for(SwerveModule swerveModule : mDrive.getSwerveModules()) {
                 swerveModule.resetOffset();
@@ -305,7 +309,9 @@ public class Robot extends TimedRobot {
             mHMI.getThrottle(),
             mHMI.getStrafe(),
             mHMI.getSteer(),
-            mHMI.getDriver().getBButton());
+            mHMI.getDriver().getBButton(),
+            false,
+            mHMI.getDriver().getAButton());
 
         if(isShootingLocation) {
             enableFlywheel = true;
@@ -441,7 +447,9 @@ public class Robot extends TimedRobot {
             mHMI.getStrafe(),
             mHMI.getSteer(),
             mHMI.getDriver().getBButton(),
-            mHMI.getDriver().getRightTriggerBoolean());
+            mHMI.getDriver().getRightTriggerBoolean(),
+            mHMI.getDriver().getAButton()
+        );
 
         //mShooter.setTargetRPM(9000);
         //mFeeder.setDemand(12);

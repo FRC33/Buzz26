@@ -315,6 +315,11 @@ public class SwerveModule extends Subsystem {
         setAngle(rotation2d.getDegrees());
     }
 
+    public void setBraked(boolean braked) {
+        mDriveMotor.setNeutralMode(braked ? NeutralMode.Brake : NeutralMode.Coast);
+        mSteerMotor.setNeutralMode(braked ? NeutralMode.Brake : NeutralMode.Coast);
+    }
+
     public SwerveModuleState getModuleState() {
         return new SwerveModuleState(getVelocity(), getAngleWPI());
     }

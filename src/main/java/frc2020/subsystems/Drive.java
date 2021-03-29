@@ -194,10 +194,10 @@ public class Drive extends Subsystem {
     }
 
     public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry) {
-        setTeleOpInputs(throttle, strafe, wheel, resetOdometry, false);
+        setTeleOpInputs(throttle, strafe, wheel, resetOdometry, false, false);
     }
 
-    public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry, boolean lockTranslation) {
+    public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry, boolean lockTranslation, boolean centerWheels) {
         double xVal = throttle;
         double yVal = -strafe;
         double steerVal = BuzzXboxController.joystickCubicScaledDeadband(
@@ -209,6 +209,17 @@ public class Drive extends Subsystem {
         if(resetOdometry) {
             resetGyro();
             resetOdometry();
+        }
+
+        // Center wheels
+        if(centerWheels) {
+            for(int i = 0; i < mPeriodicIO.swerveModuleStates.length; i++) {
+                mPeriodicIO.swerveModuleStates[i] = new SwerveModuleState(
+                    0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(0)
+                ); 
+            }
+
+            return;
         }
 
         // If no input, keep the swerve modules stopped at their current rotations (rather than snapping to 0 degrees) to avoid skidding
@@ -277,6 +288,10 @@ public class Drive extends Subsystem {
     public edu.wpi.first.wpilibj.geometry.Pose2d getPoseWPI() {
         return mSwerveDriveOdometry.getPoseMeters();
     }
+
+    public double getLinearVelocity() {
+        return new Translation2d(mPeriodicIO.vx, mPeriodicIO.vy).norm();
+    }
     // endregion
 
     public void resetGyro() {
@@ -305,7 +320,9 @@ public class Drive extends Subsystem {
     }
 
     public synchronized void setBraked(boolean braked) {
-
+        for(SwerveModule module : mModules) {
+            module.setBraked(braked);
+        }
     }
 
     public synchronized void setOpenLoop() {
