@@ -21,6 +21,7 @@ import frc2020.RobotState;
 import lib.Kinematics;
 import lib.drivers.BuzzPigeon;
 import lib.drivers.BuzzTalonFX;
+import lib.drivers.BuzzXboxController;
 import lib.drivers.TalonFXFactory;
 import lib.geometry.Pose2d;
 import lib.geometry.Rotation2d;
@@ -195,16 +196,21 @@ public class Drive extends Subsystem {
     }
 
     public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry, boolean lockTranslation) {
-        double vx = throttle;
-        double vy = -strafe;
-        double omega = -wheel * kDriveMaxAngularVelocity;
+        double xVal = throttle;
+        double yVal = -strafe;
+        double steerVal = BuzzXboxController.joystickCubicScaledDeadband(
+            -wheel, kDriveSteerJoystickDeadbandCutoff, kDriveSteerJoystickWeight
+        );
+        
+        Translation2d translationalInput = new Translation2d(xVal, yVal);
 
         if(resetOdometry) {
             resetGyro();
             resetOdometry();
         }
 
-        if(vx == 0 && vy == 0 && omega == 0 && mPeriodicIO.swerveModuleStates != null) {
+        // If no input, keep the swerve modules stopped at their current rotations (rather than snapping to 0 degrees) to avoid skidding
+        if(xVal == 0 && yVal == 0 && steerVal == 0 && mPeriodicIO.swerveModuleStates != null) {
             for(int i = 0; i < mPeriodicIO.swerveModuleStates.length; i++) {
                 var oldState = mPeriodicIO.swerveModuleStates[i];
                 var newState = new SwerveModuleState(0, oldState.angle);
@@ -214,22 +220,23 @@ public class Drive extends Subsystem {
             return;
         }
 
-        // Scale speeds
-        double norm = new Translation2d(vx, vy).norm();
-        vx = norm == 0 ? 0 : (vx / norm) * kDriveMaxLinearVelocity;
-        vy = norm == 0 ? 0 : (vy / norm) * kDriveMaxLinearVelocity;
-
         if(lockTranslation) {
-            var velocity = new Translation2d(vx, vy);
-            var oldDirection = velocity.direction();
-            var newDirection = Rotation2d.fromDegrees(Math.round(velocity.direction().getDegrees() / 45.0) * 45);
+            var oldDirection = translationalInput.direction();
+            var newDirection = Rotation2d.fromDegrees(Math.round(translationalInput.direction().getDegrees() / 45.0) * 45);
             var changeDirection = newDirection.rotateBy(oldDirection.inverse());
-            var newVelocity = velocity.rotateBy(changeDirection);
-
-            vx = newVelocity.x();
-            vy = newVelocity.y();
+            translationalInput = translationalInput.rotateBy(changeDirection);
         }
+
+        // Smooth joystick
+        Rotation2d direction = translationalInput.direction();
+        double scaledMagnitude = BuzzXboxController.joystickCubicScaledDeadband(translationalInput.norm(), kDriveJoystickDeadbandCutoff, kDriveJoystickWeight);
+        translationalInput = new Translation2d(direction.cos() * scaledMagnitude, direction.sin() * scaledMagnitude);
+
+        // Scale magnitude [0, 1] to [0, maxLinearVelocity]
+        translationalInput = translationalInput.scale(kDriveMaxLinearVelocity);
         
+        double omega = steerVal * kDriveMaxAngularVelocity;
+
         double filteredYawRate = mYawControlFilter.update(mPeriodicIO.timestamp, mPeriodicIO.yawRate);
 
         mSteerController.setGoal(omega);
@@ -238,9 +245,9 @@ public class Drive extends Subsystem {
 
         ChassisSpeeds speeds;
         if(mFieldCentric) {
-            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, omega, getHeadingWPI());
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translationalInput.x(), translationalInput.y(), omega, getHeadingWPI());
         } else {
-            speeds = new ChassisSpeeds(vx, vy, omega);
+            speeds = new ChassisSpeeds(translationalInput.x(), translationalInput.y(), omega);
         }
 
         SwerveModuleState[] moduleStates = kSwerveKinematics.toSwerveModuleStates(speeds);
