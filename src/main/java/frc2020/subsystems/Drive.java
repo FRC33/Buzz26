@@ -103,6 +103,7 @@ public class Drive extends Subsystem {
         public Rotation2d heading = Rotation2d.identity();
         public double yaw;
         public double yawRate;
+        public double fusedHeading;
 
         // OUTPUTS
         public SwerveModuleState[] swerveModuleStates;
@@ -129,7 +130,8 @@ public class Drive extends Subsystem {
         mPeriodicIO.heading = Rotation2d.fromDegrees(mPeriodicIO.yaw);
         mPeriodicIO.yawRate = (mPeriodicIO.yaw - lastYaw) 
             / (mPeriodicIO.timestamp - lastTimestamp);
-        
+        //mPeriodicIO.fusedHeading = mGyro.getFusedHeading();
+
         lastTimestamp = mPeriodicIO.timestamp;
     }
 
@@ -210,7 +212,7 @@ public class Drive extends Subsystem {
         }
 
         // If no input, keep the swerve modules stopped at their current rotations (rather than snapping to 0 degrees) to avoid skidding
-        if(xVal == 0 && yVal == 0 && steerVal == 0 && mPeriodicIO.swerveModuleStates != null) {
+        if(Util.epsilonEquals(xVal, 0, 0.08) && Util.epsilonEquals(yVal, 0, 0.08) && Util.epsilonEquals(steerVal, 0, 0.08) && mPeriodicIO.swerveModuleStates != null) {
             for(int i = 0; i < mPeriodicIO.swerveModuleStates.length; i++) {
                 var oldState = mPeriodicIO.swerveModuleStates[i];
                 var newState = new SwerveModuleState(0, oldState.angle);
@@ -229,7 +231,7 @@ public class Drive extends Subsystem {
 
         // Smooth joystick
         Rotation2d direction = translationalInput.direction();
-        double scaledMagnitude = BuzzXboxController.joystickCubicScaledDeadband(translationalInput.norm(), kDriveJoystickDeadbandCutoff, kDriveJoystickWeight);
+        double scaledMagnitude = BuzzXboxController.joystickCubicScaledDeadband(Math.min(translationalInput.norm(), 1), kDriveJoystickDeadbandCutoff, kDriveJoystickWeight);
         translationalInput = new Translation2d(direction.cos() * scaledMagnitude, direction.sin() * scaledMagnitude);
 
         // Scale magnitude [0, 1] to [0, maxLinearVelocity]
@@ -340,13 +342,15 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("x", Units.metersToInches(getPoseWPI().getX()));
         SmartDashboard.putNumber("y", Units.metersToInches(getPoseWPI().getY()));
         SmartDashboard.putNumber("theta", getPoseWPI().getRotation().getDegrees());
-        SmartDashboard.putNumber("v", Math.sqrt(Math.pow(mPeriodicIO.vx, 2) * Math.pow(mPeriodicIO.vy, 2)));
+        SmartDashboard.putNumber("v", Units.metersToInches(new Translation2d(mPeriodicIO.vx, mPeriodicIO.vy).norm()));
         SmartDashboard.putNumber("omega", mPeriodicIO.omega);
+
+        SmartDashboard.putNumber("fused heading", Rotation2d.fromDegrees(-mPeriodicIO.fusedHeading).getDegrees());
 
         var pose = mState.poseMeters;
         SmartDashboard.putNumber("lx", Units.metersToInches(pose.getX()));
         SmartDashboard.putNumber("ly", Units.metersToInches(pose.getY()));
-        SmartDashboard.putNumber("lv", mState.velocityMetersPerSecond);
+        SmartDashboard.putNumber("lv", Units.metersToInches(mState.velocityMetersPerSecond));
     }
 
     public synchronized double getTimestamp() {

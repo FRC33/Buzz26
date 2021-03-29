@@ -39,7 +39,7 @@ public class TrajectoryRegistry {
      * @param name The name of the path in PathWeaver
      */
     public void load(String name) {
-        String trajectoryJSON = "paths/" + name + ".wpilib.json";
+        String trajectoryJSON = "paths/output/" + name + ".wpilib.json";
         Trajectory trajectory = new Trajectory();
         try {
             Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);

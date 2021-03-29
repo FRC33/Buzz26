@@ -50,7 +50,7 @@ public final class Constants {
     public static final double kAutoSteerKiZone = 3;
     public static final double kAutoSteerMaxOutput = 8;
 
-    public static final double kPathXKp = 1.7;
+    public static final double kPathXKp = 0.5;
     public static final double kPathXKi = 0;
     public static final double kPathXKd = 0;
 
@@ -58,7 +58,7 @@ public final class Constants {
     public static final double kPathYKi = kPathXKi;
     public static final double kPathYKd = kPathXKd;
 
-    public static final double kPathThetaKp = 0.5;
+    public static final double kPathThetaKp = 0;
     public static final double kPathThetaKi = 0;
     public static final double kPathThetaKd = 0;
     public static final double kPathThetaMaxVelocity = 100 / 16;
@@ -71,7 +71,7 @@ public final class Constants {
     public static final double kDriveJoystickWeight = 0.5;
 
     public static final double kDriveSteerJoystickDeadbandCutoff = 0.08;
-    public static final double kDriveSteerJoystickWeight = 0.5;
+    public static final double kDriveSteerJoystickWeight = 1.0;
 
     public static final double kDriveLength = Units.inchesToMeters(16);
     public static final double kDriveWidth = Units.inchesToMeters(16);
