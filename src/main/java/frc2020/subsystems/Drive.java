@@ -241,9 +241,9 @@ public class Drive extends Subsystem {
 
         ChassisSpeeds speeds;
         if(mFieldCentric) {
-            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(xVal, yVal, omega, getHeadingWPI());
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translationalInput.x(), translationalInput.y(), omega, getHeadingWPI());
         } else {
-            speeds = new ChassisSpeeds(xVal, yVal, omega);
+            speeds = new ChassisSpeeds(translationalInput.x(), translationalInput.y(), omega);
         }
 
         SwerveModuleState[] moduleStates = kSwerveKinematics.toSwerveModuleStates(speeds);
