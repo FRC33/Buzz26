@@ -66,6 +66,9 @@ public final class Constants {
 
     public static final double kDriveMaxLinearVelocity = Units.inchesToMeters(110);
     public static final double kDriveMaxAngularVelocity = 75 / 16; // Units do not matter
+    
+    public static final double kDriveJoystickDeadbandCutoff = 0.08;
+    public static final double kDriveJoystickWeight = 0.5;
 
     public static final double kDriveLength = Units.inchesToMeters(16);
     public static final double kDriveWidth = Units.inchesToMeters(16);
