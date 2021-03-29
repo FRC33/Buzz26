@@ -198,7 +198,9 @@ public class Drive extends Subsystem {
     public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry, boolean lockTranslation) {
         double xVal = throttle;
         double yVal = -strafe;
-        double omega = -wheel * kDriveMaxAngularVelocity;
+        double steerVal = BuzzXboxController.joystickCubicScaledDeadband(
+            -wheel, kDriveSteerJoystickDeadbandCutoff, kDriveSteerJoystickWeight
+        );
         
         Translation2d translationalInput = new Translation2d(xVal, yVal);
 
@@ -208,7 +210,7 @@ public class Drive extends Subsystem {
         }
 
         // If no input, keep the swerve modules stopped at their current rotations (rather than snapping to 0 degrees) to avoid skidding
-        if(xVal == 0 && yVal == 0 && omega == 0 && mPeriodicIO.swerveModuleStates != null) {
+        if(xVal == 0 && yVal == 0 && steerVal == 0 && mPeriodicIO.swerveModuleStates != null) {
             for(int i = 0; i < mPeriodicIO.swerveModuleStates.length; i++) {
                 var oldState = mPeriodicIO.swerveModuleStates[i];
                 var newState = new SwerveModuleState(0, oldState.angle);
@@ -233,6 +235,8 @@ public class Drive extends Subsystem {
         // Scale magnitude [0, 1] to [0, maxLinearVelocity]
         translationalInput = translationalInput.scale(kDriveMaxLinearVelocity);
         
+        double omega = steerVal * kDriveMaxAngularVelocity;
+
         double filteredYawRate = mYawControlFilter.update(mPeriodicIO.timestamp, mPeriodicIO.yawRate);
 
         mSteerController.setGoal(omega);

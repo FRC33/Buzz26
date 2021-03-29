@@ -70,6 +70,9 @@ public final class Constants {
     public static final double kDriveJoystickDeadbandCutoff = 0.08;
     public static final double kDriveJoystickWeight = 0.5;
 
+    public static final double kDriveSteerJoystickDeadbandCutoff = 0.08;
+    public static final double kDriveSteerJoystickWeight = 0.5;
+
     public static final double kDriveLength = Units.inchesToMeters(16);
     public static final double kDriveWidth = Units.inchesToMeters(16);
     public static final SwerveDriveKinematics kSwerveKinematics;
