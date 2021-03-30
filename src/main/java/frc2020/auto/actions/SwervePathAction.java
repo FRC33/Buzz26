@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -69,7 +70,12 @@ public class SwervePathAction implements Action {
     @Override
     public void start() {
         if(mResetOdometry) {
-            mDrive.resetOdometry(mTrajectory.getInitialPose());
+            mDrive.resetOdometry(
+                new Pose2d(
+                    mTrajectory.getInitialPose().getTranslation(),
+                    Rotation2d.fromDegrees(0)
+                )
+            );
         }
 
         mSwerveControllerCommand.initialize();
