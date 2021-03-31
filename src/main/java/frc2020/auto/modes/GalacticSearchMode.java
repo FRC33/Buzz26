@@ -13,12 +13,14 @@ import frc2020.auto.actions.SwervePathAction;
 import frc2020.auto.actions.HoodAngleAction;
 import frc2020.auto.actions.IntakeToCapacityAction;
 import frc2020.paths.*;
+import frc2020.subsystems.Drive;
 import frc2020.subsystems.Inventory;
 import frc2020.subsystems.Pixy;
 import frc2020.subsystems.Superstructure;
 
 public class GalacticSearchMode extends AutoModeBase {
     Pixy mPixy = Pixy.getInstance();
+    Drive mDrive = Drive.getInstance();
     Superstructure mSuperstructure = Superstructure.getInstance();
     Inventory mInventory = Inventory.getInstance();
 
@@ -78,8 +80,8 @@ public class GalacticSearchMode extends AutoModeBase {
     private Rotation2d getTargetHeading() {
         var ballCount = mInventory.getBallCount();
         
-        if(mTimer.get() >= 0) {
-            return Rotation2d.fromDegrees(45);
+        if(mDrive.getPoseWPI().getX() >= 3.81) {
+            return Rotation2d.fromDegrees(90);
         } else {
             return Rotation2d.fromDegrees(0);
         }
