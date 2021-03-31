@@ -50,7 +50,7 @@ public final class Constants {
     public static final double kAutoSteerKiZone = 3;
     public static final double kAutoSteerMaxOutput = 8;
 
-    public static final double kPathXKp = 0.5;
+    public static final double kPathXKp = 1.0;
     public static final double kPathXKi = 0;
     public static final double kPathXKd = 0;
 
