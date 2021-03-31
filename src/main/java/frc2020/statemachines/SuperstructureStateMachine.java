@@ -201,6 +201,9 @@ public class SuperstructureStateMachine {
                 return SystemState.UNJAM_INTAKE;
             }
 
+            if(currentState.ballCount >= 3) {
+                return SystemState.INTAKE_FINISH;
+            }
             if(currentState.sensorValues[0]) {
                 return SystemState.INDEX;
             } else {
@@ -213,12 +216,11 @@ public class SuperstructureStateMachine {
 
     private SystemState handleIndexTransitions(WantedAction wantedAction, SuperstructureState currentState) {
         if(wantedAction == WantedAction.INTAKE_ON) {
-            if(!currentState.sensorValues[0] && currentState.sensorValues[1]) {
-                if(currentState.ballCount >= 3) {
-                    return SystemState.INTAKE_FINISH;
-                } else {
-                    return SystemState.INTAKE;
-                }
+            if(currentState.ballCount >= 3) {
+                return SystemState.INTAKE_FINISH;
+            }
+            if(!currentState.sensorValues[0] && currentState.sensorValues[1]) {    
+                return SystemState.INTAKE;
             } else {
                 return SystemState.INDEX;
             }
@@ -384,7 +386,7 @@ public class SuperstructureStateMachine {
 
         mDesiredState.intakeDeploy = true;
         mDesiredState.intakeVoltage = kBlowVoltage;
-        mDesiredState.brushVoltage = kBrushBlowVoltage;
+        mDesiredState.brushVoltage = currentState.sensorValues[0] ? 0 : kBrushBlowVoltage;
         mDesiredState.feederVoltage = kFeederBlowVoltage;
     }
 
