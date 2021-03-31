@@ -58,11 +58,11 @@ public final class Constants {
     public static final double kPathYKi = kPathXKi;
     public static final double kPathYKd = kPathXKd;
 
-    public static final double kPathThetaKp = 0;
+    public static final double kPathThetaKp = 2.0;
     public static final double kPathThetaKi = 0;
     public static final double kPathThetaKd = 0;
-    public static final double kPathThetaMaxVelocity = 100 / 16;
-    public static final double kPathThetaMaxAcceleration = 400 / 16;
+    public static final double kPathThetaMaxVelocity = 50 / 16;
+    public static final double kPathThetaMaxAcceleration = 80 / 16;
 
     /*
     145 - bounce
