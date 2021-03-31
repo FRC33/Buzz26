@@ -68,6 +68,7 @@ public final class Constants {
     145 - bounce
     145 - hyperdrive
     200 - barrel
+    150 - slalom
     */
     public static final double kDriveMaxLinearVelocity = Units.inchesToMeters(150);
     public static final double kDriveMaxAngularVelocity = 45 / 16; // Units do not matter

@@ -62,7 +62,7 @@ public class SwerveModule extends Subsystem {
         public boolean kDriveInverted = false;
         public double kDriveMotorGearReduction = 4.67;
         /** in */
-        public double kDriveWheelDiameter = Units.inchesToMeters(3);
+        public double kDriveWheelDiameter = Units.inchesToMeters(3.25);
         //TODO add current limiting
         /** Seconds */
         public double kDriveRamp = 0.3;
