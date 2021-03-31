@@ -54,9 +54,9 @@ public final class Constants {
     public static final double kPathXKi = 0;
     public static final double kPathXKd = 0;
 
-    public static final double kPathYKp = kPathXKp;
+    public static final double kPathYKp = 4.0;
     public static final double kPathYKi = kPathXKi;
-    public static final double kPathYKd = kPathXKd;
+    public static final double kPathYKd = 0.4;
 
     public static final double kPathThetaKp = 2.0;
     public static final double kPathThetaKi = 0;
