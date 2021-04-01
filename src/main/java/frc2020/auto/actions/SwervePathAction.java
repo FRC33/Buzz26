@@ -34,15 +34,15 @@ public class SwervePathAction implements Action {
     private Timer mTimer = new Timer();
 
     public static class SwervePathActionConstants {
-        public double kPathXKp = 3.0;
+        public double kPathXKp = 0.5;
         public double kPathXKi = 0;
         public double kPathXKd = 0;
     
-        public double kPathYKp = 4.0;
+        public double kPathYKp = 0.5;
         public double kPathYKi = 0;
-        public double kPathYKd = 0.4;
+        public double kPathYKd = 0;
     
-        public double kPathThetaKp = 2.0;
+        public double kPathThetaKp = 0;
         public double kPathThetaKi = 0;
         public double kPathThetaKd = 0;
         public double kPathThetaMaxVelocity = 50 / 16;

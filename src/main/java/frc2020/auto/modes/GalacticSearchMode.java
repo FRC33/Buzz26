@@ -10,6 +10,7 @@ import frc2020.auto.actions.SeekAndSuckAction;
 import frc2020.auto.actions.SelectAction;
 import frc2020.auto.actions.SeriesAction;
 import frc2020.auto.actions.SwervePathAction;
+import frc2020.auto.actions.SwervePathAction.SwervePathActionConstants;
 import frc2020.auto.actions.HoodAngleAction;
 import frc2020.auto.actions.IntakeToCapacityAction;
 import frc2020.paths.*;
@@ -28,13 +29,21 @@ public class GalacticSearchMode extends AutoModeBase {
     
     @Override
     protected void routine() throws AutoModeEndedException {
+        // 4.0 m/s
+        // 12.0 m/s^2
+        var constants = new SwervePathActionConstants();
+        constants.kPathXKp = 3.0;
+        constants.kPathYKp = 4.0;
+        constants.kPathYKd = 0.4;
+        constants.kPathThetaKp = 2.0;
+
         mTimer.reset();
         mTimer.start();
 
         runAction(
             new ParallelAction(
                 new IntakeToCapacityAction(),
-                new SwervePathAction("RedA", this::getTargetHeading, true)
+                new SwervePathAction("RedA", this::getTargetHeading, true, constants)
             )
         );
 
