@@ -56,6 +56,10 @@ public class SwervePathAction implements Action {
     public SwervePathAction(String trajectoryName, Rotation2d desiredRotation, boolean resetOdometry) {
         this(trajectoryName, desiredRotation, resetOdometry, new SwervePathActionConstants());
     }
+
+    public SwervePathAction(String trajectoryName, Supplier<Rotation2d> desiredRotation, boolean resetOdometry) {
+        this(trajectoryName, desiredRotation, resetOdometry, new SwervePathActionConstants());
+    }
     
     public SwervePathAction(String trajectoryName, boolean resetOdometry, SwervePathActionConstants constants) {
         this(trajectoryName, Rotation2d.fromDegrees(0), resetOdometry, constants);
