@@ -89,7 +89,7 @@ public class GalacticSearchMode extends AutoModeBase {
     private Rotation2d getTargetHeading() {
         var ballCount = mInventory.getBallCount();
         
-        if(mDrive.getPoseWPI().getX() >= 3.6) {
+        if(mDrive.getPoseWPI().getX() >= 3.0) {
             return Rotation2d.fromDegrees(90);
         } else {
             return Rotation2d.fromDegrees(0);
