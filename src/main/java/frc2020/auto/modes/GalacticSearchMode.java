@@ -37,13 +37,20 @@ public class GalacticSearchMode extends AutoModeBase {
         constants.kPathYKd = 0.4;
         constants.kPathThetaKp = 2.0;
 
+        var constantsB = new SwervePathActionConstants();
+        constantsB.kPathXKp = 5.0;
+        constantsB.kPathYKp = 5.0;
+        constantsB.kPathYKd = 0.4;
+        constantsB.kPathThetaKp = 2.0;
+
         mTimer.reset();
         mTimer.start();
 
         runAction(
             new ParallelAction(
                 new IntakeToCapacityAction(),
-                new SwervePathAction("RedA", this::getTargetHeading, true, constants)
+                //new SwervePathAction("RedA", this::getTargetHeading, true, constants)
+                new SwervePathAction("RedB", this::getTargetHeadingB, true, constantsB)
             )
         );
 
@@ -94,6 +101,12 @@ public class GalacticSearchMode extends AutoModeBase {
         } else {
             return Rotation2d.fromDegrees(0);
         }
+    }
+
+    private Rotation2d getTargetHeadingB() {
+        var ballCount = mInventory.getBallCount();
+        
+        return Rotation2d.fromDegrees(0);
     }
 
     private boolean isBallSeen() {

@@ -107,7 +107,7 @@ public class Robot extends TimedRobot {
 
             mAutoModeSelector.updateModeCreator();
 
-            mTrajectoryRegistry.load("Slalom", "Barrel", "Bounce1", "RedA");
+            mTrajectoryRegistry.load("Slalom", "Barrel", "Bounce1", "RedA", "RedB");
 
             if(!SmartDashboard.containsKey("Disable Shooter")) {
                 SmartDashboard.putBoolean("Disable Shooter", true);
