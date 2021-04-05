@@ -6,10 +6,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc2020.auto.AutoModeEndedException;
 import frc2020.auto.actions.LambdaAction;
 import frc2020.auto.actions.ParallelAction;
+import frc2020.auto.actions.RaceAction;
 import frc2020.auto.actions.SeekAndSuckAction;
 import frc2020.auto.actions.SelectAction;
 import frc2020.auto.actions.SeriesAction;
 import frc2020.auto.actions.SwervePathAction;
+import frc2020.auto.actions.WaitLambdaAction;
 import frc2020.auto.actions.SwervePathAction.SwervePathActionConstants;
 import frc2020.auto.actions.HoodAngleAction;
 import frc2020.auto.actions.IntakeToCapacityAction;
@@ -48,7 +50,12 @@ public class GalacticSearchMode extends AutoModeBase {
 
         runAction(
             new ParallelAction(
-                new IntakeToCapacityAction(),
+                new RaceAction(
+                    new IntakeToCapacityAction(),
+                    new WaitLambdaAction(() -> {
+                        return mDrive.getPoseWPI().getX() >= 4.8;
+                    })
+                ),
                 //new SwervePathAction("RedA", this::getTargetHeading, true, constants)
                 new SwervePathAction("RedB", this::getTargetHeadingB, true, constantsB)
             )
