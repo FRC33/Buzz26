@@ -46,7 +46,7 @@ public class SwervePathAction implements Action {
         public double kPathThetaKi = 0;
         public double kPathThetaKd = 0;
         public double kPathThetaMaxVelocity = 50 / 16;
-        public double kPathThetaMaxAcceleration = 80 / 16;
+        public double kPathThetaMaxAcceleration = 170 / 16;
     }
 
     public SwervePathAction(String trajectoryName, boolean resetOdometry) {

@@ -69,7 +69,7 @@ public class SwerveModule extends Subsystem {
         public double kDriveKp = 0.1;
         public double kDriveKi = 0;
         public double kDriveKd = 0;
-        public double kDriveKf = (1023 * 0.76) / 14253;
+        public double kDriveKf = (1023 * 0.8) / 14253;
         public double kDriveKiZone = 0;
 
         public boolean kSteerInverted = false;

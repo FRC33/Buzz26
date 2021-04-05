@@ -32,8 +32,8 @@ public class GalacticSearchMode extends AutoModeBase {
         // 4.0 m/s
         // 12.0 m/s^2
         var constants = new SwervePathActionConstants();
-        constants.kPathXKp = 3.0;
-        constants.kPathYKp = 4.0;
+        constants.kPathXKp = 5.0;
+        constants.kPathYKp = 5.0;
         constants.kPathYKd = 0.4;
         constants.kPathThetaKp = 2.0;
 
