@@ -29,25 +29,55 @@ public class SwervePathAction implements Action {
     private SwerveControllerCommand mSwerveControllerCommand;
     private Trajectory mTrajectory;
     private boolean mResetOdometry;
+    private SwervePathActionConstants mConstants;
 
     private Timer mTimer = new Timer();
 
+    public static class SwervePathActionConstants {
+        public double kPathXKp = 0.5;
+        public double kPathXKi = 0;
+        public double kPathXKd = 0;
+    
+        public double kPathYKp = 0.5;
+        public double kPathYKi = 0;
+        public double kPathYKd = 0;
+    
+        public double kPathThetaKp = 0;
+        public double kPathThetaKi = 0;
+        public double kPathThetaKd = 0;
+        public double kPathThetaMaxVelocity = 50 / 16;
+        public double kPathThetaMaxAcceleration = 80 / 16;
+    }
+
     public SwervePathAction(String trajectoryName, boolean resetOdometry) {
-        this(trajectoryName, Rotation2d.fromDegrees(0), resetOdometry);
+        this(trajectoryName, resetOdometry, new SwervePathActionConstants());
     }
 
     public SwervePathAction(String trajectoryName, Rotation2d desiredRotation, boolean resetOdometry) {
-        this(trajectoryName, () -> desiredRotation, resetOdometry);
+        this(trajectoryName, desiredRotation, resetOdometry, new SwervePathActionConstants());
     }
 
     public SwervePathAction(String trajectoryName, Supplier<Rotation2d> desiredRotation, boolean resetOdometry) {
+        this(trajectoryName, desiredRotation, resetOdometry, new SwervePathActionConstants());
+    }
+    
+    public SwervePathAction(String trajectoryName, boolean resetOdometry, SwervePathActionConstants constants) {
+        this(trajectoryName, Rotation2d.fromDegrees(0), resetOdometry, constants);
+    }
+
+    public SwervePathAction(String trajectoryName, Rotation2d desiredRotation, boolean resetOdometry, SwervePathActionConstants constants) {
+        this(trajectoryName, () -> desiredRotation, resetOdometry, constants);
+    }
+
+    public SwervePathAction(String trajectoryName, Supplier<Rotation2d> desiredRotation, boolean resetOdometry, SwervePathActionConstants constants) {
         mTrajectory = TrajectoryRegistry.getInstance().get(trajectoryName);
+        mConstants = constants;
         
-        var xPid = new PIDController(kPathXKp, kPathXKi, kPathXKd);
-        var yPid = new PIDController(kPathYKp, kPathYKi, kPathYKd);
-        var thetaConstraints = new TrapezoidProfile.Constraints(kPathThetaMaxVelocity, kPathThetaMaxAcceleration);
+        var xPid = new PIDController(mConstants.kPathXKp, mConstants.kPathXKi, mConstants.kPathXKd);
+        var yPid = new PIDController(mConstants.kPathYKp, mConstants.kPathYKi, mConstants.kPathYKd);
+        var thetaConstraints = new TrapezoidProfile.Constraints(mConstants.kPathThetaMaxVelocity, mConstants.kPathThetaMaxAcceleration);
         var thetaPid = new ProfiledPIDController(
-            kPathThetaKp, kPathThetaKi, kPathThetaKd, thetaConstraints
+            mConstants.kPathThetaKp, mConstants.kPathThetaKi, mConstants.kPathThetaKd, thetaConstraints
         );
         
         mResetOdometry = resetOdometry;

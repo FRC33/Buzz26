@@ -50,20 +50,6 @@ public final class Constants {
     public static final double kAutoSteerKiZone = 3;
     public static final double kAutoSteerMaxOutput = 8;
 
-    public static final double kPathXKp = 3.0;
-    public static final double kPathXKi = 0;
-    public static final double kPathXKd = 0;
-
-    public static final double kPathYKp = 4.0;
-    public static final double kPathYKi = kPathXKi;
-    public static final double kPathYKd = 0.4;
-
-    public static final double kPathThetaKp = 2.0;
-    public static final double kPathThetaKi = 0;
-    public static final double kPathThetaKd = 0;
-    public static final double kPathThetaMaxVelocity = 50 / 16;
-    public static final double kPathThetaMaxAcceleration = 80 / 16;
-
     /*
     145 - bounce
     145 - hyperdrive
