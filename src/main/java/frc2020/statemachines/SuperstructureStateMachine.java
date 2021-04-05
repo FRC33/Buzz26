@@ -14,7 +14,7 @@ public class SuperstructureStateMachine {
     private static final double kShooterIdleVoltage = 3;
 
     // Intake
-    private static final double kIntakeVoltage = 11;
+    private static final double kIntakeVoltage = 6.5;
     private static final double kFeederIntakeVoltage = 0; // TODO find (used to be -3)
     
     // Index
