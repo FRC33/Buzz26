@@ -5,7 +5,7 @@ public class ShootingLocation {
         new Parameters(50, 0, 0, 0),
         new Parameters(50, 5000, 0, 0), //GREEN
         new Parameters(50, 5000, 0, 0), //YELLOW
-        new Parameters(50, 4870, 0, 0), //BLUE
+        new Parameters(50, 4850, 0, 0), //BLUE
         new Parameters(50, 5000, 0, 0), //RED
     };
 

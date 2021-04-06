@@ -1,6 +1,7 @@
 package frc2020.statemachines;
 
 import edu.wpi.first.wpilibj.Timer;
+import frc2020.Constants;
 import frc2020.ShootingLocation;
 import frc2020.states.LEDState;
 import frc2020.subsystems.Shooter;
@@ -297,6 +298,7 @@ public class SuperstructureStateMachine {
 
     private SystemState handleAimLimelightTransitions(WantedAction wantedAction, SuperstructureState currentState) {
         if(wantedAction == WantedAction.SHOOT) {
+            firstBallShot = false;
             return SystemState.SHOOT;
         }
 
@@ -305,6 +307,7 @@ public class SuperstructureStateMachine {
     
     private SystemState handleAimNoLimelightTransitions(WantedAction wantedAction, SuperstructureState currentState) {
         if(wantedAction == WantedAction.SHOOT) {
+            firstBallShot = false;
             return SystemState.SHOOT;
         }
 
@@ -313,6 +316,7 @@ public class SuperstructureStateMachine {
 
     private SystemState handleAimManualTransitions(WantedAction wantedAction, SuperstructureState currentState) {
         if(wantedAction == WantedAction.SHOOT) {
+            firstBallShot = false;
             return SystemState.SHOOT;
         }
         
@@ -466,13 +470,18 @@ public class SuperstructureStateMachine {
         mDesiredState.hood = wantedShootingLocation.getHoodAngle();
     }
 
+    private boolean firstBallShot = false;
     private void getShootDesiredState(SuperstructureState currentState, ShootingLocation.Location wantedShootingLocation, double timeInState) {
         getDefaultDesiredState(currentState);
 
-        mDesiredState.brushVoltage = kBrushShootVoltage;
         mDesiredState.feederVoltage = kFeederShootVoltage;
         
-        if(wantedShootingLocation.getShooterRPM() - currentState.shooterRPM >= 50) {
+        double rpmToRecover = Constants.kRapidFire ? 100 : 200;
+        //double brushFeedRate = Constants.kRapidFire ? kBrushRapidShootVoltage : kBrushShootVoltage;
+        double brushFeedRate = 5;
+        double rpmAcceptableError = Constants.kRapidFire ? 200 : 70;
+
+        if(wantedShootingLocation.getShooterRPM() - currentState.shooterRPM >= rpmToRecover)  {
             // If the target shooting RPM is 50 RPM greater than the current, set shooter to full power to recover faster
             mDesiredState.shooterVoltage = kShooterRecoveryVoltage;
             mDesiredState.shooterRPM = Double.NaN;
@@ -480,6 +489,15 @@ public class SuperstructureStateMachine {
             // Otherwise, continue running at the target shooting RPM
             mDesiredState.shooterVoltage = Double.NaN;
             mDesiredState.shooterRPM = wantedShootingLocation.getShooterRPM();
+        }
+
+        if(wantedShootingLocation.getShooterRPM() - currentState.shooterRPM >= 200) firstBallShot = true;
+        /*if(!firstBallShot) {
+            mDesiredState.brushVoltage = kBrushShootFirstBallVoltage;
+        } else */if(Util.epsilonEquals(wantedShootingLocation.getShooterRPM(), currentState.shooterRPM, rpmAcceptableError)) {
+            mDesiredState.brushVoltage = firstBallShot ? 5 : brushFeedRate;
+        } else {
+            mDesiredState.brushVoltage = 0;
         }
 
         mDesiredState.hood = wantedShootingLocation.getHoodAngle();

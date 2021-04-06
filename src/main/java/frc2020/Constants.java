@@ -17,6 +17,8 @@ public final class Constants {
     // ------- CHANGE THIS VALUE DEPENDING ON WHICH ROBOT THIS IS -------
     public static final WhichRobot kWhichRobot = WhichRobot.PAT;
 
+    public static final boolean kRapidFire = false;
+
     // region ------ Device constants ------
     /** Encoder counts per revolution of the Falcon motor integrated encoder */
     public static final int kFalconCPR = 2048;
