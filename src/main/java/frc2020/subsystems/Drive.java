@@ -300,7 +300,7 @@ public class Drive extends Subsystem {
 
     public void resetOdometry() {
         mSwerveDriveOdometry.resetPosition(
-            new edu.wpi.first.wpilibj.geometry.Pose2d(0, 0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(0)), 
+            new edu.wpi.first.wpilibj.geometry.Pose2d(0, 0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(180)), 
             getHeadingWPI()
         );
     }

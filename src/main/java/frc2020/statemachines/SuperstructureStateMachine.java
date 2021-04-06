@@ -5,12 +5,13 @@ import frc2020.ShootingLocation;
 import frc2020.states.LEDState;
 import frc2020.subsystems.Shooter;
 import lib.util.DelayedBoolean;
+import lib.util.LatchedBoolean;
 import lib.util.Util;
 
 public class SuperstructureStateMachine {
 
     // Idle
-    private static final double kHoodStowAngle = 58;
+    private static final double kHoodStowAngle = 45;
     private static final double kShooterIdleVoltage = 3;
 
     // Intake
@@ -33,7 +34,7 @@ public class SuperstructureStateMachine {
     private static final double kFeederAimBallsBackTime = 0; // TODO
 
     // Shoot
-    private static final double kBrushShootVoltage = 5; // TODO
+    private static final double kBrushShootVoltage = 7; // TODO
     private static final double kFeederShootVoltage = 12;
     private static final double kShooterRecoveryVoltage = 12;
 
@@ -44,7 +45,7 @@ public class SuperstructureStateMachine {
 
     public enum SystemState {
         IDLE,
-        INTAKE, INDEX, INTAKE_FINISH, BLOW, UNJAM_INTAKE,
+        INTAKE, INDEX, INDEX_EXTRA, INTAKE_FINISH, BLOW, UNJAM_INTAKE,
         ENABLE_FLYWHEEL, AIM_LIGHTLIGHT, AIM_NO_LIMELIGHT, AIM_MANUAL,
         SHOOT
     }
@@ -115,10 +116,13 @@ public class SuperstructureStateMachine {
                 newState = defaultTransitions(wantedAction, currentState);
                 break;
             case INTAKE:
-                newState = handleIntakeTransitions(wantedAction, currentState);
+                newState = handleIntakeTransitions(wantedAction, currentState, timeInState);
                 break;
             case INDEX:
                 newState = handleIndexTransitions(wantedAction, currentState);
+                break;
+            case INDEX_EXTRA:
+                newState = handleIndexExtraTransitions(wantedAction, currentState, timeInState);
                 break;
             case INTAKE_FINISH:
                 newState = handleIntakeFinishTransitions(timestamp, wantedAction, currentState);
@@ -163,6 +167,9 @@ public class SuperstructureStateMachine {
             case INDEX:
                 getIndexDesiredState(currentState);
                 break;
+            case INDEX_EXTRA:
+                getIndexExtraDesiredState(currentState);
+                break;
             case INTAKE_FINISH:
                 getIntakeFinishDesiredState(currentState);
                 break;
@@ -194,11 +201,19 @@ public class SuperstructureStateMachine {
     //endregion
 
     //region Transitions
-    private SystemState handleIntakeTransitions(WantedAction wantedAction, SuperstructureState currentState) {
+    private SystemState handleIntakeTransitions(WantedAction wantedAction, SuperstructureState currentState, double timeInState) {
         //Remain in intake position if intaking
         if(wantedAction == WantedAction.INTAKE_ON) {
             if(currentState.intakeStalled) {
                 return SystemState.UNJAM_INTAKE;
+            }
+
+            if(currentState.ballCount == 2) {
+                if(timeInState >= 2) {
+                    return SystemState.INDEX_EXTRA;
+                } else {
+                    return SystemState.INTAKE;
+                }
             }
 
             if(currentState.ballCount >= 3) {
@@ -214,15 +229,25 @@ public class SuperstructureStateMachine {
         return defaultTransitions(wantedAction, currentState);
     }
 
+    LatchedBoolean latch = new LatchedBoolean();
     private SystemState handleIndexTransitions(WantedAction wantedAction, SuperstructureState currentState) {
         if(wantedAction == WantedAction.INTAKE_ON) {
-            if(currentState.ballCount >= 3) {
-                return SystemState.INTAKE_FINISH;
-            }
             if(!currentState.sensorValues[0] && currentState.sensorValues[1]) {    
                 return SystemState.INTAKE;
+            }
+
+            return SystemState.INDEX;
+        }
+
+        return defaultTransitions(wantedAction, currentState);
+    }
+
+    private SystemState handleIndexExtraTransitions(WantedAction wantedAction, SuperstructureState currentState, double timeInState) {
+        if(wantedAction == WantedAction.INTAKE_ON) {
+            if(currentState.sensorValues[0]) {
+                return SystemState.INTAKE_FINISH;
             } else {
-                return SystemState.INDEX;
+                return SystemState.INDEX_EXTRA;
             }
         }
 
@@ -368,11 +393,20 @@ public class SuperstructureStateMachine {
     private void getIndexDesiredState(SuperstructureState currentState) {
         getDefaultDesiredState(currentState);
         mDesiredState.hood = kHoodStowAngle;
-
         mDesiredState.intakeDeploy = true;
         mDesiredState.intakeVoltage = kIntakeVoltage;
         // Increase index speed with more balls. TODO Remove?
-        mDesiredState.brushVoltage = kBrushIndexVoltage + (currentState.ballCount * 2.0);
+        //mDesiredState.brushVoltage = kBrushIndexVoltage + (currentState.ballCount * 2.0);
+        mDesiredState.brushVoltage = kBrushIndexVoltage;
+        mDesiredState.feederVoltage = kFeederIntakeVoltage;
+    }
+
+    private void getIndexExtraDesiredState(SuperstructureState currentState) {
+        getDefaultDesiredState(currentState);
+        mDesiredState.hood = kHoodStowAngle;
+        mDesiredState.intakeDeploy = true;
+        mDesiredState.intakeVoltage = kIntakeVoltage;
+        mDesiredState.brushVoltage = 4;
         mDesiredState.feederVoltage = kFeederIntakeVoltage;
     }
 

@@ -147,12 +147,12 @@ public final class Constants {
     public static final double kIntakeStallTime = 0.15;
 
     // Hood
-    public static final double kHoodEncoderReduction = 2.66;
-    public static final RobotConstant<Double> kHoodSensorOffset = new RobotConstant<>(0.95, 0.0);
+    public static final double kHoodEncoderReduction = 7.81;
+    public static final RobotConstant<Double> kHoodSensorOffset = new RobotConstant<>(0.73, 0.0);
     public static final double kHoodAngleOffset = 25;
     public static final double kHoodAngleMin = 27;
     public static final double kHoodAngleMax = 70;
-    public static final double kHoodKp = 0.5;
+    public static final double kHoodKp = 2.0;
     public static final double kHoodKi = 0.0;
     public static final double kHoodKd = 0;
     public static final double kHoodKiZone = 1;
@@ -162,10 +162,10 @@ public final class Constants {
     public static final double kShooterDiameter = 4.0;
     public static final double kShooterRampRate = 0;
     public static final int kShooterSlotIdx = 0;
-    public static final double kShooterKp = 0.4;
+    public static final double kShooterKp = 0.07;
     public static final double kShooterKi = 0;
-    public static final double kShooterKd = 0;
-    public static final double kShooterKf = 0.0509952;
+    public static final double kShooterKd = 1.0;
+    public static final double kShooterKf = (1023 * (11.0 / 11.5)) / 19552;
     
     // region ------ Device IDs ------
     // Talons

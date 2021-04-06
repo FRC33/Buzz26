@@ -110,7 +110,7 @@ public class Robot extends TimedRobot {
             mTrajectoryRegistry.load("Slalom", "Barrel", "Bounce1", "RedA", "RedB");
 
             if(!SmartDashboard.containsKey("Disable Shooter")) {
-                SmartDashboard.putBoolean("Disable Shooter", true);
+                SmartDashboard.putBoolean("Disable Shooter", false);
             }
 
             //CameraServer.getInstance().startAutomaticCapture();
@@ -451,16 +451,26 @@ public class Robot extends TimedRobot {
             mHMI.getDriver().getAButton()
         );
 
+        /*
+        if(Math.abs(mHMI.getHoodManual()) >= 0.2) {
+            mHood.setPercent(mHMI.getHoodManual());
+        } else {
+            mHood.setAngle(40);
+        }
+        */
+
+        mShooter.setDemand(11);
+
         //mShooter.setTargetRPM(9000);
         //mFeeder.setDemand(12);
         //mIntake.setIntake(8);
         //mIntake.setIntakeDeploy(false);
 
-        mIntake.setIntakeDeploy(true);
-        mIntake.setIntake(10);
+        //mIntake.setIntakeDeploy(true);
+        //mIntake.setIntake(10);
 
-        var trans = new Translation2d(mHMI.getThrottle(), mHMI.getStrafe());
-        SmartDashboard.putNumber("Joystick Norm", trans.norm());
+        //var trans = new Translation2d(mHMI.getThrottle(), mHMI.getStrafe());
+        //SmartDashboard.putNumber("Joystick Norm", trans.norm());
 
         /*
         mIntake.setIntake(10);
@@ -488,6 +498,7 @@ public class Robot extends TimedRobot {
         */
 
 
+        /*
         mIntake.setIntakeDeploy(true);
         mIntake.setIntake(10);
         if(mHMI.getDriver().getAButton()) {
@@ -497,6 +508,7 @@ public class Robot extends TimedRobot {
         }
         mFeeder.setDemand(12);
         mShooter.setDemand(9.4);
+        */
 
         var g = mHMI.getDriver();
 

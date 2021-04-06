@@ -2,11 +2,11 @@ package frc2020;
 
 public class ShootingLocation {
     private static Parameters mParameters[] = {
-        new Parameters(58, 0, 0, 0),
-        new Parameters(43, 4500, 0, 0), //GREEN
-        new Parameters(66, 6000, 0, 0), //YELLOW
-        new Parameters(67, 6000, 0, 0), //BLUE
-        new Parameters(68, 6000, 0, 0), //RED
+        new Parameters(50, 0, 0, 0),
+        new Parameters(50, 5000, 0, 0), //GREEN
+        new Parameters(50, 5000, 0, 0), //YELLOW
+        new Parameters(50, 4870, 0, 0), //BLUE
+        new Parameters(50, 5000, 0, 0), //RED
     };
 
     public static class Parameters {

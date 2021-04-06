@@ -44,7 +44,7 @@ public class Hood extends Subsystem {
         mPeriodicIO = new PeriodicIO();
 
         // Initalize subsystem devices
-        boolean invert = true;
+        boolean invert = false;
         mLeftServo = new SmartServo(kHoodAId, invert);
         mRightServo = new SmartServo(kHoodBId, !invert);
 
@@ -114,16 +114,13 @@ public class Hood extends Subsystem {
 
     private double mLastSetpoint = 0;
     private double calculateDesiredPercent() {
-        return 0.0;
-
-        /*
         switch(mPeriodicIO.commandMode) {
             case DISABLED:
                 return 0.0;
             case PERCENT:
                 return mPeriodicIO.command;
             case ANGLE:
-                if(!mTrackedPositionOffset.isEmpty()) {
+                if(mTrackedPositionOffset.isPresent()) {
                     // Reset I if target angle changed
                     if(mLastSetpoint != mPeriodicIO.command) pidf.resetIntegrator();
                     mLastSetpoint = mPeriodicIO.command;
@@ -151,7 +148,6 @@ public class Hood extends Subsystem {
             default:
                 return 0.0;
         }
-        */
     }
 
     @Override

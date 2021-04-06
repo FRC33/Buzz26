@@ -207,7 +207,7 @@ public class Superstructure extends Subsystem {
     }
 
     public synchronized void setBrushOverride(boolean reverse) {
-        mBrushOverride = reverse ? -13 : 13;
+        mBrushOverride = reverse ? -3 : 3;
     }
 
     public synchronized void stopBrushOverride() {
