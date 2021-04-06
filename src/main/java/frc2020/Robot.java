@@ -311,7 +311,8 @@ public class Robot extends TimedRobot {
             mHMI.getSteer(),
             mHMI.getDriver().getBButton(),
             false,
-            mHMI.getDriver().getAButton());
+            mHMI.getDriver().getAButton(),
+            mHMI.getDriver().getYButton() || mSuperstructure.getSystemState() == SystemState.SHOOT);
 
         if(isShootingLocation) {
             enableFlywheel = true;
@@ -358,10 +359,10 @@ public class Robot extends TimedRobot {
                     intakeOn = false;
                 } else if(enableFlywheel && mHMI.getAim()) {
                     if(!mHMI.getShoot()) {
-                        if((mHMI.getTurretManual() != 0 || aimManual) && mHMI.getAim()) {
+                        /*if((mHMI.getTurretManual() != 0 || aimManual) && mHMI.getAim()) {
                             mSuperstructure.setWantAimManual();
                             aimManual = true;
-                        } else {
+                        } else */{
                             mSuperstructure.setWantAimLimelight();
                         }
                     } else {
@@ -448,7 +449,8 @@ public class Robot extends TimedRobot {
             mHMI.getSteer(),
             mHMI.getDriver().getBButton(),
             mHMI.getDriver().getRightTriggerBoolean(),
-            mHMI.getDriver().getAButton()
+            mHMI.getDriver().getAButton(),
+            mHMI.getDriver().getYButton()
         );
 
         /*

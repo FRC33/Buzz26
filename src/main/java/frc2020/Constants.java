@@ -153,7 +153,7 @@ public final class Constants {
     public static final RobotConstant<Double> kHoodSensorOffset = new RobotConstant<>(0.73, 0.0);
     public static final double kHoodAngleOffset = 25;
     public static final double kHoodAngleMin = 27;
-    public static final double kHoodAngleMax = 70;
+    public static final double kHoodAngleMax = 51.5;
     public static final double kHoodKp = 2.0;
     public static final double kHoodKi = 0.0;
     public static final double kHoodKd = 0;

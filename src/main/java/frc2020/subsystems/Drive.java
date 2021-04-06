@@ -8,6 +8,7 @@ import com.ctre.phoenix.sensors.PigeonIMU_StatusFrame;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
@@ -18,6 +19,7 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj.util.Units;
 import frc2020.Constants;
 import frc2020.RobotState;
+import frc2020.statemachines.SuperstructureStateMachine.SystemState;
 import lib.Kinematics;
 import lib.drivers.BuzzPigeon;
 import lib.drivers.BuzzTalonFX;
@@ -42,6 +44,7 @@ public class Drive extends Subsystem {
     private static Drive mInstance;
 
     private Limelight mLimelight = Limelight.getInstance();
+    private Superstructure mSuperstructure = Superstructure.getInstance();
 
     // Devices
     private SwerveModule[] mModules = new SwerveModule[4];
@@ -53,6 +56,8 @@ public class Drive extends Subsystem {
         //new ProfiledPIDController(0.02, 0, 0, new Constraints(75 / 6, (75 / 6)));
         new ProfiledPIDController(0.0, 0, 0, new Constraints(75 / 6, (75 / 6)));
     private LeadLagFilter mYawControlFilter;
+
+    private PIDController autoAimController = new PIDController(0.2, 0, 0);
 
     private DriveControlState mDriveControlState = DriveControlState.OPEN_LOOP;
 
@@ -126,7 +131,7 @@ public class Drive extends Subsystem {
         mPeriodicIO.vy = speeds.vyMetersPerSecond;
         mPeriodicIO.omega = speeds.omegaRadiansPerSecond;
 
-        mPeriodicIO.yaw = mGyro.getRawYawZeroed();
+        mPeriodicIO.yaw = mGyro.getRawYawZeroed() + 180;
         mPeriodicIO.heading = Rotation2d.fromDegrees(mPeriodicIO.yaw);
         mPeriodicIO.yawRate = (mPeriodicIO.yaw - lastYaw) 
             / (mPeriodicIO.timestamp - lastTimestamp);
@@ -194,10 +199,10 @@ public class Drive extends Subsystem {
     }
 
     public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry) {
-        setTeleOpInputs(throttle, strafe, wheel, resetOdometry, false, false);
+        setTeleOpInputs(throttle, strafe, wheel, resetOdometry, false, false, false);
     }
 
-    public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry, boolean lockTranslation, boolean centerWheels) {
+    public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry, boolean lockTranslation, boolean centerWheels, boolean lockWheels) {
         double xVal = throttle;
         double yVal = -strafe;
         double steerVal = BuzzXboxController.joystickCubicScaledDeadband(
@@ -209,6 +214,23 @@ public class Drive extends Subsystem {
         if(resetOdometry) {
             resetGyro();
             resetOdometry();
+        }
+
+        if(lockWheels) {
+            mPeriodicIO.swerveModuleStates[0] = new SwerveModuleState(
+                0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(-45)
+            );
+            mPeriodicIO.swerveModuleStates[1] = new SwerveModuleState(
+                0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(45)
+            );
+            mPeriodicIO.swerveModuleStates[2] = new SwerveModuleState(
+                0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(-45)
+            );
+            mPeriodicIO.swerveModuleStates[3] = new SwerveModuleState(
+                0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(45)
+            );
+
+            return;
         }
 
         // Center wheels
@@ -223,7 +245,12 @@ public class Drive extends Subsystem {
         }
 
         // If no input, keep the swerve modules stopped at their current rotations (rather than snapping to 0 degrees) to avoid skidding
-        if(Util.epsilonEquals(xVal, 0, 0.08) && Util.epsilonEquals(yVal, 0, 0.08) && Util.epsilonEquals(steerVal, 0, 0.08) && mPeriodicIO.swerveModuleStates != null) {
+        if(Util.epsilonEquals(xVal, 0, 0.08) && 
+            Util.epsilonEquals(yVal, 0, 0.08) &&
+            Util.epsilonEquals(steerVal, 0, 0.08) && 
+            mPeriodicIO.swerveModuleStates != null &&
+            mSuperstructure.getSystemState() != SystemState.AIM_LIGHTLIGHT
+        ) {
             for(int i = 0; i < mPeriodicIO.swerveModuleStates.length; i++) {
                 var oldState = mPeriodicIO.swerveModuleStates[i];
                 var newState = new SwerveModuleState(0, oldState.angle);
@@ -247,7 +274,13 @@ public class Drive extends Subsystem {
 
         // Scale magnitude [0, 1] to [0, maxLinearVelocity]
         translationalInput = translationalInput.scale(kDriveMaxLinearVelocity);
-        
+
+        if(mSuperstructure.getSystemState() == SystemState.AIM_LIGHTLIGHT) {
+            autoAimController.setSetpoint(0);
+            double adjust = autoAimController.calculate(mLimelight.getXAngle());
+            translationalInput = new Translation2d(translationalInput.x(), translationalInput.y() + adjust);
+        }
+
         double omega = steerVal * kDriveMaxAngularVelocity;
 
         double filteredYawRate = mYawControlFilter.update(mPeriodicIO.timestamp, mPeriodicIO.yawRate);

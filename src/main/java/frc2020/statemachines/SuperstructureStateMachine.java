@@ -476,10 +476,10 @@ public class SuperstructureStateMachine {
 
         mDesiredState.feederVoltage = kFeederShootVoltage;
         
-        double rpmToRecover = Constants.kRapidFire ? 100 : 200;
+        double rpmToRecover = Constants.kRapidFire ? 100 : 500;
         //double brushFeedRate = Constants.kRapidFire ? kBrushRapidShootVoltage : kBrushShootVoltage;
         double brushFeedRate = 5;
-        double rpmAcceptableError = Constants.kRapidFire ? 200 : 70;
+        double rpmAcceptableError = Constants.kRapidFire ? 200 : 20;
 
         if(wantedShootingLocation.getShooterRPM() - currentState.shooterRPM >= rpmToRecover)  {
             // If the target shooting RPM is 50 RPM greater than the current, set shooter to full power to recover faster
@@ -492,9 +492,8 @@ public class SuperstructureStateMachine {
         }
 
         if(wantedShootingLocation.getShooterRPM() - currentState.shooterRPM >= 200) firstBallShot = true;
-        /*if(!firstBallShot) {
-            mDesiredState.brushVoltage = kBrushShootFirstBallVoltage;
-        } else */if(Util.epsilonEquals(wantedShootingLocation.getShooterRPM(), currentState.shooterRPM, rpmAcceptableError)) {
+        
+        if(Util.epsilonEquals(wantedShootingLocation.getShooterRPM(), currentState.shooterRPM, rpmAcceptableError)) {
             mDesiredState.brushVoltage = firstBallShot ? 5 : brushFeedRate;
         } else {
             mDesiredState.brushVoltage = 0;
