@@ -34,12 +34,16 @@ public class PowerPortMode extends AutoModeBase {
             // Drive to reintroduction zone
             runAction(new SwervePathAction("PowerPort", Rotation2d.fromDegrees(180), i == 0, constants));
             runAction(new LambdaAction(mDrive::centerWheels));
-
-            // Intake until B button is pressed
-            runAction(new HangingAction(new IntakeToCapacityAction(), mHMI.getDriver()::getBButton));
-            
-            // Drive to shoot zone
-            runAction(new SwervePathAction("PowerPortBack", Rotation2d.fromDegrees(180), false, constants));
+ 
+            runAction(new RaceAction(
+                // Start intaking
+                new IntakeToCapacityAction(),
+                // Start driving to shooting zone once B is pressed
+                new SeriesAction(
+                    new WaitLambdaAction(mHMI.getDriver()::getBButton),
+                    new SwervePathAction("PowerPortBack", Rotation2d.fromDegrees(180), false, constants)
+                )
+            ));
             
             // Aim until 0.3 degrees from target
             runAction(new AimAction(0.3));
