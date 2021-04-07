@@ -18,9 +18,10 @@ public class SuperstructureStateMachine {
     // Intake
     private static final double kIntakeVoltage = 6.5;
     private static final double kFeederIntakeVoltage = 0; // TODO find (used to be -3)
-    
+
     // Index
     private static final double kBrushIndexVoltage = 5;
+    private static final double kFinalIndexTime = 2.0;
 
     // Blow
     private static final double kBlowVoltage = 0;
@@ -169,7 +170,7 @@ public class SuperstructureStateMachine {
                 getIndexDesiredState(currentState);
                 break;
             case INDEX_EXTRA:
-                getIndexExtraDesiredState(currentState);
+                getIndexExtraDesiredState(currentState, timeInState);
                 break;
             case INTAKE_FINISH:
                 getIntakeFinishDesiredState(currentState);
@@ -214,9 +215,10 @@ public class SuperstructureStateMachine {
             }
 
             if(currentState.ballCount == 1 || currentState.ballCount == 2) {
-                /*if(timeInState >= 1) {
+                if(timeInState >= 1) {
                     return SystemState.INDEX_EXTRA;
-                }*/
+                    //return SystemState.INTAKE_FINISH;
+                }
             }
 
             return SystemState.INTAKE;
@@ -240,7 +242,7 @@ public class SuperstructureStateMachine {
 
     private SystemState handleIndexExtraTransitions(WantedAction wantedAction, SuperstructureState currentState, double timeInState) {
         if(wantedAction == WantedAction.INTAKE_ON) {
-            if(timeInState >= 0.65) {
+            if(timeInState >= kFinalIndexTime) {
                 return SystemState.INTAKE_FINISH;
             } else {
                 return SystemState.INDEX_EXTRA;
@@ -400,12 +402,22 @@ public class SuperstructureStateMachine {
         mDesiredState.feederVoltage = kFeederIntakeVoltage;
     }
 
-    private void getIndexExtraDesiredState(SuperstructureState currentState) {
+    private void getIndexExtraDesiredState(SuperstructureState currentState, double timeInState) {
         getDefaultDesiredState(currentState);
         mDesiredState.hood = kHoodStowAngle;
         mDesiredState.intakeDeploy = true;
         mDesiredState.intakeVoltage = kIntakeVoltage;
-        mDesiredState.brushVoltage = 4;
+
+        var ratio = timeInState / kFinalIndexTime;
+        var ratioToCycle = 0.2;
+        var ratioToOff = ratio >= 0.6 ? 0.1 : 0.05;
+        if((timeInState / kFinalIndexTime) % ratioToCycle >= ratioToOff) {
+            mDesiredState.brushVoltage = 0;
+        } else {
+            mDesiredState.brushVoltage = 4;
+        }
+
+        
         mDesiredState.feederVoltage = kFeederIntakeVoltage;
     }
 
