@@ -12,7 +12,7 @@ import lib.util.Util;
 public class SuperstructureStateMachine {
 
     // Idle
-    private static final double kHoodStowAngle = 45;
+    private static final double kHoodStowAngle = 51.5;
     private static final double kShooterIdleVoltage = 3;
 
     // Intake
@@ -216,8 +216,8 @@ public class SuperstructureStateMachine {
 
             if(currentState.ballCount == 1 || currentState.ballCount == 2) {
                 if(timeInState >= 1) {
-                    return SystemState.INDEX_EXTRA;
-                    //return SystemState.INTAKE_FINISH;
+                    //return SystemState.INDEX_EXTRA;
+                    return SystemState.INTAKE_FINISH;
                 }
             }
 
@@ -486,7 +486,7 @@ public class SuperstructureStateMachine {
         
         double rpmToRecover = Constants.kRapidFire ? 100 : 500;
         //double brushFeedRate = Constants.kRapidFire ? kBrushRapidShootVoltage : kBrushShootVoltage;
-        double brushFeedRate = Constants.kRapidFire ? 7 : 5;
+        double brushFeedRate = Constants.kRapidFire ? 10 : 5;
         double rpmAcceptableError = Constants.kRapidFire ? 200 : 20;
 
         if(wantedShootingLocation.getShooterRPM() - currentState.shooterRPM >= rpmToRecover)  {
@@ -507,7 +507,7 @@ public class SuperstructureStateMachine {
         }
 
         if((timestamp - beforeRecoveredTimestamp >= 1.0 && !Constants.kRapidFire) || (recovered && Constants.kRapidFire)) {
-            mDesiredState.brushVoltage = firstBallShot ? 7 : brushFeedRate;
+            mDesiredState.brushVoltage = firstBallShot ? 10 : brushFeedRate;
         } else {
             mDesiredState.brushVoltage = 0;
         }
