@@ -209,22 +209,17 @@ public class SuperstructureStateMachine {
                 return SystemState.UNJAM_INTAKE;
             }
 
-            if(currentState.ballCount == 2) {
-                if(timeInState >= 2) {
-                    return SystemState.INDEX_EXTRA;
-                } else {
-                    return SystemState.INTAKE;
-                }
+            if(currentState.sensorValues[0] && currentState.ballCount == 1) {
+                return SystemState.INDEX;
             }
 
-            if(currentState.ballCount >= 3) {
-                return SystemState.INTAKE_FINISH;
+            if(currentState.ballCount == 1 || currentState.ballCount == 2) {
+                /*if(timeInState >= 1) {
+                    return SystemState.INDEX_EXTRA;
+                }*/
             }
-            if(currentState.sensorValues[0]) {
-                return SystemState.INDEX;
-            } else {
-                return SystemState.INTAKE;
-            }
+
+            return SystemState.INTAKE;
         }
         
         return defaultTransitions(wantedAction, currentState);
@@ -245,7 +240,7 @@ public class SuperstructureStateMachine {
 
     private SystemState handleIndexExtraTransitions(WantedAction wantedAction, SuperstructureState currentState, double timeInState) {
         if(wantedAction == WantedAction.INTAKE_ON) {
-            if(currentState.sensorValues[0]) {
+            if(timeInState >= 0.65) {
                 return SystemState.INTAKE_FINISH;
             } else {
                 return SystemState.INDEX_EXTRA;
@@ -479,7 +474,7 @@ public class SuperstructureStateMachine {
         
         double rpmToRecover = Constants.kRapidFire ? 100 : 500;
         //double brushFeedRate = Constants.kRapidFire ? kBrushRapidShootVoltage : kBrushShootVoltage;
-        double brushFeedRate = 5;
+        double brushFeedRate = Constants.kRapidFire ? 7 : 5;
         double rpmAcceptableError = Constants.kRapidFire ? 200 : 20;
 
         if(wantedShootingLocation.getShooterRPM() - currentState.shooterRPM >= rpmToRecover)  {
@@ -494,12 +489,13 @@ public class SuperstructureStateMachine {
 
         if(wantedShootingLocation.getShooterRPM() - currentState.shooterRPM >= 200) firstBallShot = true;
         
-        if(!Util.epsilonEquals(wantedShootingLocation.getShooterRPM(), currentState.shooterRPM, rpmAcceptableError)) {
+        boolean recovered = Util.epsilonEquals(wantedShootingLocation.getShooterRPM(), currentState.shooterRPM, rpmAcceptableError);
+        if(!recovered) {
             beforeRecoveredTimestamp = timestamp;
         }
 
-        if(timestamp - beforeRecoveredTimestamp >= 1.0) {
-            mDesiredState.brushVoltage = firstBallShot ? 5 : brushFeedRate;
+        if((timestamp - beforeRecoveredTimestamp >= 1.0 && !Constants.kRapidFire) || (recovered && Constants.kRapidFire)) {
+            mDesiredState.brushVoltage = firstBallShot ? 7 : brushFeedRate;
         } else {
             mDesiredState.brushVoltage = 0;
         }
