@@ -310,7 +310,7 @@ public class Robot extends TimedRobot {
             mHMI.getStrafe(),
             mHMI.getSteer(),
             mHMI.getDriver().getBButton(),
-            false,
+            !mHMI.getDriver().getRightTriggerBoolean(), // TODO change
             mHMI.getDriver().getAButton(),
             mHMI.getDriver().getYButton() || mSuperstructure.getSystemState() == SystemState.SHOOT);
 

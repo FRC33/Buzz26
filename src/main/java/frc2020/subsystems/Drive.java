@@ -54,11 +54,12 @@ public class Drive extends Subsystem {
     private SwerveDriveOdometry mSwerveDriveOdometry;
     private ProfiledPIDController mSteerController =
         //new ProfiledPIDController(0.02, 0, 0, new Constraints(75 / 6, (75 / 6)));
-        new ProfiledPIDController(0.0, 0, 0, new Constraints(75 / 6, (75 / 6)));
+        new ProfiledPIDController(0.0, 0, 0, new Constraints(75 / 6, (40 / 6)));
     private LeadLagFilter mYawControlFilter;
 
     private PIDController autoAimController = new PIDController(0.2, 0, 0);
-    private PIDController thetaController = new PIDController(0.2, 0, 0);
+    private ProfiledPIDController thetaController = 
+        new ProfiledPIDController(2.0, 0, 0, new Constraints(50.0 / 16.0, 170.0 / 16.0));
 
     private DriveControlState mDriveControlState = DriveControlState.OPEN_LOOP;
 
@@ -93,7 +94,7 @@ public class Drive extends Subsystem {
         mGyro.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10);
 
         mYawControlFilter = new LeadLagFilter(Timer.getFPGATimestamp(), kYawLead, kYawLag);
-        mSwerveDriveOdometry = new SwerveDriveOdometry(kSwerveKinematics, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(0));
+        mSwerveDriveOdometry = new SwerveDriveOdometry(kSwerveKinematics, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(180));
     }
 
     private final PeriodicIO mPeriodicIO;
@@ -246,6 +247,7 @@ public class Drive extends Subsystem {
         }
 
         // If no input, keep the swerve modules stopped at their current rotations (rather than snapping to 0 degrees) to avoid skidding
+        /*
         if(Util.epsilonEquals(xVal, 0, 0.08) && 
             Util.epsilonEquals(yVal, 0, 0.08) &&
             Util.epsilonEquals(steerVal, 0, 0.08) && 
@@ -260,10 +262,11 @@ public class Drive extends Subsystem {
 
             return;
         }
+        */
 
         if(lockTranslation) {
             var oldDirection = translationalInput.direction();
-            var newDirection = Rotation2d.fromDegrees(Math.round(translationalInput.direction().getDegrees() / 45.0) * 45);
+            var newDirection = Rotation2d.fromDegrees(Math.round(translationalInput.direction().getDegrees() / 90.0) * 90);
             var changeDirection = newDirection.rotateBy(oldDirection.inverse());
             translationalInput = translationalInput.rotateBy(changeDirection);
         }
@@ -289,6 +292,11 @@ public class Drive extends Subsystem {
         mSteerController.setGoal(omega);
         var correction = mSteerController.calculate(filteredYawRate);
         omega += correction;
+
+        if(Math.abs(steerVal) <= 0.08) {
+            var correction2 = thetaController.calculate(Rotation2d.fromDegrees(180).distance(getHeading()), 0);
+            omega += correction2;
+        }
 
         ChassisSpeeds speeds;
         if(mFieldCentric) {
