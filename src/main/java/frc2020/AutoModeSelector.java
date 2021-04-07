@@ -18,6 +18,7 @@ public class AutoModeSelector {
         SLALOM,
         BOUNCE,
         GALACTIC_SEARCH,
+        POWER_PORT,
         TEST_PATH,
     }
 
@@ -42,6 +43,7 @@ public class AutoModeSelector {
         mModeChooser.addOption("Slalom", DesiredMode.SLALOM);
         mModeChooser.addOption("Bounce", DesiredMode.BOUNCE);
         mModeChooser.addOption("Galactic Search", DesiredMode.GALACTIC_SEARCH);
+        mModeChooser.addOption("Power Port", DesiredMode.POWER_PORT);
         mModeChooser.addOption("Test Path", DesiredMode.TEST_PATH);
         SmartDashboard.putData("Auto mode", mModeChooser);
     }
@@ -70,6 +72,8 @@ public class AutoModeSelector {
                 return Optional.of(new BounceMode());
             case GALACTIC_SEARCH:
                 return Optional.of(new GalacticSearchMode());
+            case POWER_PORT:
+                return Optional.of(new PowerPortMode());
             case TEST_PATH:
                 return Optional.of(new PathTestMode());
             default:

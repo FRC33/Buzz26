@@ -45,8 +45,8 @@ public class SwervePathAction implements Action {
         public double kPathThetaKp = 0;
         public double kPathThetaKi = 0;
         public double kPathThetaKd = 0;
-        public double kPathThetaMaxVelocity = 50 / 16;
-        public double kPathThetaMaxAcceleration = 170 / 16;
+        public double kPathThetaMaxVelocity = 50.0 / 16.0;
+        public double kPathThetaMaxAcceleration = 170.0 / 16.0;
     }
 
     public SwervePathAction(String trajectoryName, boolean resetOdometry) {
@@ -103,7 +103,7 @@ public class SwervePathAction implements Action {
             mDrive.resetOdometry(
                 new Pose2d(
                     mTrajectory.getInitialPose().getTranslation(),
-                    Rotation2d.fromDegrees(0)
+                    Rotation2d.fromDegrees(180) //TODO fix
                 )
             );
         }

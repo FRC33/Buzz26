@@ -29,6 +29,7 @@ import frc2020.subsystems.Superstructure;
 import frc2020.subsystems.SwerveModule;
 import frc2020.auto.AutoModeExecutor;
 import frc2020.auto.modes.AutoModeBase;
+import frc2020.auto.modes.PowerPortMode;
 import frc2020.hmi.HMI;
 import frc2020.paths.TrajectoryRegistry;
 import frc2020.statemachines.ClimberStateMachine;
@@ -73,6 +74,8 @@ public class Robot extends TimedRobot {
     private TrajectoryRegistry mTrajectoryRegistry = TrajectoryRegistry.getInstance();
 
     private boolean mCoastDrive = true;
+    private boolean mPowerPortAuto = false;
+    private boolean mEscapePowerPortAuto = false;
     
     Robot() {
         CrashTracker.logRobotConstruction();
@@ -107,7 +110,7 @@ public class Robot extends TimedRobot {
 
             mAutoModeSelector.updateModeCreator();
 
-            mTrajectoryRegistry.load("Slalom", "Barrel", "Bounce1", "RedA", "RedB");
+            mTrajectoryRegistry.load("Slalom", "Barrel", "Bounce1", "RedA", "RedB", "PowerPort", "PowerPortBack");
 
             if(!SmartDashboard.containsKey("Disable Shooter")) {
                 SmartDashboard.putBoolean("Disable Shooter", false);
@@ -162,12 +165,17 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         try {
-            if (mAutoModeExecutor != null) {
+            if (mAutoModeExecutor != null && !mPowerPortAuto) {
                 mAutoModeExecutor.stop();
             }
 
             SmartDashboard.putBoolean("autoInit", true);
             enabledInit();
+            if (mPowerPortAuto) {
+                mAutoModeExecutor.start();
+            }
+
+            mEscapePowerPortAuto = false;
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -248,6 +256,8 @@ public class Robot extends TimedRobot {
                 System.out.println("Set auto mode to: " + autoMode.get().getClass().toString());
                 mAutoModeExecutor.setAutoMode(autoMode.get());
             }
+
+            mPowerPortAuto = mAutoModeSelector.getAutoMode().get() instanceof PowerPortMode;
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;
@@ -262,7 +272,13 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopPeriodic() {
         try {
-            manualControl();
+            if(mHMI.getDriver().getStartButton()) {
+                mEscapePowerPortAuto = true;
+                mAutoModeExecutor.stop();
+            }
+            if(!mPowerPortAuto || mEscapePowerPortAuto) {
+                manualControl();
+            }
         } catch (Throwable t) {
             CrashTracker.logThrowableCrash(t);
             throw t;

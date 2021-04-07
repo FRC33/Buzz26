@@ -218,30 +218,13 @@ public class Drive extends Subsystem {
         }
 
         if(lockWheels) {
-            mPeriodicIO.swerveModuleStates[0] = new SwerveModuleState(
-                0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(-45)
-            );
-            mPeriodicIO.swerveModuleStates[1] = new SwerveModuleState(
-                0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(45)
-            );
-            mPeriodicIO.swerveModuleStates[2] = new SwerveModuleState(
-                0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(-45)
-            );
-            mPeriodicIO.swerveModuleStates[3] = new SwerveModuleState(
-                0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(45)
-            );
-
+            lockWheels();
             return;
         }
 
         // Center wheels
         if(centerWheels) {
-            for(int i = 0; i < mPeriodicIO.swerveModuleStates.length; i++) {
-                mPeriodicIO.swerveModuleStates[i] = new SwerveModuleState(
-                    0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(0)
-                ); 
-            }
-
+            centerWheels();
             return;
         }
 
@@ -276,6 +259,7 @@ public class Drive extends Subsystem {
         // Scale magnitude [0, 1] to [0, maxLinearVelocity]
         translationalInput = translationalInput.scale(kDriveMaxLinearVelocity);
 
+        // Limelight
         if(mSuperstructure.getSystemState() == SystemState.AIM_LIGHTLIGHT) {
             autoAimController.setSetpoint(0);
             double adjust = autoAimController.calculate(mLimelight.getXAngle());
@@ -290,16 +274,48 @@ public class Drive extends Subsystem {
         var correction = mSteerController.calculate(filteredYawRate);
         omega += correction;
 
-        ChassisSpeeds speeds;
         if(mFieldCentric) {
-            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translationalInput.x(), translationalInput.y(), omega, getHeadingWPI());
+            setFieldRelativeChassisSpeeds(translationalInput.x(), translationalInput.y(), omega);
         } else {
-            speeds = new ChassisSpeeds(translationalInput.x(), translationalInput.y(), omega);
+            setChassisSpeeds(translationalInput.x(), translationalInput.y(), omega);
         }
+    }
 
-        SwerveModuleState[] moduleStates = kSwerveKinematics.toSwerveModuleStates(speeds);
+    public void setChassisSpeeds(double vx, double vy, double theta) {
+        setChassisSpeeds(new ChassisSpeeds(vx, vy, theta));
+    }
+
+    public void setFieldRelativeChassisSpeeds(double vx, double vy, double theta) {
+        setChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, theta, getHeadingWPI()));
+    }
+
+    public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+        SwerveModuleState[] moduleStates = kSwerveKinematics.toSwerveModuleStates(chassisSpeeds);
 
         mPeriodicIO.swerveModuleStates = moduleStates;
+    }
+
+    public void lockWheels() {
+        mPeriodicIO.swerveModuleStates[0] = new SwerveModuleState(
+            0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(-45)
+        );
+        mPeriodicIO.swerveModuleStates[1] = new SwerveModuleState(
+            0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(45)
+        );
+        mPeriodicIO.swerveModuleStates[2] = new SwerveModuleState(
+            0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(-45)
+        );
+        mPeriodicIO.swerveModuleStates[3] = new SwerveModuleState(
+            0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(45)
+        );
+    }
+
+    public void centerWheels() {
+        for(int i = 0; i < mPeriodicIO.swerveModuleStates.length; i++) {
+            mPeriodicIO.swerveModuleStates[i] = new SwerveModuleState(
+                0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(0)
+            ); 
+        }
     }
 
     public void setModuleStates(SwerveModuleState[] moduleStates) {

@@ -94,7 +94,7 @@ public class Superstructure extends Subsystem {
                                 mWantedShootingLocation, mAltitudeOffset);
 
                         // Write subsystem outputs based on new state
-                        mIntake.setIntakeDeploy(newState.intakeDeploy);
+                        mIntake.setIntakeDeploy(newState.intakeDeploy || true); //TODO remove hardcode
                         mIntake.setIntake(newState.intakeVoltage);
                         if (mBrushOverride == 0) {
                             mIntake.setIndexer(newState.brushVoltage);
