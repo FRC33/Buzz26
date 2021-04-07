@@ -3,10 +3,8 @@ package frc2020.auto.modes;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import frc2020.auto.AutoModeEndedException;
-import frc2020.auto.actions.LambdaAction;
-import frc2020.auto.actions.SwervePathAction;
-import frc2020.auto.actions.WaitAction;
 import frc2020.auto.actions.SwervePathAction.SwervePathActionConstants;
+import frc2020.hmi.HMI;
 import frc2020.auto.actions.*;
 import frc2020.paths.*;
 import frc2020.subsystems.Drive;
@@ -14,6 +12,7 @@ import frc2020.subsystems.Drive;
 public class PowerPortMode extends AutoModeBase {
 
     Drive mDrive = Drive.getInstance();
+    HMI mHMI = HMI.getInstance();
 
     @Override
     protected void routine() throws AutoModeEndedException {
@@ -26,14 +25,32 @@ public class PowerPortMode extends AutoModeBase {
         constants.kPathThetaMaxVelocity = 50.0 / 16.0;
         constants.kPathThetaMaxAcceleration = 170.0 / 16.0;
 
-        for(int i = 0; i < 5; i++) {
+        // Shoot preload
+        runAction(new HangingAction(new ShootAction(), mHMI.getDriver()::getAButton));
+        runAction(new LambdaAction(() -> mDrive.centerWheels()));
+        runAction(new WaitAction(0.2));
+
+        for(int i = 0; i < 6; i++) {
+            // Drive to reintroduction zone
             runAction(new SwervePathAction("PowerPort", Rotation2d.fromDegrees(180), i == 0, constants));
-            runAction(new LambdaAction(() -> mDrive.centerWheels()));
-            runAction(new WaitAction(1.0)); // Intake
+            runAction(new LambdaAction(mDrive::centerWheels));
+
+            // Intake until B button is pressed
+            runAction(new HangingAction(new IntakeToCapacityAction(), mHMI.getDriver()::getBButton));
+            
+            // Drive to shoot zone
             runAction(new SwervePathAction("PowerPortBack", Rotation2d.fromDegrees(180), false, constants));
-            runAction(new AimAction());
-            runAction(new LambdaAction(() -> mDrive.centerWheels()));
-            runAction(new WaitAction(0.3));
+            
+            // Aim until 0.3 degrees from target
+            runAction(new AimAction(0.3));
+
+            // Shoot until A button is pressed
+            runAction(new LambdaAction(mDrive::lockWheels));
+            runAction(new HangingAction(new ShootAction(), mHMI.getDriver()::getAButton));
+
+            // Prepare to drive to reintroduction zone
+            runAction(new LambdaAction(mDrive::centerWheels));
+            runAction(new WaitAction(0.2));
         }
     }
 }

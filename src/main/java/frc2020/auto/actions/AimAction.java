@@ -12,18 +12,27 @@ public class AimAction implements Action {
     private Superstructure mSuperstructure = Superstructure.getInstance();
     private Limelight mLimelight = Limelight.getInstance();
 
-    private PIDController autoAimController = new PIDController(0.2, 0, 0);
+    private double mAngleEpsilon;
+    private PIDController mAutoAimController = new PIDController(0.2, 0, 0);
+
+    public AimAction() {
+        this(0.3);
+    }
+
+    public AimAction(double angleEpsilon) {
+        mAngleEpsilon = angleEpsilon;
+    }
 
     @Override
     public void start() {
-        autoAimController.setSetpoint(0);
-        autoAimController.calculate(mLimelight.getXAngle());
+        mAutoAimController.setSetpoint(0);
+        mAutoAimController.calculate(mLimelight.getXAngle());
     }
 
     @Override
     public void update() {
-        autoAimController.setSetpoint(0);
-        double adjust = autoAimController.calculate(mLimelight.getXAngle());
+        mAutoAimController.setSetpoint(0);
+        double adjust = mAutoAimController.calculate(mLimelight.getXAngle());
         
         double limit = 1;
         if(adjust > limit) {
@@ -39,7 +48,7 @@ public class AimAction implements Action {
 
     @Override
     public boolean isFinished() {
-        return Util.epsilonEquals(autoAimController.getPositionError(), 0, 0.3) && mLimelight.getValid();
+        return Util.epsilonEquals(mAutoAimController.getPositionError(), 0, mAngleEpsilon) && mLimelight.getValid();
     }
 
     @Override
