@@ -98,8 +98,6 @@ public class Shooter extends Subsystem {
                 mShooterB.setRPM(mPeriodicIO.command);
                 break;
         }
-
-        System.out.println((mShooterA.getSelectedSensorVelocity() + mShooterB.getSelectedSensorVelocity()) / 2);
     }
 
     public double getRPM() {

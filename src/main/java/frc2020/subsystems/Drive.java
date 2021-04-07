@@ -58,6 +58,7 @@ public class Drive extends Subsystem {
     private LeadLagFilter mYawControlFilter;
 
     private PIDController autoAimController = new PIDController(0.2, 0, 0);
+    private PIDController thetaController = new PIDController(0.2, 0, 0);
 
     private DriveControlState mDriveControlState = DriveControlState.OPEN_LOOP;
 

@@ -58,8 +58,8 @@ public final class Constants {
     200 - barrel
     150 - slalom
     */
-    public static final double kDriveMaxLinearVelocity = Units.inchesToMeters(160);
-    public static final double kDriveMaxAngularVelocity = 45 / 16; // Units do not matter
+    public static final double kDriveMaxLinearVelocity = Units.inchesToMeters(90);
+    public static final double kDriveMaxAngularVelocity = 45.0 / 16.0; // Units do not matter
     
     public static final double kDriveJoystickDeadbandCutoff = 0.08;
     public static final double kDriveJoystickWeight = 0.5;

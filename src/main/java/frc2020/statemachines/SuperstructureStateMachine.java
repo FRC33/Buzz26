@@ -193,7 +193,7 @@ public class SuperstructureStateMachine {
                 getAimManualDesiredState(currentState, wantedShootingLocation);
                 break;
             case SHOOT:
-                getShootDesiredState(currentState, wantedShootingLocation, timeInState);
+                getShootDesiredState(currentState, wantedShootingLocation, timestamp);
                 break;
         }
 
@@ -471,7 +471,8 @@ public class SuperstructureStateMachine {
     }
 
     private boolean firstBallShot = false;
-    private void getShootDesiredState(SuperstructureState currentState, ShootingLocation.Location wantedShootingLocation, double timeInState) {
+    private double beforeRecoveredTimestamp = 0;
+    private void getShootDesiredState(SuperstructureState currentState, ShootingLocation.Location wantedShootingLocation, double timestamp) {
         getDefaultDesiredState(currentState);
 
         mDesiredState.feederVoltage = kFeederShootVoltage;
@@ -493,7 +494,11 @@ public class SuperstructureStateMachine {
 
         if(wantedShootingLocation.getShooterRPM() - currentState.shooterRPM >= 200) firstBallShot = true;
         
-        if(Util.epsilonEquals(wantedShootingLocation.getShooterRPM(), currentState.shooterRPM, rpmAcceptableError)) {
+        if(!Util.epsilonEquals(wantedShootingLocation.getShooterRPM(), currentState.shooterRPM, rpmAcceptableError)) {
+            beforeRecoveredTimestamp = timestamp;
+        }
+
+        if(timestamp - beforeRecoveredTimestamp >= 1.0) {
             mDesiredState.brushVoltage = firstBallShot ? 5 : brushFeedRate;
         } else {
             mDesiredState.brushVoltage = 0;

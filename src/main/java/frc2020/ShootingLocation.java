@@ -4,9 +4,9 @@ public class ShootingLocation {
     private static Parameters mParameters[] = {
         new Parameters(50, 0, 0, 0),
         new Parameters(33.5, 4000, 0, 0), //GREEN
-        new Parameters(44, 5000, 0, 0), //YELLOW
+        new Parameters(43.5, 5000, 0, 0), //YELLOW
         new Parameters(51.5, 4850, 0, 0), //BLUE
-        new Parameters(51, 5050, 0, 0), //RED
+        new Parameters(51, 5000, 0, 0), //RED
     };
 
     public static class Parameters {
