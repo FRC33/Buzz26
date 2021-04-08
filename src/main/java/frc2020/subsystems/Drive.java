@@ -58,6 +58,7 @@ public class Drive extends Subsystem {
     private LeadLagFilter mYawControlFilter;
 
     private PIDController autoAimController = new PIDController(0.2, 0, 0);
+    private PIDController autoAimThetaController = new PIDController(0.055, 0, 0);
     private PIDController thetaController = new PIDController(0.2, 0, 0);
 
     private DriveControlState mDriveControlState = DriveControlState.OPEN_LOOP;
@@ -259,14 +260,19 @@ public class Drive extends Subsystem {
         // Scale magnitude [0, 1] to [0, maxLinearVelocity]
         translationalInput = translationalInput.scale(kDriveMaxLinearVelocity);
 
+        // Rotation
+        double omega = steerVal * kDriveMaxAngularVelocity;
+
         // Limelight
         if(mSuperstructure.getSystemState() == SystemState.AIM_LIGHTLIGHT) {
-            autoAimController.setSetpoint(0);
-            double adjust = autoAimController.calculate(mLimelight.getXAngle());
-            translationalInput = new Translation2d(translationalInput.x(), translationalInput.y() + adjust);
+            //autoAimController.setSetpoint(0);
+            //double adjust = autoAimController.calculate(mLimelight.getXAngle());
+            //translationalInput = new Translation2d(translationalInput.x(), translationalInput.y() + adjust);
+            
+            autoAimThetaController.setSetpoint(0);
+            double adjust2 = autoAimThetaController.calculate(mLimelight.getXAngle());
+            omega += adjust2;
         }
-
-        double omega = steerVal * kDriveMaxAngularVelocity;
 
         double filteredYawRate = mYawControlFilter.update(mPeriodicIO.timestamp, mPeriodicIO.yawRate);
 
