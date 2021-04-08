@@ -201,10 +201,10 @@ public class Drive extends Subsystem {
     }
 
     public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry) {
-        setTeleOpInputs(throttle, strafe, wheel, resetOdometry, false, false, false);
+        setTeleOpInputs(throttle, strafe, wheel, resetOdometry, false, false, false, false);
     }
 
-    public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry, boolean lockTranslation, boolean centerWheels, boolean lockWheels) {
+    public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry, boolean lockTranslation, boolean centerWheels, boolean lockWheels, boolean aim) {
         double xVal = throttle;
         double yVal = -strafe;
         double steerVal = BuzzXboxController.joystickCubicScaledDeadband(
@@ -264,7 +264,7 @@ public class Drive extends Subsystem {
         double omega = steerVal * kDriveMaxAngularVelocity;
 
         // Limelight
-        if(mSuperstructure.getSystemState() == SystemState.AIM_LIGHTLIGHT) {
+        if(mSuperstructure.getSystemState() == SystemState.AIM_LIGHTLIGHT || aim) {
             //autoAimController.setSetpoint(0);
             //double adjust = autoAimController.calculate(mLimelight.getXAngle());
             //translationalInput = new Translation2d(translationalInput.x(), translationalInput.y() + adjust);

@@ -132,6 +132,7 @@ public class Robot extends TimedRobot {
             mCompressor.stop();
             mDrive.setBraked(true);
             mHood.forceDisable();
+            mSuperstructure.stopIntakeDeployOverride();
 
             // Reset all auto mode state.
             if (mAutoModeExecutor != null) {
@@ -332,7 +333,8 @@ public class Robot extends TimedRobot {
             mHMI.getDriver().getBButton(),
             false,
             mHMI.getDriver().getAButton(),
-            mHMI.getDriver().getYButton() || mSuperstructure.getSystemState() == SystemState.SHOOT);
+            mHMI.getDriver().getYButton() || mSuperstructure.getSystemState() == SystemState.SHOOT,
+            mHMI.getDriver().getLeftTriggerBoolean() || true);
 
         /*
         if(isShootingLocation) {
@@ -414,6 +416,12 @@ public class Robot extends TimedRobot {
             mSuperstructure.stopBrushOverride();
         }
 
+        if(mHMI.getDriver().getPOVData().getDown()) {
+            mSuperstructure.setIntakeDeployOverride(false);
+        } else {
+            mSuperstructure.stopIntakeDeployOverride();
+        }
+
         /*
         //Climber
         ClimberStateMachine.WantedAction climberWantedAction = ClimberStateMachine.WantedAction.STOP;
@@ -466,6 +474,7 @@ public class Robot extends TimedRobot {
         mSuperstructure.setDisabled(true);
         mDrive.setDisabled(false);
 
+        /*
         mDrive.setTeleOpInputs(
             mHMI.getThrottle(),
             mHMI.getStrafe(),
@@ -475,6 +484,7 @@ public class Robot extends TimedRobot {
             mHMI.getDriver().getAButton(),
             mHMI.getDriver().getYButton()
         );
+        */
 
         /*
         if(Math.abs(mHMI.getHoodManual()) >= 0.2) {

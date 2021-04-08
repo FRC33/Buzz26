@@ -38,6 +38,7 @@ public class Superstructure extends Subsystem {
 
     private double mBrushOverride = 0;
     private Optional<Double> mHoodAngleOverride = Optional.empty();
+    private Optional<Boolean> mIntakeDeployOverride = Optional.empty();
 
     private boolean disabled = false;
 
@@ -95,7 +96,12 @@ public class Superstructure extends Subsystem {
                                 mWantedShootingLocation, mAltitudeOffset);
 
                         // Write subsystem outputs based on new state
-                        mIntake.setIntakeDeploy(newState.intakeDeploy || true); //TODO remove hardcode
+                        if(mIntakeDeployOverride.isEmpty()) {
+                            mIntake.setIntakeDeploy(newState.intakeDeploy || true); //TODO remove hardcode
+                        } else {
+                            mIntake.setIntakeDeploy(mIntakeDeployOverride.get());
+                        }
+                        
                         mIntake.setIntake(newState.intakeVoltage);
                         if (mBrushOverride == 0) {
                             mIntake.setIndexer(newState.brushVoltage);
@@ -217,6 +223,14 @@ public class Superstructure extends Subsystem {
 
     public synchronized void stopBrushOverride() {
         mBrushOverride = 0;
+    }
+
+    public synchronized void setIntakeDeployOverride(boolean deploy) {
+        mIntakeDeployOverride = Optional.of(deploy);
+    }
+
+    public synchronized void stopIntakeDeployOverride() {
+        mIntakeDeployOverride = Optional.empty();
     }
 
     public synchronized void setHoodAngleOverride(double angle) {
