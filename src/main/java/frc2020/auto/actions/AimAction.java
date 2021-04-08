@@ -27,6 +27,8 @@ public class AimAction implements Action {
     public void start() {
         mAutoAimController.setSetpoint(0);
         mAutoAimController.calculate(mLimelight.getXAngle());
+
+        mSuperstructure.setWantAimLimelight();
     }
 
     @Override
