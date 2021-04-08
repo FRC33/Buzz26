@@ -20,8 +20,8 @@ public class SuperstructureStateMachine {
     private static final double kFeederIntakeVoltage = 0; // TODO find (used to be -3)
 
     // Index
-    private static final double kBrushIndexVoltage = 5;
-    private static final double kFinalIndexTime = 2.0;
+    private static final double kBrushIndexVoltage = 7;
+    private static final double kFinalIndexTime = 1.0;
 
     // Blow
     private static final double kBlowVoltage = 0;
@@ -215,7 +215,7 @@ public class SuperstructureStateMachine {
             }
 
             if(currentState.ballCount >= 1) {
-                if(timeInState >= 1) {
+                if(timeInState >= 0.8) {
                     return SystemState.INDEX_EXTRA;
                     //return SystemState.INTAKE_FINISH;
                 }
@@ -414,7 +414,7 @@ public class SuperstructureStateMachine {
         if((timeInState / kFinalIndexTime) % ratioToCycle >= ratioToOff) {
             mDesiredState.brushVoltage = 0;
         } else {
-            mDesiredState.brushVoltage = 4;
+            mDesiredState.brushVoltage = 8;
         }
 
         
