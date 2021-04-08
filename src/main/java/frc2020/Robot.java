@@ -27,6 +27,7 @@ import frc2020.subsystems.Hood;
 import frc2020.subsystems.Shooter;
 import frc2020.subsystems.Superstructure;
 import frc2020.subsystems.SwerveModule;
+import frc2020.ShootingLocation.Location;
 import frc2020.auto.AutoModeExecutor;
 import frc2020.auto.modes.AutoModeBase;
 import frc2020.auto.modes.PowerPortMode;
@@ -310,6 +311,7 @@ public class Robot extends TimedRobot {
         boolean altitudeDec = lAltitudeDec.update(mHMI.getAltitudeDec());
 
         //Shooting location
+        /*
         ShootingLocation.Location shootingLocation = mHMI.getShootingLocation();
         boolean isShootingLocation = shootingLocation != ShootingLocation.Location.NONE;
         if(isShootingLocation) {
@@ -317,10 +319,12 @@ public class Robot extends TimedRobot {
         } else if(mHMI.getClearShot()) {
             mSuperstructure.setWantedShootingLocation(ShootingLocation.Location.NONE);
         }
+        */
+        mSuperstructure.setWantedShootingLocation(Location.BLUE);
 
         //Drive
-        boolean search = mSuperstructure.systemStateIsLimelight() && 
-                        (mHood.getAngle() > 45.0 || shootingLocation == ShootingLocation.Location.GREEN);
+        //boolean search = mSuperstructure.systemStateIsLimelight() && 
+        //                (mHood.getAngle() > 45.0 || shootingLocation == ShootingLocation.Location.GREEN);
         mDrive.setTeleOpInputs(
             mHMI.getThrottle(),
             mHMI.getStrafe(),
@@ -330,6 +334,7 @@ public class Robot extends TimedRobot {
             mHMI.getDriver().getAButton(),
             mHMI.getDriver().getYButton() || mSuperstructure.getSystemState() == SystemState.SHOOT);
 
+        /*
         if(isShootingLocation) {
             enableFlywheel = true;
         } else if(mHMI.getClearShot()) {
@@ -337,6 +342,7 @@ public class Robot extends TimedRobot {
             enableFlywheel = false;
             aimManual = false;
         }
+        */
 
         // ----- Superstructure Wanted Action ------
         // ----- Intake -----
@@ -355,6 +361,8 @@ public class Robot extends TimedRobot {
                 mSuperstructure.setWantIntakeOn();
                 intakeOn = true;
             }
+        } else if(intakeOn) {
+            mSuperstructure.setWantIntakeOn();
         } else {
             // ----- Blow -----
             if(mHMI.getBlow()) {
@@ -370,10 +378,7 @@ public class Robot extends TimedRobot {
                 }
             } else {
                 // ----- Aim -----
-                if(enableFlywheel && !mHMI.getAim()) {
-                    mSuperstructure.setWantEnableFlywheel();
-                    intakeOn = false;
-                } else if(enableFlywheel && mHMI.getAim()) {
+                if(mHMI.getAim()) {
                     if(!mHMI.getShoot()) {
                         /*if((mHMI.getTurretManual() != 0 || aimManual) && mHMI.getAim()) {
                             mSuperstructure.setWantAimManual();
@@ -385,6 +390,8 @@ public class Robot extends TimedRobot {
                         // ----- Shoot -----
                         mSuperstructure.setWantShoot();
                     }
+                } else {
+                    mSuperstructure.setWantIdle();
                 }
             }
         }

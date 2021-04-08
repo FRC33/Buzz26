@@ -256,7 +256,7 @@ public class SuperstructureStateMachine {
         if(wantedAction == WantedAction.INTAKE_ON) {
             return SystemState.INTAKE_FINISH;
         } else if(wantedAction == WantedAction.IDLE) {
-            return SystemState.IDLE;
+            return SystemState.ENABLE_FLYWHEEL;
         }
 
         return defaultTransitions(wantedAction, currentState);
@@ -343,7 +343,7 @@ public class SuperstructureStateMachine {
     private SystemState defaultTransitions(WantedAction wantedAction, SuperstructureState currentState) {
         switch(wantedAction) {
             case IDLE:
-                return SystemState.IDLE;
+                return SystemState.ENABLE_FLYWHEEL;
             case INTAKE_ON:
                 return SystemState.INTAKE;
             case BLOW:
@@ -351,16 +351,16 @@ public class SuperstructureStateMachine {
             case ENABLE_FLYWHEEL:
                 return SystemState.ENABLE_FLYWHEEL;
             case AIM_LIGHTLIGHT:
-                return SystemState.IDLE;
+                return SystemState.ENABLE_FLYWHEEL;
             case AIM_NO_LIMELIGHT:
-                return SystemState.IDLE;
+                return SystemState.ENABLE_FLYWHEEL;
             case AIM_MANUAL:
-                return SystemState.IDLE;
+                return SystemState.ENABLE_FLYWHEEL;
             case SHOOT:
-                return SystemState.IDLE;
+                return SystemState.ENABLE_FLYWHEEL;
         }
 
-        return SystemState.IDLE;
+        return SystemState.ENABLE_FLYWHEEL;
     }
     //endregion
 
@@ -484,10 +484,10 @@ public class SuperstructureStateMachine {
 
         mDesiredState.feederVoltage = kFeederShootVoltage;
         
-        double rpmToRecover = Constants.kRapidFire ? 50 : 500;
+        double rpmToRecover = Constants.kRapidFire ? 100 : 500;
         //double brushFeedRate = Constants.kRapidFire ? kBrushRapidShootVoltage : kBrushShootVoltage;
         double brushFeedRate = Constants.kRapidFire ? 10 : 5;
-        double rpmAcceptableError = Constants.kRapidFire ? 150 : 20;
+        double rpmAcceptableError = Constants.kRapidFire ? 50 : 20;
 
         if(wantedShootingLocation.getShooterRPM() - currentState.shooterRPM >= rpmToRecover)  {
             // If the target shooting RPM is 50 RPM greater than the current, set shooter to full power to recover faster

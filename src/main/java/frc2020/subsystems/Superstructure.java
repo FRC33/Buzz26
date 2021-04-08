@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc2020.ShootingLocation;
+import frc2020.ShootingLocation.Location;
 import frc2020.statemachines.SuperstructureStateMachine;
 import frc2020.statemachines.SuperstructureStateMachine.SystemState;
 import frc2020.Robot;
@@ -103,13 +104,15 @@ public class Superstructure extends Subsystem {
                         }
 
                         if(mHoodAngleOverride.isEmpty()) {
-                            mHood.setAngle(newState.hood);
+                            //mHood.setAngle(newState.hood);
+                            mHood.setAngle(Location.BLUE.getHoodAngle());
                         } else {
                             mHood.setAngle(mHoodAngleOverride.get());
                         }
                         
                         mFeeder.setDemand(newState.feederVoltage);
 
+                        /*
                         boolean isShooterVoltage = !Double.isNaN(newState.shooterVoltage);
                         boolean isShooterRPM = !Double.isNaN(newState.shooterRPM);
                         try {
@@ -126,6 +129,8 @@ public class Superstructure extends Subsystem {
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
+                        */
+                        mShooter.setTargetRPM(Location.BLUE.getShooterRPM());
 
                         if(mCurrentState.shooterRPM > newState.shooterRPM) {
                             mAtRPM = true;
