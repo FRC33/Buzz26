@@ -32,7 +32,7 @@ public class PowerPortMode extends AutoModeBase {
 
         for(int i = 0; i < 6; i++) {
             // Drive to reintroduction zone
-            runAction(new SwervePathAction("PowerPort", Rotation2d.fromDegrees(180), i == 0, constants));
+            runAction(new SwervePathAction("PowerPort", this::getTargetAngle, i == 0, constants));
             runAction(new LambdaAction(mDrive::centerWheels));
  
             runAction(new RaceAction(
@@ -41,7 +41,7 @@ public class PowerPortMode extends AutoModeBase {
                 // Start driving to shooting zone once B is pressed
                 new SeriesAction(
                     new WaitLambdaAction(mHMI.getDriver()::getBButton),
-                    new SwervePathAction("PowerPortBack", Rotation2d.fromDegrees(180), false, constants)
+                    new SwervePathAction("PowerPortBack", this::getTargetAngle, false, constants)
                 )
             ));
             
@@ -56,5 +56,11 @@ public class PowerPortMode extends AutoModeBase {
             runAction(new LambdaAction(mDrive::centerWheels));
             runAction(new WaitAction(0.2));
         }
+    }
+
+    // Ensures the target angle (180 or -180 degrees) is the same sign as the current angle
+    // so that the control loop always outputs in the correct direction
+    public Rotation2d getTargetAngle() {
+        return new Rotation2d(Math.signum(mDrive.getPoseWPI().getRotation().getRadians()) * Math.PI);
     }
 }
