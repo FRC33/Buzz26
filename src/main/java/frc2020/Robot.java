@@ -312,7 +312,8 @@ public class Robot extends TimedRobot {
             mHMI.getDriver().getBButton(),
             false,
             mHMI.getDriver().getAButton(),
-            mHMI.getDriver().getYButton() || mSuperstructure.getSystemState() == SystemState.SHOOT);
+            mHMI.getDriver().getYButton() || mSuperstructure.getSystemState() == SystemState.SHOOT,
+            mHMI.getDriver().getLeftTriggerBoolean());
 
         if(isShootingLocation) {
             enableFlywheel = true;
@@ -450,7 +451,8 @@ public class Robot extends TimedRobot {
             mHMI.getDriver().getBButton(),
             mHMI.getDriver().getRightTriggerBoolean(),
             mHMI.getDriver().getAButton(),
-            mHMI.getDriver().getYButton()
+            mHMI.getDriver().getYButton(),
+            mHMI.getDriver().getLeftTriggerBoolean()
         );
 
         /*
