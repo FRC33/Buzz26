@@ -410,7 +410,7 @@ public class SuperstructureStateMachine {
 
         var ratio = timeInState / kFinalIndexTime;
         var ratioToCycle = 0.2;
-        var ratioToOff = ratio >= 0.6 ? 0.1 : 0.05;
+        var ratioToOff = ratio >= 0.6 ? 0.1 : 0.06;
         if((timeInState / kFinalIndexTime) % ratioToCycle >= ratioToOff) {
             mDesiredState.brushVoltage = 0;
         } else {
