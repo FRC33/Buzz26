@@ -133,7 +133,7 @@ public class Drive extends Subsystem {
         mPeriodicIO.vy = speeds.vyMetersPerSecond;
         mPeriodicIO.omega = speeds.omegaRadiansPerSecond;
 
-        mPeriodicIO.yaw = mGyro.getRawYawZeroed() + 180;
+        mPeriodicIO.yaw = mGyro.getRawYawZeroed() + kInitialHeading;
         mPeriodicIO.heading = Rotation2d.fromDegrees(mPeriodicIO.yaw);
         mPeriodicIO.yawRate = (mPeriodicIO.yaw - lastYaw) 
             / (mPeriodicIO.timestamp - lastTimestamp);
@@ -356,7 +356,7 @@ public class Drive extends Subsystem {
 
     public void resetOdometry() {
         mSwerveDriveOdometry.resetPosition(
-            new edu.wpi.first.wpilibj.geometry.Pose2d(0, 0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(180)), 
+            new edu.wpi.first.wpilibj.geometry.Pose2d(0, 0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(kInitialHeading)), 
             getHeadingWPI()
         );
     }
