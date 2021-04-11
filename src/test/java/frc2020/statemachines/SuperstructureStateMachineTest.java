@@ -4,6 +4,7 @@ import frc2020.statemachines.SuperstructureStateMachine.WantedAction;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import frc2020.ShootingLocation.Location;
@@ -12,6 +13,7 @@ import frc2020.statemachines.SuperstructureStateMachine.SuperstructureState;
 public class SuperstructureStateMachineTest {
     SuperstructureStateMachine stateMachine = new SuperstructureStateMachine();
 
+    @Ignore
     @Test
     public void testTransitions() {
         stateMachine.reset();
