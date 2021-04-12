@@ -174,7 +174,7 @@ public class Drive extends Subsystem {
             public void onLoop(double timestamp) {
                 synchronized (Drive.this) {
                     //handleFaults();
-                    mSwerveDriveOdometry.update(getHeadingWPI(),
+                    mSwerveDriveOdometry.update(getHeading().toWPI(),
                         mModules[0].getModuleState(),
                         mModules[1].getModuleState(),
                         mModules[2].getModuleState(),
@@ -292,7 +292,7 @@ public class Drive extends Subsystem {
     }
 
     public void setFieldRelativeChassisSpeeds(double vx, double vy, double theta) {
-        setChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, theta, getHeadingWPI()));
+        setChassisSpeeds(ChassisSpeeds.fromFieldRelativeSpeeds(vx, vy, theta, getHeading().toWPI()));
     }
 
     public void setChassisSpeeds(ChassisSpeeds chassisSpeeds) {
@@ -302,25 +302,15 @@ public class Drive extends Subsystem {
     }
 
     public void lockWheels() {
-        mPeriodicIO.swerveModuleStates[0] = new SwerveModuleState(
-            0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(-45)
-        );
-        mPeriodicIO.swerveModuleStates[1] = new SwerveModuleState(
-            0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(45)
-        );
-        mPeriodicIO.swerveModuleStates[2] = new SwerveModuleState(
-            0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(-45)
-        );
-        mPeriodicIO.swerveModuleStates[3] = new SwerveModuleState(
-            0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(45)
-        );
+        mPeriodicIO.swerveModuleStates[0] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45).toWPI());
+        mPeriodicIO.swerveModuleStates[1] = new SwerveModuleState(0, Rotation2d.fromDegrees(45).toWPI());
+        mPeriodicIO.swerveModuleStates[2] = new SwerveModuleState(0, Rotation2d.fromDegrees(-45).toWPI());
+        mPeriodicIO.swerveModuleStates[3] = new SwerveModuleState(0, Rotation2d.fromDegrees(45).toWPI());
     }
 
     public void centerWheels() {
         for(int i = 0; i < mPeriodicIO.swerveModuleStates.length; i++) {
-            mPeriodicIO.swerveModuleStates[i] = new SwerveModuleState(
-                0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(0)
-            ); 
+            mPeriodicIO.swerveModuleStates[i] = new SwerveModuleState(0, Rotation2d.fromDegrees(0).toWPI());
         }
     }
 
@@ -337,12 +327,8 @@ public class Drive extends Subsystem {
         return mPeriodicIO.heading;
     }
 
-    public edu.wpi.first.wpilibj.geometry.Rotation2d getHeadingWPI() {
-        return new edu.wpi.first.wpilibj.geometry.Rotation2d(mPeriodicIO.heading.getRadians());
-    }
-
-    public edu.wpi.first.wpilibj.geometry.Pose2d getPoseWPI() {
-        return mSwerveDriveOdometry.getPoseMeters();
+    public Pose2d getPose() {
+        return Pose2d.fromWPI(mSwerveDriveOdometry.getPoseMeters());
     }
 
     public double getLinearVelocity() {
@@ -356,14 +342,14 @@ public class Drive extends Subsystem {
 
     public void resetOdometry() {
         mSwerveDriveOdometry.resetPosition(
-            new edu.wpi.first.wpilibj.geometry.Pose2d(0, 0, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(kInitialHeading)), 
-            getHeadingWPI()
+            new Pose2d(0, 0, Rotation2d.fromDegrees(kInitialHeading)).toWPI(), 
+            getHeading().toWPI()
         );
     }
     public void resetOdometry(edu.wpi.first.wpilibj.geometry.Pose2d pose) {
         mSwerveDriveOdometry.resetPosition(
             pose, 
-            getHeadingWPI()
+            getHeading().toWPI()
         );
     }
 
@@ -412,17 +398,20 @@ public class Drive extends Subsystem {
 
     @Override
     public void outputTelemetry() {
-        SmartDashboard.putNumber("x", Units.metersToInches(getPoseWPI().getX()));
-        SmartDashboard.putNumber("y", Units.metersToInches(getPoseWPI().getY()));
-        SmartDashboard.putNumber("theta", getPoseWPI().getRotation().getDegrees());
+        var currentTranslation = getPose().getTranslation();
+
+        SmartDashboard.putNumber("x", Units.metersToInches(currentTranslation.x()));
+        SmartDashboard.putNumber("y", Units.metersToInches(currentTranslation.y()));
+        SmartDashboard.putNumber("theta", getPose().getRotation().getDegrees());
         SmartDashboard.putNumber("v", Units.metersToInches(new Translation2d(mPeriodicIO.vx, mPeriodicIO.vy).norm()));
         SmartDashboard.putNumber("omega", mPeriodicIO.omega);
 
         SmartDashboard.putNumber("fused heading", Rotation2d.fromDegrees(-mPeriodicIO.fusedHeading).getDegrees());
 
-        var pose = mState.poseMeters;
-        SmartDashboard.putNumber("lx", Units.metersToInches(pose.getX()));
-        SmartDashboard.putNumber("ly", Units.metersToInches(pose.getY()));
+        var statePose = mState.poseMeters;
+        var stateTrans = statePose.getTranslation();
+        SmartDashboard.putNumber("lx", Units.metersToInches(stateTrans.getX()));
+        SmartDashboard.putNumber("ly", Units.metersToInches(stateTrans.getY()));
         SmartDashboard.putNumber("lv", Units.metersToInches(mState.velocityMetersPerSecond));
     }
 

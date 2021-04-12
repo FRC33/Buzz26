@@ -83,7 +83,7 @@ public class SwervePathAction implements Action {
         mResetOdometry = resetOdometry;
         mSwerveControllerCommand = new SwerveControllerCommand(
             mTrajectory,
-            mDrive::getPoseWPI,
+            () -> mDrive.getPose().toWPI(),
             kSwerveKinematics,
             xPid,
             yPid,

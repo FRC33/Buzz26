@@ -53,7 +53,7 @@ public class GalacticSearchMode extends AutoModeBase {
                 new RaceAction(
                     new IntakeToCapacityAction(),
                     new WaitLambdaAction(() -> {
-                        return mDrive.getPoseWPI().getX() >= 4.8;
+                        return mDrive.getPose().getTranslation().x() >= 4.8;
                     })
                 ),
                 //new SwervePathAction("RedA", this::getTargetHeading, true, constants)
@@ -103,7 +103,7 @@ public class GalacticSearchMode extends AutoModeBase {
     private Rotation2d getTargetHeading() {
         var ballCount = mInventory.getBallCount();
         
-        if(mDrive.getPoseWPI().getX() >= 3.0) {
+        if(mDrive.getPose().getTranslation().x() >= 3.0) {
             return Rotation2d.fromDegrees(90);
         } else {
             return Rotation2d.fromDegrees(0);
