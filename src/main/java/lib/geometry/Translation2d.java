@@ -113,6 +113,14 @@ public class Translation2d implements ITranslation2d<Translation2d> {
         return Util.epsilonEquals(x(), other.x(), epsilon) && Util.epsilonEquals(y(), other.y(), epsilon);
     }
 
+    public edu.wpi.first.wpilibj.geometry.Translation2d toWPI() {
+        return new edu.wpi.first.wpilibj.geometry.Translation2d(x_, y_);
+    }
+
+    public static Translation2d fromWPI(edu.wpi.first.wpilibj.geometry.Translation2d translation2d) {
+        return new Translation2d(translation2d.getX(), translation2d.getY());
+    }
+
     @Override
     public String toString() {
         final DecimalFormat format = new DecimalFormat("#0.000");
