@@ -51,7 +51,6 @@ public class Drive extends Subsystem {
     private BuzzPigeon mGyro;
 
     // Controllers
-    private SwerveDriveOdometry mSwerveDriveOdometry;
     private ProfiledPIDController mSteerController =
         //new ProfiledPIDController(0.02, 0, 0, new Constraints(75 / 6, (75 / 6)));
         new ProfiledPIDController(0.0, 0, 0, new Constraints(75 / 6, (75 / 6)));
@@ -94,7 +93,6 @@ public class Drive extends Subsystem {
         mGyro.setStatusFramePeriod(PigeonIMU_StatusFrame.CondStatus_9_SixDeg_YPR, 10);
 
         mYawControlFilter = new LeadLagFilter(Timer.getFPGATimestamp(), kYawLead, kYawLag);
-        mSwerveDriveOdometry = new SwerveDriveOdometry(kSwerveKinematics, edu.wpi.first.wpilibj.geometry.Rotation2d.fromDegrees(0));
     }
 
     private final PeriodicIO mPeriodicIO;
@@ -173,13 +171,7 @@ public class Drive extends Subsystem {
             @Override
             public void onLoop(double timestamp) {
                 synchronized (Drive.this) {
-                    //handleFaults();
-                    mSwerveDriveOdometry.update(getHeading().toWPI(),
-                        mModules[0].getModuleState(),
-                        mModules[1].getModuleState(),
-                        mModules[2].getModuleState(),
-                        mModules[3].getModuleState());
-                    
+                    //handleFaults();                    
                     switch (mDriveControlState) {
                         case OPEN_LOOP:
                             break;
@@ -200,11 +192,11 @@ public class Drive extends Subsystem {
         });
     }
 
-    public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry) {
-        setTeleOpInputs(throttle, strafe, wheel, resetOdometry, false, false, false, false);
+    public void setTeleOpInputs(double throttle, double strafe, double wheel) {
+        setTeleOpInputs(throttle, strafe, wheel, false, false, false, false);
     }
 
-    public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean resetOdometry, boolean lockTranslation, boolean centerWheels, boolean lockWheels, boolean aim) {
+    public void setTeleOpInputs(double throttle, double strafe, double wheel, boolean lockTranslation, boolean centerWheels, boolean lockWheels, boolean aim) {
         double xVal = throttle;
         double yVal = -strafe;
         double steerVal = BuzzXboxController.joystickCubicScaledDeadband(
@@ -212,11 +204,6 @@ public class Drive extends Subsystem {
         );
         
         Translation2d translationalInput = new Translation2d(xVal, yVal);
-
-        if(resetOdometry) {
-            resetGyro();
-            resetOdometry();
-        }
 
         if(lockWheels) {
             lockWheels();
@@ -327,10 +314,6 @@ public class Drive extends Subsystem {
         return mPeriodicIO.heading;
     }
 
-    public Pose2d getPose() {
-        return Pose2d.fromWPI(mSwerveDriveOdometry.getPoseMeters());
-    }
-
     public double getLinearVelocity() {
         return new Translation2d(mPeriodicIO.vx, mPeriodicIO.vy).norm();
     }
@@ -338,19 +321,6 @@ public class Drive extends Subsystem {
 
     public void resetGyro() {
         mGyro.reset();
-    }
-
-    public void resetOdometry() {
-        mSwerveDriveOdometry.resetPosition(
-            new Pose2d(0, 0, Rotation2d.fromDegrees(kInitialHeading)).toWPI(), 
-            getHeading().toWPI()
-        );
-    }
-    public void resetOdometry(edu.wpi.first.wpilibj.geometry.Pose2d pose) {
-        mSwerveDriveOdometry.resetPosition(
-            pose, 
-            getHeading().toWPI()
-        );
     }
 
     public void setTrajectoryState(State state) {
@@ -398,11 +368,6 @@ public class Drive extends Subsystem {
 
     @Override
     public void outputTelemetry() {
-        var currentTranslation = getPose().getTranslation();
-
-        SmartDashboard.putNumber("x", Units.metersToInches(currentTranslation.x()));
-        SmartDashboard.putNumber("y", Units.metersToInches(currentTranslation.y()));
-        SmartDashboard.putNumber("theta", getPose().getRotation().getDegrees());
         SmartDashboard.putNumber("v", Units.metersToInches(new Translation2d(mPeriodicIO.vx, mPeriodicIO.vy).norm()));
         SmartDashboard.putNumber("omega", mPeriodicIO.omega);
 

@@ -11,20 +11,25 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import frc2020.RobotState;
 import frc2020.paths.TrajectoryRegistry;
 import frc2020.subsystems.Drive;
+import frc2020.subsystems.RobotStateEstimator;
+import lib.geometry.Pose2d;
+import lib.geometry.Rotation2d;
+import lib.geometry.Translation2d;
 
 public class SwervePathAction implements Action {
 
     private Drive mDrive = Drive.getInstance();
+    private RobotStateEstimator mRobotStateEstimator = RobotStateEstimator.getInstance();
+    private RobotState mRobotState = RobotState.getInstance();
 
     private SwerveControllerCommand mSwerveControllerCommand;
     private Trajectory mTrajectory;
@@ -83,12 +88,12 @@ public class SwervePathAction implements Action {
         mResetOdometry = resetOdometry;
         mSwerveControllerCommand = new SwerveControllerCommand(
             mTrajectory,
-            () -> mDrive.getPose().toWPI(),
+            () -> mRobotState.getLatestFieldToVehicle().getValue().toWPI(),
             kSwerveKinematics,
             xPid,
             yPid,
             thetaPid,
-            desiredRotation,
+            () -> desiredRotation.get().toWPI(),
             mDrive::setModuleStates
         );
     }
@@ -100,9 +105,9 @@ public class SwervePathAction implements Action {
     @Override
     public void start() {
         if(mResetOdometry) {
-            mDrive.resetOdometry(
+            mRobotStateEstimator.resetOdometry(
                 new Pose2d(
-                    mTrajectory.getInitialPose().getTranslation(),
+                    Translation2d.fromWPI(mTrajectory.getInitialPose().getTranslation()),
                     Rotation2d.fromDegrees(0)
                 )
             );

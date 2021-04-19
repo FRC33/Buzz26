@@ -49,7 +49,7 @@ public class Robot extends TimedRobot {
 
     private final Drive mDrive = Drive.getInstance();
     
-    //private final RobotStateEstimator mRobotStateEstimator = RobotStateEstimator.getInstance();
+    private final RobotStateEstimator mRobotStateEstimator = RobotStateEstimator.getInstance();
     
     private final Intake mIntake = Intake.getInstance();
     private final Hood mHood = Hood.getInstance();
@@ -85,7 +85,7 @@ public class Robot extends TimedRobot {
             CrashTracker.logRobotInit();
 
             mSubsystemManager.setSubsystems(
-                //mRobotStateEstimator,
+                mRobotStateEstimator,
                 mDrive,
                 mDrive.getSwerveModules()[0],
                 mDrive.getSwerveModules()[1],
@@ -220,10 +220,7 @@ public class Robot extends TimedRobot {
             mAutoModeSelector.updateModeCreator();
             
             //Reset Field to Vehicle
-            var robotState = RobotState.getInstance();
-            robotState.reset(Timer.getFPGATimestamp(), Pose2d.identity());
-            mDrive.resetGyro();
-            mDrive.resetOdometry();
+            mRobotStateEstimator.resetOdometry();
 
             mSuperstructure.resetStateMachine();
 
@@ -309,11 +306,11 @@ public class Robot extends TimedRobot {
             mHMI.getThrottle(),
             mHMI.getStrafe(),
             mHMI.getSteer(),
-            mHMI.getDriver().getBButton(),
             false,
             mHMI.getDriver().getAButton(),
             mHMI.getDriver().getYButton() || mSuperstructure.getSystemState() == SystemState.SHOOT,
             mHMI.getDriver().getLeftTriggerBoolean());
+        if(mHMI.getDriver().getBButton()) mRobotStateEstimator.resetOdometry();
 
         if(isShootingLocation) {
             enableFlywheel = true;
@@ -448,7 +445,6 @@ public class Robot extends TimedRobot {
             mHMI.getThrottle(),
             mHMI.getStrafe(),
             mHMI.getSteer(),
-            mHMI.getDriver().getBButton(),
             mHMI.getDriver().getRightTriggerBoolean(),
             mHMI.getDriver().getAButton(),
             mHMI.getDriver().getYButton(),
