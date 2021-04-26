@@ -190,7 +190,7 @@ public final class Constants {
     public static final int kHoodBId = 9;
 
     // DIO
-    public static final int kBallSensorIds[] = {5, 4};
+    public static final int kBallSensorIds[] = {5, 4, 2};
     public static final int kPixyDigitalInputId = 3;
 
     // Analog

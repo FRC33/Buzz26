@@ -442,8 +442,11 @@ public class Robot extends TimedRobot {
     @Override
     public void testPeriodic() {
         mSuperstructure.setDisabled(true);
-        mDrive.setDisabled(false);
+        mDrive.setDisabled(true);
 
+        mIntake.setIntakeDeploy(true);
+
+        /*
         mDrive.setTeleOpInputs(
             mHMI.getThrottle(),
             mHMI.getStrafe(),
@@ -454,6 +457,7 @@ public class Robot extends TimedRobot {
             mHMI.getDriver().getYButton(),
             mHMI.getDriver().getLeftTriggerBoolean()
         );
+        */
 
         /*
         if(Math.abs(mHMI.getHoodManual()) >= 0.2) {
@@ -463,7 +467,7 @@ public class Robot extends TimedRobot {
         }
         */
 
-        mShooter.setDemand(11);
+        //mShooter.setDemand(11);
 
         //mShooter.setTargetRPM(9000);
         //mFeeder.setDemand(12);

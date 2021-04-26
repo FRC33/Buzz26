@@ -13,7 +13,7 @@ import lib.util.LatchedBoolean;
 public class Inventory extends Subsystem {
     private static Inventory mInstance;
 
-    private BuzzDigitalInput mBallSensors[] = new BuzzDigitalInput[2];
+    private BuzzDigitalInput mBallSensors[] = new BuzzDigitalInput[kBallSensorIds.length];
 
     private LatchedBoolean mBallEnteredLatch = new LatchedBoolean();
 
@@ -40,6 +40,7 @@ public class Inventory extends Subsystem {
         
         mBallSensors[0].invert(false);
         mBallSensors[1].invert(false);
+        mBallSensors[2].invert(false);
     }
 
     private final PeriodicIO mPeriodicIO;
@@ -47,7 +48,7 @@ public class Inventory extends Subsystem {
     public static class PeriodicIO {
         // INPUTS
         public double timestamp;
-        public boolean[] sensorValues = new boolean[2];
+        public boolean[] sensorValues = new boolean[kBallSensorIds.length];
     }
 
     @Override
@@ -66,11 +67,14 @@ public class Inventory extends Subsystem {
             @Override
             public void onStart(final double timestamp) {
                 synchronized (Inventory.this) {
+                    /*
                     if(getVisbileBalls() == 0) {
                         mBallCount = 0;
                     } else {
                         mBallCount = 3;
                     }
+                    */
+                    mBallCount = 0;
                 }
             }
 
@@ -79,7 +83,7 @@ public class Inventory extends Subsystem {
                 synchronized (Inventory.this) {
                     // Visible ball count
                     int newBallCount = 0;
-                    for(int i = 1; i < mPeriodicIO.sensorValues.length; i++) {
+                    for(int i = 0; i < mPeriodicIO.sensorValues.length; i++) {
                         newBallCount += mPeriodicIO.sensorValues[i] ? 1 : 0;
                     }
                     mVisibleBallCount = newBallCount;

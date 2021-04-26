@@ -20,7 +20,7 @@ public class SuperstructureStateMachine {
     private static final double kFeederIntakeVoltage = 0; // TODO find (used to be -3)
 
     // Index
-    private static final double kBrushIndexVoltage = 5;
+    private static final double kBrushIndexVoltage = 5.5;
     private static final double kFinalIndexTime = 2.0;
 
     // Blow
@@ -210,15 +210,12 @@ public class SuperstructureStateMachine {
                 return SystemState.UNJAM_INTAKE;
             }
 
-            if(currentState.sensorValues[0] && currentState.ballCount == 1) {
-                return SystemState.INDEX;
+            if(currentState.ballCount == 3) {
+                return SystemState.INTAKE_FINISH;
             }
 
-            if(currentState.ballCount == 1 || currentState.ballCount == 2) {
-                if(timeInState >= 1) {
-                    //return SystemState.INDEX_EXTRA;
-                    return SystemState.INTAKE_FINISH;
-                }
+            if(currentState.sensorValues[0]) {
+                return SystemState.INDEX;
             }
 
             return SystemState.INTAKE;
@@ -227,11 +224,16 @@ public class SuperstructureStateMachine {
         return defaultTransitions(wantedAction, currentState);
     }
 
-    LatchedBoolean latch = new LatchedBoolean();
+    //LatchedBoolean latch = new LatchedBoolean();
     private SystemState handleIndexTransitions(WantedAction wantedAction, SuperstructureState currentState) {
         if(wantedAction == WantedAction.INTAKE_ON) {
-            if(!currentState.sensorValues[0] && currentState.sensorValues[1]) {    
+            int stopSensor = Math.max(1, currentState.ballCount);
+            if(!currentState.sensorValues[0] && currentState.sensorValues[stopSensor]) {    
                 return SystemState.INTAKE;
+            }
+
+            if(currentState.ballCount == 3) {
+                return SystemState.INTAKE_FINISH;
             }
 
             return SystemState.INDEX;
