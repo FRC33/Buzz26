@@ -42,6 +42,8 @@ public class Superstructure extends Subsystem {
 
     private boolean mAtRPM = false;
 
+    private Optional<Boolean> mIntakeDeployOverride = Optional.empty();
+
     public synchronized static Superstructure getInstance() {
         if (mInstance == null) {
             mInstance = new Superstructure();
@@ -94,7 +96,11 @@ public class Superstructure extends Subsystem {
                                 mWantedShootingLocation, mAltitudeOffset);
 
                         // Write subsystem outputs based on new state
-                        mIntake.setIntakeDeploy(newState.intakeDeploy);
+                        if(mIntakeDeployOverride.isEmpty()) {
+                            mIntake.setIntakeDeploy(newState.intakeDeploy);
+                        } else {
+                            mIntake.setIntakeDeploy(mIntakeDeployOverride.get());
+                        }
                         mIntake.setIntake(newState.intakeVoltage);
                         if (mBrushOverride == 0) {
                             mIntake.setIndexer(newState.brushVoltage);
@@ -220,6 +226,14 @@ public class Superstructure extends Subsystem {
 
     public synchronized void stopHoodAngleOverride() {
         mHoodAngleOverride = Optional.empty();
+    }
+
+    public synchronized void setIntakeDeployOverride(boolean deploy) {
+        mIntakeDeployOverride = Optional.of(deploy);
+    }
+
+    public synchronized void stopIntakeDeployOverride() {
+        mIntakeDeployOverride = Optional.empty();
     }
 
     public synchronized SuperstructureStateMachine.SystemState getSystemState() {
