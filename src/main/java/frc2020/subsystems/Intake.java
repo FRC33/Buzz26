@@ -13,6 +13,8 @@ import lib.drivers.BuzzTalonFX;
 import lib.drivers.BuzzTalonSRX;
 import lib.drivers.TalonFXFactory;
 import lib.drivers.TalonSRXFactory;
+import lib.loops.ILooper;
+import lib.loops.Loop;
 import lib.subsystems.Subsystem;
 import lib.util.DelayedBoolean;
 
@@ -25,6 +27,8 @@ public class Intake extends Subsystem {
 
     private DelayedBoolean mIntakeStalledDelayedBoolean = new DelayedBoolean(Timer.getFPGATimestamp(), kIntakeStallTime);
     private DelayedBoolean mIndexerStalledDelayedBoolean = new DelayedBoolean(Timer.getFPGATimestamp(), kIntakeStallTime);
+
+    private boolean mActuateIntake = false;
 
     public synchronized static Intake getInstance() {
         if (mInstance == null) {
@@ -84,7 +88,37 @@ public class Intake extends Subsystem {
         // Set output
         mIntake.setDemandVoltage(mPeriodicIO.intakeDemand);
         mIndexer.setDemandVoltage(mPeriodicIO.indexerDemand);
-        mIntakeSolenoid.set(mPeriodicIO.intakeDeploy ? Value.kReverse : Value.kForward);
+        if(mActuateIntake) {
+            mIntakeSolenoid.set(mPeriodicIO.intakeDeploy ? Value.kReverse : Value.kForward);
+        } else {
+            mIntakeSolenoid.set(Value.kOff);
+        }
+    }
+
+    @Override
+    public void registerEnabledLoops(final ILooper in) {
+        in.register(new Loop() {
+            @Override
+            public void onStart(final double timestamp) {
+                synchronized (Intake.this) {
+                    mActuateIntake = false;
+                }
+            }
+
+            @Override
+            public void onLoop(final double timestamp) {
+                synchronized (Intake.this) {
+                    if(mPeriodicIO.intakeDeploy) {
+                        mActuateIntake = true;
+                    }
+                }
+            }
+
+            @Override
+            public void onStop(final double timestamp) {
+                stop();
+            }
+        });
     }
 
     public boolean isIntakeDeployed() {

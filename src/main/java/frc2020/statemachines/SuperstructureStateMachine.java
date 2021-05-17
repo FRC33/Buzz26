@@ -16,7 +16,7 @@ public class SuperstructureStateMachine {
     private static final double kShooterIdleVoltage = 3;
 
     // Intake
-    private static final double kIntakeVoltage = 6.5;
+    private static final double kIntakeVoltage = 10;
     private static final double kFeederIntakeVoltage = 0; // TODO find (used to be -3)
 
     // Index
@@ -24,7 +24,7 @@ public class SuperstructureStateMachine {
     private static final double kFinalIndexTime = 2.0;
 
     // Blow
-    private static final double kBlowVoltage = 0;
+    private static final double kBlowVoltage = -5;
     private static final double kBrushBlowVoltage = -5; // TODO
     private static final double kFeederBlowVoltage = 0;
 
@@ -211,7 +211,7 @@ public class SuperstructureStateMachine {
             }
 
             if(currentState.ballCount == 3) {
-                return SystemState.INTAKE_FINISH;
+                return SystemState.INTAKE;
             }
 
             if(currentState.sensorValues[0]) {
@@ -233,7 +233,7 @@ public class SuperstructureStateMachine {
             }
 
             if(currentState.ballCount == 3) {
-                return SystemState.INTAKE_FINISH;
+                return SystemState.INTAKE;
             }
 
             return SystemState.INDEX;
