@@ -10,6 +10,7 @@ import frc2020.ShootingLocation;
 import frc2020.statemachines.SuperstructureStateMachine;
 import frc2020.statemachines.SuperstructureStateMachine.SystemState;
 import frc2020.Robot;
+import frc2020.RobotContainer;
 import frc2020.RobotState;
 import lib.loops.ILooper;
 import lib.loops.Loop;
@@ -38,7 +39,8 @@ public class Superstructure extends Subsystem {
     private double mBrushOverride = 0;
     private Optional<Double> mHoodAngleOverride = Optional.empty();
 
-    private boolean disabled = false;
+    private boolean mDisabled = false;
+    private boolean mDisableShooter = false;
 
     private boolean mAtRPM = false;
 
@@ -69,7 +71,7 @@ public class Superstructure extends Subsystem {
             @Override
             public void onLoop(final double timestamp) {
                 synchronized (Superstructure.this) {
-                    if (!disabled) {
+                    if (!mDisabled) {
                         // This is needed so that the inventory knows if it should increment the ball
                         // counter
                         mInventory.setIntaking(systemStateIsIntaking());
@@ -122,7 +124,7 @@ public class Superstructure extends Subsystem {
                             if (isShooterVoltage && isShooterRPM) {
                                 throw new Exception("SuperstructureStateMachine exception: cannot set shooter voltage and RPM at the same time. One or both must be equal to Double.NaN"); 
                             }
-                            if(Robot.disableShooter || (!isShooterVoltage && !isShooterRPM)) {
+                            if(mDisableShooter || (!isShooterVoltage && !isShooterRPM)) {
                                 mShooter.setDemand(0);
                             } else if(isShooterVoltage) {
                                 mShooter.setDemand(newState.shooterVoltage);
@@ -154,7 +156,11 @@ public class Superstructure extends Subsystem {
     }
 
     public void setDisabled(boolean disabled) {
-        this.disabled = disabled;
+        mDisabled = disabled;
+    }
+
+    public void setDisableShooter(boolean disableShooter) {
+        mDisableShooter = disableShooter;
     }
 
     public synchronized void resetStateMachine() {
