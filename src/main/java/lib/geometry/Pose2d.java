@@ -153,6 +153,18 @@ public class Pose2d implements IPose2d<Pose2d> {
                 && getRotation().isParallel(other.getRotation());
     }
 
+    public edu.wpi.first.wpilibj.geometry.Pose2d toWPI() {
+        return new edu.wpi.first.wpilibj.geometry.Pose2d(translation_.toWPI(), rotation_.toWPI());
+    }
+
+    public static Pose2d fromWPI(edu.wpi.first.wpilibj.geometry.Pose2d pose2d, boolean normalize) {
+        return new Pose2d(Translation2d.fromWPI(pose2d.getTranslation()), Rotation2d.fromWPI(pose2d.getRotation(), normalize));
+    }
+
+    public static Pose2d fromWPI(edu.wpi.first.wpilibj.geometry.Pose2d pose2d) {
+        return fromWPI(pose2d, true);
+    }
+
     private static Translation2d intersectionInternal(final Pose2d a, final Pose2d b) {
         final Rotation2d a_r = a.getRotation();
         final Rotation2d b_r = b.getRotation();

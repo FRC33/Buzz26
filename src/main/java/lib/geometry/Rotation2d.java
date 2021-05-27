@@ -164,6 +164,18 @@ public class Rotation2d implements IRotation2d<Rotation2d> {
         return new Translation2d(cos_angle_, sin_angle_);
     }
 
+    public edu.wpi.first.wpilibj.geometry.Rotation2d toWPI() {
+        return new edu.wpi.first.wpilibj.geometry.Rotation2d(radians_);
+    }
+
+    public static Rotation2d fromWPI(edu.wpi.first.wpilibj.geometry.Rotation2d rotation2d, boolean normalize) {
+        return new Rotation2d(rotation2d.getRadians(), normalize);
+    }
+
+    public static Rotation2d fromWPI(edu.wpi.first.wpilibj.geometry.Rotation2d rotation2d) {
+        return fromWPI(rotation2d, true);
+    }
+
     protected double WrapRadians(double radians) {
         final double k2Pi = 2.0 * Math.PI;
         radians = radians % k2Pi;

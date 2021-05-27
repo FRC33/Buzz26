@@ -11,6 +11,9 @@ import lib.util.MovingAverageTwist2d;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Units;
+
+import static frc2020.Constants.*;
 
 import java.util.*;
 
@@ -58,7 +61,7 @@ public class RobotState {
     }
 
     public synchronized void reset() {
-        reset(Timer.getFPGATimestamp(), Pose2d.identity());
+        reset(Timer.getFPGATimestamp(), new Pose2d(0, 0, Rotation2d.fromDegrees(kInitialHeading)));
     }
 
     /**
@@ -82,6 +85,7 @@ public class RobotState {
         field_to_vehicle_.put(new InterpolatingDouble(timestamp), observation);
     }
 
+    /* TODO
     public synchronized void addObservations(double timestamp, Twist2d displacement, Twist2d measured_velocity, Twist2d predicted_velocity) {
         distance_driven_ += displacement.dx;
         addFieldToVehicleObservation(timestamp,
@@ -95,6 +99,7 @@ public class RobotState {
         }
         vehicle_velocity_predicted_ = predicted_velocity;
     }
+    */
 
     public synchronized double getDistanceDriven() {
         return distance_driven_;
@@ -245,8 +250,8 @@ public class RobotState {
 
     public synchronized void outputToSmartDashboard() {
         var pose = getLatestFieldToVehicle().getValue();
-        SmartDashboard.putNumber("x", pose.getTranslation().x());
-        SmartDashboard.putNumber("y", pose.getTranslation().y());
+        SmartDashboard.putNumber("x", Units.metersToInches(pose.getTranslation().x()));
+        SmartDashboard.putNumber("y", Units.metersToInches(pose.getTranslation().y()));
         SmartDashboard.putNumber("theta", pose.getRotation().getDegrees());
 
         //SmartDashboard.putString("Robot Velocity", getMeasuredVelocity().toString());

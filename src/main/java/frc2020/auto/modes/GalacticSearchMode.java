@@ -3,6 +3,7 @@ package frc2020.auto.modes;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc2020.RobotState;
 import frc2020.auto.AutoModeEndedException;
 import frc2020.auto.actions.LambdaAction;
 import frc2020.auto.actions.ParallelAction;
@@ -24,6 +25,7 @@ import frc2020.subsystems.Superstructure;
 public class GalacticSearchMode extends AutoModeBase {
     Pixy mPixy = Pixy.getInstance();
     Drive mDrive = Drive.getInstance();
+    RobotState mRobotState = RobotState.getInstance();
     Superstructure mSuperstructure = Superstructure.getInstance();
     Inventory mInventory = Inventory.getInstance();
 
@@ -53,11 +55,11 @@ public class GalacticSearchMode extends AutoModeBase {
                 new RaceAction(
                     new IntakeToCapacityAction(),
                     new WaitLambdaAction(() -> {
-                        return mDrive.getPoseWPI().getX() >= 4.8;
+                        return mRobotState.getLatestFieldToVehicle().getValue().getTranslation().x() >= 4.8;
                     })
-                ),
+                )
                 //new SwervePathAction("RedA", this::getTargetHeading, true, constants)
-                new SwervePathAction("RedB", this::getTargetHeadingB, true, constantsB)
+                //new SwervePathAction("RedB", this::getTargetHeadingB(), true, constantsB)
             )
         );
 
@@ -103,7 +105,7 @@ public class GalacticSearchMode extends AutoModeBase {
     private Rotation2d getTargetHeading() {
         var ballCount = mInventory.getBallCount();
         
-        if(mDrive.getPoseWPI().getX() >= 3.0) {
+        if(mRobotState.getLatestFieldToVehicle().getValue().getTranslation().x() >= 3.0) {
             return Rotation2d.fromDegrees(90);
         } else {
             return Rotation2d.fromDegrees(0);

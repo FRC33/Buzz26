@@ -21,7 +21,7 @@ public class StopAction implements Action {
 
     @Override
     public void update() {
-        mDrive.setTeleOpInputs(0, 0, 0, false);
+        mDrive.setTeleOpInputs(0, 0, 0);
         finished = true;
     }
 
