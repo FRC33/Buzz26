@@ -12,9 +12,10 @@ import frc2020.statemachines.*;
 import frc2020.statemachines.SuperstructureStateMachine.SystemState;
 import lib.subsystems.Subsystem;
 import lib.util.LatchedBoolean;
+import lib.wpilib.IRobotContainer;
 import frc2020.paths.TrajectoryRegistry;
 
-public class RobotContainer {
+public class RobotContainer implements IRobotContainer {
 
     private final Drive mDrive = Drive.getInstance();
     

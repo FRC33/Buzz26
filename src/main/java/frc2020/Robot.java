@@ -9,6 +9,7 @@ import lib.SubsystemManager;
 //import lib.vision.AimingParameters;
 import lib.loops.Looper;
 import lib.util.CrashTracker;
+import lib.wpilib.IRobotContainer;
 import lib.wpilib.TimedRobot;
 
 /**
@@ -26,7 +27,7 @@ public class Robot extends TimedRobot {
 
     private final Compressor mCompressor;
 
-    private RobotContainer mRobotContainer = new RobotContainer();
+    private IRobotContainer mRobotContainer = new RobotContainer();
     
     Robot() {
         CrashTracker.logRobotConstruction();
