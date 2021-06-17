@@ -395,6 +395,13 @@ public class Robot extends TimedRobot {
             mSuperstructure.stopIntakeDeployOverride();
         }
 
+        if(mHMI.getDriver().getPOVData().getTop()) {
+            mSuperstructure.setLidDeployOverride(true);
+        }
+        else {
+            mSuperstructure.stopLidDeployOverride();
+        }
+
         /*
         //Climber
         ClimberStateMachine.WantedAction climberWantedAction = ClimberStateMachine.WantedAction.STOP;

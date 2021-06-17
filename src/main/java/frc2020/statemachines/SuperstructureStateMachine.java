@@ -72,6 +72,7 @@ public class SuperstructureStateMachine {
         public double intakeVoltage;
         public double brushVoltage;
         public boolean intakeDeploy;
+        public boolean lidDeploy;
 
         public double feederVoltage;
 
@@ -371,6 +372,7 @@ public class SuperstructureStateMachine {
         mDesiredState.intakeVoltage = 0;
         mDesiredState.brushVoltage = 0;
         mDesiredState.intakeDeploy = false;
+        mDesiredState.lidDeploy = false;
 
         mDesiredState.feederVoltage = 0;
 
@@ -389,6 +391,7 @@ public class SuperstructureStateMachine {
         mDesiredState.hood = kHoodStowAngle;
 
         mDesiredState.intakeDeploy = true;
+        mDesiredState.lidDeploy = true;
         mDesiredState.intakeVoltage = kIntakeVoltage;
         mDesiredState.feederVoltage = kFeederIntakeVoltage;
     }
@@ -397,6 +400,7 @@ public class SuperstructureStateMachine {
         getDefaultDesiredState(currentState);
         mDesiredState.hood = kHoodStowAngle;
         mDesiredState.intakeDeploy = true;
+        mDesiredState.lidDeploy = true;
         mDesiredState.intakeVoltage = kIntakeVoltage;
         // Increase index speed with more balls. TODO Remove?
         //mDesiredState.brushVoltage = kBrushIndexVoltage + (currentState.ballCount * 2.0);
@@ -408,6 +412,7 @@ public class SuperstructureStateMachine {
         getDefaultDesiredState(currentState);
         mDesiredState.hood = kHoodStowAngle;
         mDesiredState.intakeDeploy = true;
+        mDesiredState.lidDeploy = true;
         mDesiredState.intakeVoltage = kIntakeVoltage;
 
         var ratio = timeInState / kFinalIndexTime;
@@ -432,6 +437,7 @@ public class SuperstructureStateMachine {
         mDesiredState.hood = kHoodStowAngle;
 
         mDesiredState.intakeDeploy = true;
+        mDesiredState.lidDeploy = true;
         mDesiredState.intakeVoltage = kBlowVoltage;
         mDesiredState.brushVoltage = currentState.sensorValues[0] ? 0 : kBrushBlowVoltage;
         mDesiredState.feederVoltage = kFeederBlowVoltage;
@@ -442,6 +448,7 @@ public class SuperstructureStateMachine {
         mDesiredState.hood = kHoodStowAngle;
 
         mDesiredState.intakeDeploy = true;
+        mDesiredState.lidDeploy = true;
         mDesiredState.intakeVoltage = kBlowVoltage;
         mDesiredState.feederVoltage = kFeederIntakeVoltage;
     }

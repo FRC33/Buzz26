@@ -24,6 +24,7 @@ public class Intake extends Subsystem {
     private BuzzTalonFX mIntake;
     private BuzzTalonFX mIndexer;
     private DoubleSolenoid mIntakeSolenoid;
+    private DoubleSolenoid mLidSolenoid;
 
     private DelayedBoolean mIntakeStalledDelayedBoolean = new DelayedBoolean(Timer.getFPGATimestamp(), kIntakeStallTime);
     private DelayedBoolean mIndexerStalledDelayedBoolean = new DelayedBoolean(Timer.getFPGATimestamp(), kIntakeStallTime);
@@ -45,6 +46,7 @@ public class Intake extends Subsystem {
         mIntake = TalonFXFactory.createDefaultTalon(kIntakeId);
         mIndexer = TalonFXFactory.createDefaultTalon(kIndexerId);
         mIntakeSolenoid = new DoubleSolenoid(kIntakeForwardId, kIntakeReverseId);
+        mLidSolenoid = new DoubleSolenoid(6, 7); // TODO: Fix this
 
         mIntake.setInverted(true);
         mIntake.setNeutralMode(NeutralMode.Coast);
@@ -70,6 +72,7 @@ public class Intake extends Subsystem {
         // OUTPUTS
         public double intakeDemand;
         public boolean intakeDeploy;
+        public boolean lidDeploy;
         public double indexerDemand;
     }
 
@@ -90,8 +93,10 @@ public class Intake extends Subsystem {
         mIndexer.setDemandVoltage(mPeriodicIO.indexerDemand);
         if(mActuateIntake) {
             mIntakeSolenoid.set(mPeriodicIO.intakeDeploy ? Value.kReverse : Value.kForward);
+            mLidSolenoid.set(mPeriodicIO.lidDeploy ? Value.kReverse : Value.kForward);
         } else {
             mIntakeSolenoid.set(Value.kOff);
+            mLidSolenoid.set(Value.kOff);
         }
     }
 
@@ -108,7 +113,7 @@ public class Intake extends Subsystem {
             @Override
             public void onLoop(final double timestamp) {
                 synchronized (Intake.this) {
-                    if(mPeriodicIO.intakeDeploy) {
+                    if(mPeriodicIO.intakeDeploy || mPeriodicIO.lidDeploy) { // 6/17 WTF: May be an issue doing an OR for lidDeploy, would probs do this diff but testing purpose it is fine.
                         mActuateIntake = true;
                     }
                 }
@@ -139,6 +144,10 @@ public class Intake extends Subsystem {
 
     public void setIntakeDeploy(boolean deploy) {
         mPeriodicIO.intakeDeploy = deploy;
+    }
+
+    public void setLidDeploy(boolean deploy) {
+        mPeriodicIO.lidDeploy = deploy;
     }
 
     @Override
