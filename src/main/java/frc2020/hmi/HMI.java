@@ -54,6 +54,10 @@ public class HMI {
         return driver.getLeftBumper();
     }
 
+    public boolean getLidOverride() {
+        return driver.getBButton();
+    }
+
     public boolean getBlow() {
         return driver.getXButton();
     }

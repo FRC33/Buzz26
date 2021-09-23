@@ -5,6 +5,7 @@ import static frc2020.Constants.*;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,6 +25,7 @@ public class Intake extends Subsystem {
     private BuzzTalonFX mIntake;
     private BuzzTalonFX mIndexer;
     private DoubleSolenoid mIntakeSolenoid;
+    private Solenoid mLidSolenoid;
 
     private DelayedBoolean mIntakeStalledDelayedBoolean = new DelayedBoolean(Timer.getFPGATimestamp(), kIntakeStallTime);
     private DelayedBoolean mIndexerStalledDelayedBoolean = new DelayedBoolean(Timer.getFPGATimestamp(), kIntakeStallTime);
@@ -45,6 +47,7 @@ public class Intake extends Subsystem {
         mIntake = TalonFXFactory.createDefaultTalon(kIntakeId);
         mIndexer = TalonFXFactory.createDefaultTalon(kIndexerId);
         mIntakeSolenoid = new DoubleSolenoid(kIntakeForwardId, kIntakeReverseId);
+        mLidSolenoid = new Solenoid(2);
 
         mIntake.setInverted(true);
         mIntake.setNeutralMode(NeutralMode.Coast);
@@ -71,6 +74,7 @@ public class Intake extends Subsystem {
         public double intakeDemand;
         public boolean intakeDeploy;
         public double indexerDemand;
+        public boolean lidDeploy;
     }
 
     @Override
@@ -93,6 +97,8 @@ public class Intake extends Subsystem {
         } else {
             mIntakeSolenoid.set(Value.kOff);
         }
+
+        mLidSolenoid.set(mPeriodicIO.lidDeploy);
     }
 
     @Override
@@ -125,6 +131,10 @@ public class Intake extends Subsystem {
         return mPeriodicIO.intakeDeploy;
     }
 
+    public boolean isLidDeployed() {
+        return mPeriodicIO.lidDeploy;
+    }
+
     public boolean isStalled() {
         return mPeriodicIO.intakeStalled;
     }
@@ -139,6 +149,10 @@ public class Intake extends Subsystem {
 
     public void setIntakeDeploy(boolean deploy) {
         mPeriodicIO.intakeDeploy = deploy;
+    }
+
+    public void setLidDeploy(boolean deploy) {
+        mPeriodicIO.lidDeploy = deploy;
     }
 
     @Override
@@ -157,6 +171,7 @@ public class Intake extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Brush Demand", mPeriodicIO.indexerDemand);
+        SmartDashboard.putBoolean("Lid Deploy State", mPeriodicIO.lidDeploy);
     }
 
     public synchronized double getTimestamp() {

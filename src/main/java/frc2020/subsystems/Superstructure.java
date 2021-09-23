@@ -44,6 +44,8 @@ public class Superstructure extends Subsystem {
 
     private Optional<Boolean> mIntakeDeployOverride = Optional.empty();
 
+    private Optional<Boolean> mLidDeployOverride = Optional.empty();
+
     public synchronized static Superstructure getInstance() {
         if (mInstance == null) {
             mInstance = new Superstructure();
@@ -101,7 +103,16 @@ public class Superstructure extends Subsystem {
                         } else {
                             mIntake.setIntakeDeploy(mIntakeDeployOverride.get());
                         }
+                    
+                        if (mLidDeployOverride.isEmpty()) {
+                            mIntake.setLidDeploy(newState.lidDeploy);
+                        }
+                        else {
+                            mIntake.setLidDeploy(mLidDeployOverride.get());
+                        }
+
                         mIntake.setIntake(newState.intakeVoltage);
+
                         if (mBrushOverride == 0) {
                             mIntake.setIndexer(newState.brushVoltage);
                         } else {
@@ -179,6 +190,10 @@ public class Superstructure extends Subsystem {
         mWantedAction = SuperstructureStateMachine.WantedAction.BLOW;
     }
 
+    public void setWantLidOverride() {
+        mWantedAction = SuperstructureStateMachine.WantedAction.LID_OVERRIDE;
+    }
+
     public void setWantEnableFlywheel() {
         mWantedAction = SuperstructureStateMachine.WantedAction.ENABLE_FLYWHEEL;
     }
@@ -234,6 +249,14 @@ public class Superstructure extends Subsystem {
 
     public synchronized void stopIntakeDeployOverride() {
         mIntakeDeployOverride = Optional.empty();
+    }
+
+    public synchronized void setLidDeployOverride(boolean deploy) {
+        mLidDeployOverride = Optional.of(deploy);
+    }
+
+    public synchronized void stopLidDeployOverride() {
+        mLidDeployOverride = Optional.empty();
     }
 
     public synchronized SuperstructureStateMachine.SystemState getSystemState() {

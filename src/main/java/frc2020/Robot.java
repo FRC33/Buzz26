@@ -323,12 +323,11 @@ public class Robot extends TimedRobot {
         // ----- Superstructure Wanted Action ------
         // ----- Intake -----
         // Automatically toggle intake off once there are 3 balls
-        if(mSuperstructure.getSystemState() == SuperstructureStateMachine.SystemState.INTAKE_FINISH && 
-            intakeOn
-        ) {
+        if(mSuperstructure.getSystemState() == SuperstructureStateMachine.SystemState.INTAKE_FINISH && intakeOn) {
             mSuperstructure.setWantIdle();
             intakeOn = false;
         }
+
         if(toggleCollect && !enableFlywheel) {
             if(intakeOn) {
                 mSuperstructure.setWantIdle();
@@ -357,10 +356,10 @@ public class Robot extends TimedRobot {
                     intakeOn = false;
                 } else if(enableFlywheel && mHMI.getAim()) {
                     if(!mHMI.getShoot()) {
-                        /*if((mHMI.getTurretManual() != 0 || aimManual) && mHMI.getAim()) {
+                        if((mHMI.getTurretManual() != 0 || aimManual) && mHMI.getAim()) {
                             mSuperstructure.setWantAimManual();
                             aimManual = true;
-                        } else */{
+                        } else {
                             mSuperstructure.setWantAimLimelight();
                         }
                     } else {
@@ -395,6 +394,16 @@ public class Robot extends TimedRobot {
             mSuperstructure.stopIntakeDeployOverride();
         }
 
+        if(mHMI.getLidOverride()) {
+            mSuperstructure.setLidDeployOverride(true);
+
+            if (intakeOn) {
+                mSuperstructure.setLidDeployOverride(false);
+            }
+        } else {
+            mSuperstructure.stopLidDeployOverride();
+        }
+
         /*
         //Climber
         ClimberStateMachine.WantedAction climberWantedAction = ClimberStateMachine.WantedAction.STOP;
@@ -408,32 +417,6 @@ public class Robot extends TimedRobot {
             climberWantedAction = ClimberStateMachine.WantedAction.WINCH_OUT;
         }
         mClimber.setWantedAction(climberWantedAction);
-
-        // LEDs
-        
-        // TODO clean up
-        /*
-        if(mClimber.getPartyMode()) {
-            mLED.setState(Color.WHITE, 0, true);
-        } else {
-            if(mSuperstructure.systemStateIsIntaking()) {
-                mLED.setState(Color.WHITE, mInventory.getBallCount(), false);
-            } else {
-                if(mSuperstructure.getSystemState() == SystemState.ENABLE_FLYWHEEL) {
-                    mLED.setState(Color.BLUE, 5, false);
-                } else {
-                    if(mSuperstructure.getSystemState() == SystemState.AIM_LIGHTLIGHT &&
-                        mSuperstructure.getAtRPM()
-                    ) {
-                        if(Math.abs(mDrive.getAutoSteerError()) <= 0.00827266) {
-                            mLED.setState(Color.GREEN, 5, false);
-                        } else {
-                            mLED.setState(Color.BLUE, 5, false);
-                        }
-                    }
-                }
-            }
-        }
         */
     }
 

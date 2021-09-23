@@ -55,13 +55,13 @@ public class SuperstructureStateMachine {
 
     public enum WantedAction {
         IDLE,
-        INTAKE_ON, BLOW,
+        INTAKE_ON, LID_OVERRIDE, BLOW,
         ENABLE_FLYWHEEL, AIM_LIGHTLIGHT, AIM_NO_LIMELIGHT, AIM_MANUAL,
         SHOOT
     }
 
     public enum IntakeDeployWantedAction {
-        IDLE, INTAKE_OVERRIDE_DOWN, INTAKE_OVERRIDE_UP
+        IDLE, INTAKE_OVERRIDE_DOWN, INTAKE_OVERRIDE_UP, LID_OVERRIDE_UP, LID_OVERRIDE_DOWN
     }
 
     public static class SuperstructureState {
@@ -73,6 +73,7 @@ public class SuperstructureStateMachine {
         public double intakeVoltage;
         public double brushVoltage;
         public boolean intakeDeploy;
+        public boolean lidDeploy;
 
         public double feederVoltage;
 
@@ -206,6 +207,7 @@ public class SuperstructureStateMachine {
     //region Transitions
     private SystemState handleIntakeTransitions(WantedAction wantedAction, SuperstructureState currentState, double timeInState) {
         //Remain in intake position if intaking
+
         if(wantedAction == WantedAction.INTAKE_ON) {
             if(currentState.intakeStalled) {
                 return SystemState.UNJAM_INTAKE;
@@ -371,6 +373,7 @@ public class SuperstructureStateMachine {
     private void getDefaultDesiredState(SuperstructureState currentState) {
         mDesiredState.intakeVoltage = 0;
         mDesiredState.brushVoltage = 0;
+        mDesiredState.lidDeploy = false;
         mDesiredState.intakeDeploy = false;
 
         mDesiredState.feederVoltage = 0;
@@ -390,6 +393,8 @@ public class SuperstructureStateMachine {
         mDesiredState.hood = kHoodStowAngle;
 
         mDesiredState.intakeDeploy = true;
+        mDesiredState.lidDeploy = true;
+
         mDesiredState.intakeVoltage = kIntakeVoltage;
         mDesiredState.feederVoltage = kFeederIntakeVoltage;
     }
@@ -398,6 +403,8 @@ public class SuperstructureStateMachine {
         getDefaultDesiredState(currentState);
         mDesiredState.hood = kHoodStowAngle;
         mDesiredState.intakeDeploy = true;
+        mDesiredState.lidDeploy = true;
+
         mDesiredState.intakeVoltage = kIntakeVoltage;
         // Increase index speed with more balls. TODO Remove?
         //mDesiredState.brushVoltage = kBrushIndexVoltage + (currentState.ballCount * 2.0);
@@ -409,6 +416,8 @@ public class SuperstructureStateMachine {
         getDefaultDesiredState(currentState);
         mDesiredState.hood = kHoodStowAngle;
         mDesiredState.intakeDeploy = true;
+        mDesiredState.lidDeploy = true;
+
         mDesiredState.intakeVoltage = kIntakeVoltage;
 
         var ratio = timeInState / kFinalIndexTime;
@@ -433,6 +442,8 @@ public class SuperstructureStateMachine {
         mDesiredState.hood = kHoodStowAngle;
 
         mDesiredState.intakeDeploy = true;
+        mDesiredState.lidDeploy = true;
+
         mDesiredState.intakeVoltage = kBlowVoltage;
         mDesiredState.brushVoltage = currentState.sensorValues[0] ? 0 : kBrushBlowVoltage;
         mDesiredState.feederVoltage = kFeederBlowVoltage;
@@ -443,6 +454,8 @@ public class SuperstructureStateMachine {
         mDesiredState.hood = kHoodStowAngle;
 
         mDesiredState.intakeDeploy = true;
+        mDesiredState.lidDeploy = true;
+
         mDesiredState.intakeVoltage = kBlowVoltage;
         mDesiredState.feederVoltage = kFeederIntakeVoltage;
     }
