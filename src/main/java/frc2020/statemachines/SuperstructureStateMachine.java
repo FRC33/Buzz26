@@ -1,6 +1,7 @@
 package frc2020.statemachines;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc2020.Constants;
 import frc2020.ShootingLocation;
 import frc2020.states.LEDState;
@@ -13,7 +14,7 @@ public class SuperstructureStateMachine {
 
     // Idle
     private static final double kHoodStowAngle = 51.5;
-    private static final double kShooterIdleVoltage = 3;
+    private static final double kShooterIdleVoltage = 0;
 
     // Intake
     private static final double kIntakeVoltage = 10;
@@ -490,7 +491,7 @@ public class SuperstructureStateMachine {
         //double brushFeedRate = Constants.kRapidFire ? kBrushRapidShootVoltage : kBrushShootVoltage;
         double brushFeedRate = Constants.kRapidFire ? 10 : 5;
         double rpmAcceptableError = Constants.kRapidFire ? 200 : 20;
-
+        
         if(wantedShootingLocation.getShooterRPM() - currentState.shooterRPM >= rpmToRecover)  {
             // If the target shooting RPM is 50 RPM greater than the current, set shooter to full power to recover faster
             mDesiredState.shooterVoltage = kShooterRecoveryVoltage;
