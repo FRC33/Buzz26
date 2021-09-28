@@ -41,6 +41,10 @@ public class Inventory extends Subsystem {
         mBallSensors[0].invert(false);
         mBallSensors[1].invert(false);
         mBallSensors[2].invert(false);
+
+        mBallSensors[0].enableLowPass(true, 0.04);
+        mBallSensors[1].enableLowPass(true, 0.03);
+        mBallSensors[2].enableLowPass(true, 0.02);
     }
 
     private final PeriodicIO mPeriodicIO;
