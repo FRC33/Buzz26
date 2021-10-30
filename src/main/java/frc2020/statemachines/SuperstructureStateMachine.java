@@ -18,6 +18,7 @@ public class SuperstructureStateMachine {
 
     // Intake
     private static final double kIntakeVoltage = 10;
+    private static final double kConveyorVoltage = 8;
     private static final double kFeederIntakeVoltage = 0; // TODO find (used to be -3)
 
     // Index
@@ -71,6 +72,7 @@ public class SuperstructureStateMachine {
 
         //Desired only
         public double intakeVoltage;
+        public double conveyorVoltage;
         public double brushVoltage;
         public boolean intakeDeploy;
         public boolean lidDeploy;
@@ -372,6 +374,7 @@ public class SuperstructureStateMachine {
     //region Desired State
     private void getDefaultDesiredState(SuperstructureState currentState) {
         mDesiredState.intakeVoltage = 0;
+        mDesiredState.conveyorVoltage = 0;
         mDesiredState.brushVoltage = 0;
         mDesiredState.lidDeploy = false;
         mDesiredState.intakeDeploy = false;
@@ -396,6 +399,7 @@ public class SuperstructureStateMachine {
         mDesiredState.lidDeploy = true;
 
         mDesiredState.intakeVoltage = kIntakeVoltage;
+        mDesiredState.conveyorVoltage = kConveyorVoltage;
         mDesiredState.feederVoltage = kFeederIntakeVoltage;
     }
 
@@ -408,6 +412,7 @@ public class SuperstructureStateMachine {
         mDesiredState.intakeVoltage = kIntakeVoltage;
         // Increase index speed with more balls. TODO Remove?
         //mDesiredState.brushVoltage = kBrushIndexVoltage + (currentState.ballCount * 2.0);
+        mDesiredState.conveyorVoltage = kConveyorVoltage;
         mDesiredState.brushVoltage = kBrushIndexVoltage;
         mDesiredState.feederVoltage = kFeederIntakeVoltage;
     }
@@ -419,6 +424,7 @@ public class SuperstructureStateMachine {
         mDesiredState.lidDeploy = true;
 
         mDesiredState.intakeVoltage = kIntakeVoltage;
+        mDesiredState.conveyorVoltage = kConveyorVoltage;
 
         var ratio = timeInState / kFinalIndexTime;
         var ratioToCycle = 0.2;
@@ -445,6 +451,7 @@ public class SuperstructureStateMachine {
         mDesiredState.lidDeploy = true;
 
         mDesiredState.intakeVoltage = kBlowVoltage;
+        mDesiredState.conveyorVoltage = kBlowVoltage;
         mDesiredState.brushVoltage = currentState.sensorValues[0] ? 0 : kBrushBlowVoltage;
         mDesiredState.feederVoltage = kFeederBlowVoltage;
     }
@@ -457,6 +464,7 @@ public class SuperstructureStateMachine {
         mDesiredState.lidDeploy = true;
 
         mDesiredState.intakeVoltage = kBlowVoltage;
+        mDesiredState.conveyorVoltage = kBlowVoltage;
         mDesiredState.feederVoltage = kFeederIntakeVoltage;
     }
 

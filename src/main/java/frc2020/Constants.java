@@ -172,6 +172,10 @@ public final class Constants {
     public static final double kShooterKf = (1023 * (11.0 / 11.5)) / 19552;
     
     // region ------ Device IDs ------
+
+    // Spark Max
+    public static final int kConveyorId = 45;
+
     // Talons
     public static final int kIntakeId = 9;
     public static final int kIndexerId = 10;

@@ -112,6 +112,7 @@ public class Superstructure extends Subsystem {
                         }
 
                         mIntake.setIntake(newState.intakeVoltage);
+                        mIntake.setConveyor(newState.conveyorVoltage);
 
                         if (mBrushOverride == 0) {
                             mIntake.setIndexer(newState.brushVoltage);

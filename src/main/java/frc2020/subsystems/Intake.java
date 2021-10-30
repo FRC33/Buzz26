@@ -3,6 +3,9 @@ package frc2020.subsystems;
 import static frc2020.Constants.*;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -24,6 +27,7 @@ public class Intake extends Subsystem {
 
     private BuzzTalonFX mIntake;
     private BuzzTalonFX mIndexer;
+    private CANSparkMax mConveyor;
     private DoubleSolenoid mIntakeSolenoid;
     private Solenoid mLidSolenoid;
 
@@ -46,6 +50,7 @@ public class Intake extends Subsystem {
         // Initalize subsystem devices
         mIntake = TalonFXFactory.createDefaultTalon(kIntakeId);
         mIndexer = TalonFXFactory.createDefaultTalon(kIndexerId);
+        mConveyor = new CANSparkMax(kConveyorId, MotorType.kBrushless);
         mIntakeSolenoid = new DoubleSolenoid(kIntakeForwardId, kIntakeReverseId);
         mLidSolenoid = new Solenoid(2);
 
@@ -59,6 +64,10 @@ public class Intake extends Subsystem {
         mIndexer.setNeutralMode(NeutralMode.Brake);
         mIndexer.enableVoltageCompensation(true);
         mIndexer.configVoltageCompSaturation(11.5);
+
+        mConveyor.setInverted(false);
+        mConveyor.setIdleMode(IdleMode.kBrake);
+        mConveyor.enableVoltageCompensation(11.5);
     }
 
     private final PeriodicIO mPeriodicIO;
@@ -72,6 +81,7 @@ public class Intake extends Subsystem {
 
         // OUTPUTS
         public double intakeDemand;
+        public double conveyorDemand;
         public boolean intakeDeploy;
         public double indexerDemand;
         public boolean lidDeploy;
@@ -92,6 +102,8 @@ public class Intake extends Subsystem {
         // Set output
         mIntake.setDemandVoltage(mPeriodicIO.intakeDemand);
         mIndexer.setDemandVoltage(mPeriodicIO.indexerDemand);
+        mConveyor.set(0.5);
+
         if(mActuateIntake) {
             mIntakeSolenoid.set(mPeriodicIO.intakeDeploy ? Value.kReverse : Value.kForward);
         } else {
@@ -147,6 +159,10 @@ public class Intake extends Subsystem {
         mPeriodicIO.indexerDemand = voltage;
     }
 
+    public void setConveyor(double voltage) {
+        mPeriodicIO.conveyorDemand = voltage;
+    }
+
     public void setIntakeDeploy(boolean deploy) {
         mPeriodicIO.intakeDeploy = deploy;
     }
@@ -171,6 +187,7 @@ public class Intake extends Subsystem {
     @Override
     public void outputTelemetry() {
         SmartDashboard.putNumber("Brush Demand", mPeriodicIO.indexerDemand);
+        SmartDashboard.putNumber("Conveyor Demand", mPeriodicIO.conveyorDemand);
         SmartDashboard.putBoolean("Lid Deploy State", mPeriodicIO.lidDeploy);
     }
 
