@@ -101,6 +101,8 @@ public class SuperstructureStateMachine {
 
     public synchronized void reset() {
         mSystemState = SystemState.IDLE;
+        mIndexState = IndexState.STATE0;
+        mIndexWantedAction = IndexWantedAction.STOP;
     }
 
     public SuperstructureStateMachine() {
@@ -227,10 +229,6 @@ public class SuperstructureStateMachine {
         if(wantedAction == WantedAction.INTAKE_ON) {
             if(currentState.intakeStalled) {
                 return SystemState.UNJAM_INTAKE;
-            }
-
-            if(currentState.ballCount == 3) {
-                return SystemState.INTAKE;
             }
 
             if(currentState.sensorValues[0]) {
@@ -562,6 +560,7 @@ public class SuperstructureStateMachine {
         mDesiredState.brushVoltage = timeInState >= kFeederAimBallsBackTime ? 
             0 : kBrushBallPrepVoltage;
         mDesiredState.feederVoltage = kFeederAimForwardVoltage;
+        mDesiredState.intakeDeploy = true;
     }
 
     private void getAimNoLimelightDesiredState(SuperstructureState currentState, ShootingLocation.Location wantedShootingLocation) {
@@ -574,6 +573,7 @@ public class SuperstructureStateMachine {
         mDesiredState.shooterVoltage = Double.NaN;
         mDesiredState.shooterRPM = wantedShootingLocation.getShooterRPM();
         mDesiredState.hood = wantedShootingLocation.getHoodAngle();
+        mDesiredState.intakeDeploy = true;
     }
 
     private boolean firstBallShot = false;
@@ -581,6 +581,7 @@ public class SuperstructureStateMachine {
     private void getShootDesiredState(SuperstructureState currentState, ShootingLocation.Location wantedShootingLocation, double timestamp) {
         getDefaultDesiredState(currentState);
 
+        mDesiredState.intakeDeploy = true;
         mDesiredState.feederVoltage = kFeederShootVoltage;
         
         double rpmToRecover = Constants.kRapidFire ? 100 : 500;
@@ -611,6 +612,7 @@ public class SuperstructureStateMachine {
             mDesiredState.brushVoltage = 0;
         }
 
+        mDesiredState.conveyorVoltage = 7.0;
         mDesiredState.hood = wantedShootingLocation.getHoodAngle();
     }
 }
