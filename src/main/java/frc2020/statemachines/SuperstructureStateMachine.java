@@ -276,7 +276,7 @@ public class SuperstructureStateMachine {
                     break;
             }
 
-            return SystemState.INTAKE;
+            return SystemState.INDEX;
         }
 
         return defaultTransitions(wantedAction, currentState);
