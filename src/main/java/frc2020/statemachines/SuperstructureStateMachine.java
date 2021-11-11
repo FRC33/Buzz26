@@ -1,14 +1,9 @@
 package frc2020.statemachines;
 
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.trajectory.Trajectory.State;
 import frc2020.Constants;
 import frc2020.ShootingLocation;
-import frc2020.states.LEDState;
-import frc2020.subsystems.Shooter;
 import lib.util.DelayedBoolean;
-import lib.util.LatchedBoolean;
 import lib.util.Util;
 
 public class SuperstructureStateMachine {

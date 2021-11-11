@@ -114,6 +114,7 @@ public class Superstructure extends Subsystem {
                         mIntake.setIntake(newState.intakeVoltage);
                         mIntake.setConveyor(newState.conveyorVoltage);
 
+                        //TODO: Rename all brush actions as agitator
                         if (mBrushOverride == 0) {
                             mIntake.setIndexer(newState.brushVoltage);
                         } else {
