@@ -65,7 +65,7 @@ public class Intake extends Subsystem {
         mIndexer.enableVoltageCompensation(true);
         mIndexer.configVoltageCompSaturation(11.5);
 
-        mConveyor.setInverted(false);
+        mConveyor.setInverted(true);
         mConveyor.setIdleMode(IdleMode.kBrake);
         mConveyor.enableVoltageCompensation(11.5);
     }

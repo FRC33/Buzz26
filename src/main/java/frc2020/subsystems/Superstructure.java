@@ -265,6 +265,14 @@ public class Superstructure extends Subsystem {
         return mStateMachine.getSystemState();
     }
 
+    public synchronized SuperstructureStateMachine.IndexState getIndexState() {
+        return mStateMachine.getIndexState();
+    }
+
+    public synchronized SuperstructureStateMachine.IndexWantedAction getIndexWantedAction() {
+        return mStateMachine.getIndexWantedAction();
+    }
+
     public synchronized boolean systemStateIsIntaking() {
         var systemState = getSystemState();
         return systemStateIsIntaking(systemState);
@@ -301,5 +309,7 @@ public class Superstructure extends Subsystem {
     public void outputTelemetry() { 
         SmartDashboard.putString("Wanted Action", mWantedAction.toString());
         SmartDashboard.putString("System State", getSystemState().toString());
+        SmartDashboard.putString("Index State", getIndexState().toString());
+        SmartDashboard.putString("Index Action", getIndexWantedAction().toString());
     }
 }

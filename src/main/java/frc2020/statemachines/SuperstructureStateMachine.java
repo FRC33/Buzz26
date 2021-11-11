@@ -111,6 +111,14 @@ public class SuperstructureStateMachine {
         return mSystemState;
     }
 
+    public synchronized IndexState getIndexState() {
+        return mIndexState;
+    }
+
+    public synchronized IndexWantedAction getIndexWantedAction() {
+        return mIndexWantedAction;
+    }
+
     //region Main Case Structure
     public synchronized SuperstructureState update(
         double timestamp,
@@ -131,7 +139,7 @@ public class SuperstructureStateMachine {
                 newState = handleIntakeTransitions(wantedAction, currentState, timeInState);
                 break;
             case INDEX:
-                newState = handleIndexTransitions(wantedAction, currentState);
+                newState = handleIndexTransitions(wantedAction, currentState, timeInState);
                 break;
             case INDEX_EXTRA:
                 newState = handleIndexExtraTransitions(wantedAction, currentState, timeInState);
@@ -236,7 +244,7 @@ public class SuperstructureStateMachine {
     }
 
     //LatchedBoolean latch = new LatchedBoolean();
-    private SystemState handleIndexTransitions(WantedAction wantedAction, SuperstructureState currentState) {
+    private SystemState handleIndexTransitions(WantedAction wantedAction, SuperstructureState currentState, double timeInState) {
         if(wantedAction == WantedAction.INTAKE_ON) {
             switch(mIndexState) {
                 case STATE0:
@@ -267,6 +275,30 @@ public class SuperstructureStateMachine {
                         return SystemState.INTAKE;
                     }
                     break;
+                case STATE4:
+                    mIndexWantedAction = IndexWantedAction.BACKWARDS_CONVEY;
+
+                    if (timeInState > 0.5) {
+                        mIndexState = IndexState.STATE5;
+                    }
+
+                    return SystemState.INDEX;
+                case STATE5:
+                    mIndexState = IndexState.STATE6;
+                    mIndexWantedAction = IndexWantedAction.STOP;
+                    return SystemState.INTAKE;
+                case STATE6:
+                if(currentState.sensorValues[0] && currentState.sensorValues[1]) {
+                    mIndexState = IndexState.STATE7;
+                    mIndexWantedAction = IndexWantedAction.ADVANCE_CONVEY_AGI;
+                    return SystemState.INDEX;
+                }
+                case STATE7:
+                if(currentState.sensorValues[1] && currentState.sensorValues[2]) {
+                    mIndexState = IndexState.STATE8;
+                    mIndexWantedAction = IndexWantedAction.STOP;
+                    return SystemState.INDEX;
+                }
                 default:
                     break;
             }
@@ -359,6 +391,7 @@ public class SuperstructureStateMachine {
 
     private SystemState handleShootTransitions(WantedAction wantedAction, SuperstructureState currentState) {
         if(wantedAction == WantedAction.SHOOT) {
+            mIndexState = IndexState.STATE0;
             return SystemState.SHOOT;
         }
         
