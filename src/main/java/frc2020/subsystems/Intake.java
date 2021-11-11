@@ -102,7 +102,7 @@ public class Intake extends Subsystem {
         // Set output
         mIntake.setDemandVoltage(mPeriodicIO.intakeDemand);
         mIndexer.setDemandVoltage(mPeriodicIO.indexerDemand);
-        mConveyor.set(0.5);
+        mConveyor.set(mPeriodicIO.conveyorDemand);
 
         if(mActuateIntake) {
             mIntakeSolenoid.set(mPeriodicIO.intakeDeploy ? Value.kReverse : Value.kForward);

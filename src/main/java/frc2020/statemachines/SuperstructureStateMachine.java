@@ -2,6 +2,7 @@ package frc2020.statemachines;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory.State;
 import frc2020.Constants;
 import frc2020.ShootingLocation;
 import frc2020.states.LEDState;
@@ -43,6 +44,8 @@ public class SuperstructureStateMachine {
     private static final double kShooterRecoveryVoltage = 12;
 
     private SystemState mSystemState = SystemState.IDLE;
+    private IndexState mIndexState = IndexState.STATE0;
+    private IndexWantedAction mIndexWantedAction = IndexWantedAction.STOP;
     private SuperstructureState mDesiredState = new SuperstructureState();
 
     private double mCurrentStateStartTime = 0.0;
@@ -63,6 +66,14 @@ public class SuperstructureStateMachine {
 
     public enum IntakeDeployWantedAction {
         IDLE, INTAKE_OVERRIDE_DOWN, INTAKE_OVERRIDE_UP, LID_OVERRIDE_UP, LID_OVERRIDE_DOWN
+    }
+
+    public enum IndexState {
+        STATE0, STATE1, STATE2, STATE3, STATE4, STATE5, STATE6, STATE7, STATE8
+    }
+
+    public enum IndexWantedAction {
+        ADVANCE_CONVEY_AGI, BACKWARDS_CONVEY, STOP
     }
 
     public static class SuperstructureState {
@@ -232,16 +243,40 @@ public class SuperstructureStateMachine {
     //LatchedBoolean latch = new LatchedBoolean();
     private SystemState handleIndexTransitions(WantedAction wantedAction, SuperstructureState currentState) {
         if(wantedAction == WantedAction.INTAKE_ON) {
-            int stopSensor = Math.max(1, currentState.ballCount);
-            if(!currentState.sensorValues[0] && currentState.sensorValues[stopSensor]) {    
-                return SystemState.INTAKE;
+            switch(mIndexState) {
+                case STATE0:
+                    if(currentState.sensorValues[0]) {
+                        mIndexState = IndexState.STATE1;
+                        mIndexWantedAction = IndexWantedAction.ADVANCE_CONVEY_AGI;
+                        return SystemState.INDEX;
+                    }
+                    break;
+                case STATE1:
+                    if(currentState.sensorValues[1] && !currentState.sensorValues[2]) {
+                        mIndexState = IndexState.STATE2;
+                        mIndexWantedAction = IndexWantedAction.STOP;
+                        return SystemState.INTAKE;
+                    }
+                    break;
+                case STATE2:
+                    if(currentState.sensorValues[0] && currentState.sensorValues[1]) {
+                        mIndexState = IndexState.STATE3;
+                        mIndexWantedAction = IndexWantedAction.ADVANCE_CONVEY_AGI;
+                        return SystemState.INDEX;
+                    }
+                    break;
+                case STATE3:
+                    if(currentState.sensorValues[1] && currentState.sensorValues[2]) {
+                        mIndexState = IndexState.STATE4;
+                        mIndexWantedAction = IndexWantedAction.STOP;
+                        return SystemState.INTAKE;
+                    }
+                    break;
+                default:
+                    break;
             }
 
-            if(currentState.ballCount == 3) {
-                return SystemState.INTAKE;
-            }
-
-            return SystemState.INDEX;
+            return SystemState.INTAKE;
         }
 
         return defaultTransitions(wantedAction, currentState);
@@ -410,10 +445,22 @@ public class SuperstructureStateMachine {
         mDesiredState.lidDeploy = true;
 
         mDesiredState.intakeVoltage = kIntakeVoltage;
-        // Increase index speed with more balls. TODO Remove?
-        //mDesiredState.brushVoltage = kBrushIndexVoltage + (currentState.ballCount * 2.0);
-        mDesiredState.conveyorVoltage = kConveyorVoltage;
-        mDesiredState.brushVoltage = kBrushIndexVoltage;
+
+        switch(mIndexWantedAction) {
+            case ADVANCE_CONVEY_AGI:
+                mDesiredState.conveyorVoltage = kConveyorVoltage;
+                mDesiredState.brushVoltage = kBrushIndexVoltage;
+                break;
+            case BACKWARDS_CONVEY:
+                mDesiredState.conveyorVoltage = 0.0;
+                mDesiredState.brushVoltage = kBrushBlowVoltage;
+                break;
+            case STOP:
+                mDesiredState.conveyorVoltage = 0.0;
+                mDesiredState.brushVoltage = 0.0;
+                break;
+        }
+
         mDesiredState.feederVoltage = kFeederIntakeVoltage;
     }
 
