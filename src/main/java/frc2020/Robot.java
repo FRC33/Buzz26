@@ -394,47 +394,6 @@ public class Robot extends TimedRobot {
         } else {
             mSuperstructure.stopIntakeDeployOverride();
         }
-
-        /*
-        //Climber
-        ClimberStateMachine.WantedAction climberWantedAction = ClimberStateMachine.WantedAction.STOP;
-        if(mHMI.getMastUp()) {
-            climberWantedAction = ClimberStateMachine.WantedAction.MAST_UP;
-        } else if(mHMI.getMastDown()) {
-            climberWantedAction = ClimberStateMachine.WantedAction.MAST_DOWN;
-        } else if(mHMI.getWinchIn()) {
-            climberWantedAction = ClimberStateMachine.WantedAction.WINCH_IN;
-        } else if(mHMI.getWinchOut()) {
-            climberWantedAction = ClimberStateMachine.WantedAction.WINCH_OUT;
-        }
-        mClimber.setWantedAction(climberWantedAction);
-
-        // LEDs
-        
-        // TODO clean up
-        /*
-        if(mClimber.getPartyMode()) {
-            mLED.setState(Color.WHITE, 0, true);
-        } else {
-            if(mSuperstructure.systemStateIsIntaking()) {
-                mLED.setState(Color.WHITE, mInventory.getBallCount(), false);
-            } else {
-                if(mSuperstructure.getSystemState() == SystemState.ENABLE_FLYWHEEL) {
-                    mLED.setState(Color.BLUE, 5, false);
-                } else {
-                    if(mSuperstructure.getSystemState() == SystemState.AIM_LIGHTLIGHT &&
-                        mSuperstructure.getAtRPM()
-                    ) {
-                        if(Math.abs(mDrive.getAutoSteerError()) <= 0.00827266) {
-                            mLED.setState(Color.GREEN, 5, false);
-                        } else {
-                            mLED.setState(Color.BLUE, 5, false);
-                        }
-                    }
-                }
-            }
-        }
-        */
     }
 
     Timer testTimer = new Timer();
